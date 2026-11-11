@@ -946,7 +946,7 @@ function canonLink(url) {
 }
 
 async function loadOrders() {
-  const { data, error } = await sb.from('orders')
+  const { data, error } = await sb.from('video_orders')
     .select('id, kind, video_url, reward, seconds, done, status, created_at')
     .neq('status', 'cancelled')
     .order('created_at', { ascending: false })
