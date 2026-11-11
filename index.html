@@ -2,167 +2,819 @@
 <html lang="my">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>TikTok Boost Service</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Myanmar:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1E1A4D">
+<title>TikTok Boost</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Noto+Sans+Myanmar:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ground: #1E1A4D;
+  --sheet:  #F7F5FF;
+  --ink:    #17143C;
+  --muted:  #6B6890;
+  --line:   #DDD9F2;
+  --soft:   #EFECFC;
+  --cyan:   #25F4EE;
+  --pink:   #FE2C55;
+  --gold:   #FFC933;
+  --ok:     #0A7F5F;
+  --err:    #C80F3A;
+  --sans:    "Noto Sans Myanmar", "Padauk", "Myanmar Text", system-ui, sans-serif;
+  --display: "Bricolage Grotesque", "Noto Sans Myanmar", system-ui, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  font-family: var(--sans);
+  background: var(--ground);
+  color: var(--ink);
+  min-height: 100vh; min-height: 100dvh;
+  line-height: 1.7;
+}
+[hidden] { display: none !important; }
+button { font-family: inherit; }
+button:focus-visible, input:focus-visible { outline: 3px solid var(--pink); outline-offset: 2px; }
+
+.screen {
+  display: flex; flex-direction: column;
+  min-height: 100vh; min-height: 100dvh;
+  max-width: 460px; margin: 0 auto;
+}
+.sheet {
+  flex: 1;
+  background: var(--sheet);
+  border-radius: 28px 28px 0 0;
+  padding: 22px 20px calc(36px + env(safe-area-inset-bottom));
+}
+
+/* ---------- tabs (login/register, earn/spend) ---------- */
+.tabs {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 4px;
+  padding: 4px; margin-bottom: 20px;
+  background: #E9E6FA; border-radius: 14px;
+}
+.tab {
+  border: 0; background: transparent; cursor: pointer;
+  padding: 11px 6px; border-radius: 11px;
+  font-size: 15px; font-weight: 700; color: var(--muted);
+}
+.tab.active { background: var(--ink); color: #fff; }
+
+/* ---------- login / register ---------- */
+.auth-top { padding: 48px 24px 30px; text-align: center; color: #fff; }
+.logo {
+  width: 84px; height: 84px; margin: 0 auto;
+  display: grid; place-items: center;
+  background: #fff; border-radius: 24px;
+  box-shadow: -5px -5px 0 var(--cyan), 5px 5px 0 var(--pink);
+}
+.logo svg { width: 44px; height: 44px; fill: var(--ink); }
+.auth-top h1 {
+  margin-top: 26px;
+  font: 800 46px/1.05 var(--display); letter-spacing: -.02em;
+}
+.tag { margin-top: 12px; font-size: 14px; line-height: 1.9; color: #CBC7F2; }
+
+.panel { display: none; }
+.panel.show { display: block; }
+.field { display: block; margin-bottom: 14px; }
+.field > span { display: block; font-size: 14px; font-weight: 600; margin: 0 0 6px 2px; }
+.input-box {
+  display: flex; align-items: center; gap: 10px;
+  background: #fff; border: 2px solid var(--line);
+  border-radius: 14px; padding: 0 12px;
+  transition: border-color .15s, box-shadow .15s;
+}
+.input-box:focus-within { border-color: var(--ink); box-shadow: 3px 3px 0 var(--cyan); }
+.input-box svg { width: 20px; height: 20px; fill: var(--muted); flex: none; }
+.input-box input {
+  flex: 1; min-width: 0; border: 0; background: transparent;
+  font: inherit; font-size: 16px; color: var(--ink); padding: 13px 0;
+}
+.input-box input:focus-visible { outline: none; }
+.input-box input::placeholder, .text::placeholder { color: #A29FC4; }
+.eye {
+  border: 0; background: transparent; cursor: pointer;
+  display: flex; padding: 6px; margin-right: -4px; border-radius: 8px;
+}
+.eye svg { width: 22px; height: 22px; }
+
+.btn-primary {
+  width: 100%; margin-top: 10px; padding: 15px;
+  font-size: 17px; font-weight: 700; color: #fff;
+  background: var(--ink); border: 0; border-radius: 14px; cursor: pointer;
+  box-shadow: 4px 4px 0 var(--pink);
+  transition: transform .1s, box-shadow .1s;
+}
+.btn-primary:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--pink); }
+.btn-primary:disabled { opacity: .55; cursor: default; }
+.msg { margin-top: 14px; min-height: 22px; font-size: 14px; text-align: center; }
+.msg.ok  { color: var(--ok); }
+.msg.err { color: var(--err); }
+
+/* ---------- app: top bar + wallet ---------- */
+.top {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: calc(14px + env(safe-area-inset-top)) 20px 6px;
+  color: #fff;
+}
+.who { display: flex; align-items: center; gap: 10px; min-width: 0; font-size: 15px; font-weight: 600; }
+.who #who { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.avatar {
+  flex: none; width: 34px; height: 34px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--cyan); color: var(--ink); font: 800 16px var(--display);
+}
+.ghost {
+  flex: none; cursor: pointer; color: #fff; background: transparent;
+  border: 1.5px solid #5D57AB; border-radius: 999px;
+  padding: 4px 14px; font-size: 13px; font-weight: 600;
+}
+
+.wallet { text-align: center; padding: 14px 24px 36px; color: #fff; }
+.coin {
+  width: 72px; height: 72px; margin: 0 auto; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--gold); color: var(--ink);
+  font: 800 34px/1 var(--display);
+  box-shadow: -4px -4px 0 var(--cyan), 4px 4px 0 var(--pink), inset 0 0 0 5px #FFE08A;
+}
+.coin.drop { animation: drop .7s cubic-bezier(.2, 1.3, .4, 1); }
+.bal { margin-top: 22px; font: 800 64px/1 var(--display); letter-spacing: -.03em; }
+.bal.bump { animation: bump .35s ease; }
+.bal-label { margin-top: 6px; font-size: 14px; color: #CBC7F2; }
+
+/* ---------- choice tiles ---------- */
+.tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.tile {
+  display: flex; flex-direction: column; gap: 2px; text-align: left;
+  padding: 14px; cursor: pointer; color: var(--ink);
+  background: #fff; border: 2px solid var(--line); border-radius: 16px;
+  transition: box-shadow .12s, transform .12s;
+}
+.tile svg { width: 26px; height: 26px; fill: var(--ink); margin-bottom: 6px; }
+.tile b { font-size: 15px; line-height: 1.5; }
+.tile small { font-size: 13px; color: var(--muted); }
+.tile.active { background: var(--cyan); border-color: var(--ink); box-shadow: 4px 4px 0 var(--ink); transform: translate(-1px, -1px); }
+.tile.active small { color: var(--ink); }
+
+.hint { padding: 30px 0 6px; text-align: center; font-size: 14px; color: var(--muted); }
+
+/* ---------- earn task ---------- */
+.task {
+  margin-top: 20px; overflow: hidden;
+  background: #fff; border: 2px solid var(--ink); border-radius: 18px;
+  box-shadow: 4px 4px 0 var(--pink);
+}
+.task.pop, .use-panel.pop { animation: pop .3s ease; }
+.task-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px; }
+.reward { font-size: 14px; font-weight: 600; color: var(--muted); }
+.reward b { margin-left: 6px; font: 800 34px var(--display); color: var(--ink); vertical-align: -3px; }
+.desc { margin-top: 2px; font-size: 13px; color: var(--muted); }
+.btn {
+  flex: none; white-space: nowrap; cursor: pointer;
+  padding: 11px 20px; border: 0; border-radius: 999px;
+  font-size: 15px; font-weight: 700; color: #fff; background: var(--ink);
+}
+.btn:disabled { opacity: .7; cursor: default; }
+.btn.claim { background: var(--gold); color: var(--ink); animation: pulse 1s infinite; }
+.btn.next  { background: var(--cyan); color: var(--ink); }
+.progress { display: none; height: 10px; background: var(--line); }
+.progress.on { display: block; }
+.progress div { width: 0; height: 100%; background: var(--pink); transition: width 1s linear; }
+
+/* ---------- spend panel ---------- */
+.use-panel { margin-top: 20px; }
+.use-panel .type { font-size: 18px; font-weight: 700; }
+.field-label { margin: 18px 0 8px; font-size: 14px; font-weight: 600; }
+.note { margin: -2px 0 10px; font-size: 13px; line-height: 1.7; color: var(--muted); }
+.text {
+  width: 100%; padding: 13px 14px;
+  font: inherit; font-size: 16px; color: var(--ink);
+  background: #fff; border: 2px solid var(--line); border-radius: 14px;
+  transition: border-color .15s, box-shadow .15s;
+}
+.text:focus { outline: none; border-color: var(--ink); box-shadow: 3px 3px 0 var(--cyan); }
+.chips { display: grid; gap: 8px; }
+.c6 { grid-template-columns: repeat(6, 1fr); }
+.c3 { grid-template-columns: repeat(3, 1fr); }
+.chip {
+  padding: 12px 0; cursor: pointer; color: var(--ink);
+  font-size: 16px; font-weight: 700;
+  background: #fff; border: 2px solid var(--line); border-radius: 12px;
+}
+.c3 .chip { font-size: 14px; }
+.chip.active { background: var(--cyan); border-color: var(--ink); box-shadow: 2px 2px 0 var(--ink); }
+.cost {
+  display: flex; align-items: baseline; justify-content: space-between;
+  margin-top: 20px; padding: 14px 16px;
+  background: var(--soft); border-radius: 14px;
+  font-size: 14px; color: var(--muted);
+}
+.cost b { font: 800 28px/1 var(--display); color: var(--ink); }
+.cost b small { margin-left: 4px; font: 600 13px var(--sans); color: var(--muted); }
+
+@keyframes pop   { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes pulse { 50% { transform: scale(1.07); } }
+@keyframes bump  { 40% { transform: scale(1.18); } }
+@keyframes drop  { from { opacity: 0; transform: translateY(-28px) rotate(-120deg) scale(.6); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
 </head>
 <body>
 
 <!-- ================= Login / Register ================= -->
 <div class="screen" id="authScreen">
-  <div class="auth-wrap">
+  <div class="auth-top">
+    <div class="logo">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.6 5.8A4.3 4.3 0 0 1 15.5 3h-3.1v12.4a2.6 2.6 0 1 1-2.6-2.6c.3 0 .5 0 .8.1V9.7a5.7 5.7 0 1 0 4.9 5.7V9a7.3 7.3 0 0 0 4.3 1.4V7.3a4.3 4.3 0 0 1-3.2-1.5z"/></svg>
+    </div>
+    <h1>TikTok Boost</h1>
+    <p class="tag">Like တစ်ခုအတွက် Like တစ်ခု<br>ကြည့်ရှုမှုတစ်ခုအတွက် ကြည့်ရှုမှု</p>
+  </div>
 
-    <div class="auth-hero">
-      <div class="logo">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.6 5.8A4.3 4.3 0 0 1 15.5 3h-3.1v12.4a2.6 2.6 0 1 1-2.6-2.6c.3 0 .5 0 .8.1V9.7a5.7 5.7 0 1 0 4.9 5.7V9a7.3 7.3 0 0 0 4.3 1.4V7.3a4.3 4.3 0 0 1-3.2-1.5z"/></svg>
-      </div>
-      <h1>TikTok Boost Service<span>မှကြိုဆိုပါတယ်</span></h1>
-      <p class="auth-sub">Like တစ်ခုအတွက် Like တစ်ခု ကြည့်ရှုမှုတစ်ခုအတွက် ကြည့်ရှုမှု<br>အလွယ်တစ်ကူရယူမည်</p>
+  <div class="sheet">
+    <div class="tabs" id="authTabs" role="tablist">
+      <button type="button" class="tab active" data-mode="login" role="tab" aria-selected="true">အကောင့်ဝင်မည်</button>
+      <button type="button" class="tab" data-mode="register" role="tab" aria-selected="false">အကောင့်သစ်ဖွင့်မည်</button>
     </div>
 
-    <div class="auth-card">
-      <div class="select-wrap">
-        <select id="authMode">
-          <option value="login" selected>အကောင့်ရှိပြီးသား</option>
-          <option value="register">အကောင့်သစ်ဖွင့်မည်</option>
-        </select>
-      </div>
-
-      <!-- Login -->
-      <div class="auth-panel" id="loginPanel">
-        <label class="field">
-          <span>သင့်ရဲ့ နာမည်</span>
-          <div class="input-box">
-            <svg viewBox="0 0 24 24"><path d="M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9zm0 2c-4 0-8 2-8 5v2h16v-2c0-3-4-5-8-5z"/></svg>
-            <input type="text" id="loginName" autocomplete="username" autocapitalize="none" placeholder="နာမည်ထည့်ပါ">
-          </div>
-        </label>
-        <label class="field">
-          <span>စကားဝှက်</span>
-          <div class="input-box">
-            <svg viewBox="0 0 24 24"><path d="M17 9V7a5 5 0 0 0-10 0v2H5v12h14V9h-2zm-8-2a3 3 0 0 1 6 0v2H9V7z"/></svg>
-            <input type="password" id="loginPass" autocomplete="current-password" placeholder="စကားဝှက်ထည့်ပါ">
-            <button type="button" class="eye" data-for="loginPass" aria-label="စကားဝှက်ပြရန်"><svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.7 7.6 1 12c1.7 4.4 6 7.5 11 7.5s9.3-3.1 11-7.5c-1.7-4.4-6-7.5-11-7.5zM12 17a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/></svg></button>
-          </div>
-        </label>
-        <button type="button" class="auth-btn" id="loginBtn">ဝင်မည်</button>
-        <div class="msg" id="loginMsg"></div>
-      </div>
-
-      <!-- Register -->
-      <div class="auth-panel" id="registerPanel">
-        <label class="field">
-          <span>အသုံးပြုမည့်နာမည်</span>
-          <div class="input-box">
-            <svg viewBox="0 0 24 24"><path d="M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9zm0 2c-4 0-8 2-8 5v2h16v-2c0-3-4-5-8-5z"/></svg>
-            <input type="text" id="regName" autocomplete="username" autocapitalize="none" placeholder="အနည်းဆုံး ၃ လုံး">
-          </div>
-        </label>
-        <label class="field">
-          <span>စကားဝှက်</span>
-          <div class="input-box">
-            <svg viewBox="0 0 24 24"><path d="M17 9V7a5 5 0 0 0-10 0v2H5v12h14V9h-2zm-8-2a3 3 0 0 1 6 0v2H9V7z"/></svg>
-            <input type="password" id="regPass" autocomplete="new-password" placeholder="အနည်းဆုံး ၆ လုံး">
-            <button type="button" class="eye" data-for="regPass" aria-label="စကားဝှက်ပြရန်"><svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.7 7.6 1 12c1.7 4.4 6 7.5 11 7.5s9.3-3.1 11-7.5c-1.7-4.4-6-7.5-11-7.5zM12 17a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/></svg></button>
-          </div>
-        </label>
-        <label class="field">
-          <span>စကားဝှက်အား ပြန်ရိုက်ပါ</span>
-          <div class="input-box">
-            <svg viewBox="0 0 24 24"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>
-            <input type="password" id="regPass2" autocomplete="new-password" placeholder="စကားဝှက်ကို ထပ်ရိုက်ပါ">
-            <button type="button" class="eye" data-for="regPass2" aria-label="စကားဝှက်ပြရန်"><svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.7 7.6 1 12c1.7 4.4 6 7.5 11 7.5s9.3-3.1 11-7.5c-1.7-4.4-6-7.5-11-7.5zM12 17a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/></svg></button>
-          </div>
-        </label>
-        <button type="button" class="auth-btn" id="regBtn">အကောင့်ဖွင့်မည်</button>
-        <div class="msg" id="regMsg"></div>
-      </div>
+    <!-- Login (show ကို HTML ထဲမှာ ကြိုထည့်ထား၊ JS မလိုဘဲ ပေါ်မယ်) -->
+    <div class="panel show" id="loginPanel">
+      <label class="field">
+        <span>နာမည်</span>
+        <div class="input-box">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9zm0 2c-4 0-8 2-8 5v2h16v-2c0-3-4-5-8-5z"/></svg>
+          <input type="text" id="loginName" autocomplete="username" autocapitalize="none" placeholder="နာမည်ထည့်ပါ">
+        </div>
+      </label>
+      <label class="field">
+        <span>စကားဝှက်</span>
+        <div class="input-box">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 9V7a5 5 0 0 0-10 0v2H5v12h14V9h-2zm-8-2a3 3 0 0 1 6 0v2H9V7z"/></svg>
+          <input type="password" id="loginPass" autocomplete="current-password" placeholder="စကားဝှက်ထည့်ပါ">
+          <button type="button" class="eye" data-for="loginPass" aria-label="စကားဝှက်ပြရန်"></button>
+        </div>
+      </label>
+      <button type="button" class="btn-primary" id="loginBtn">အကောင့်ဝင်မည်</button>
+      <div class="msg" id="loginMsg" role="status"></div>
     </div>
 
+    <!-- Register -->
+    <div class="panel" id="registerPanel">
+      <label class="field">
+        <span>အသုံးပြုမည့်နာမည်</span>
+        <div class="input-box">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9zm0 2c-4 0-8 2-8 5v2h16v-2c0-3-4-5-8-5z"/></svg>
+          <input type="text" id="regName" autocomplete="username" autocapitalize="none" placeholder="အနည်းဆုံး ၃ လုံး">
+        </div>
+      </label>
+      <label class="field">
+        <span>စကားဝှက်</span>
+        <div class="input-box">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 9V7a5 5 0 0 0-10 0v2H5v12h14V9h-2zm-8-2a3 3 0 0 1 6 0v2H9V7z"/></svg>
+          <input type="password" id="regPass" autocomplete="new-password" placeholder="အနည်းဆုံး ၆ လုံး">
+          <button type="button" class="eye" data-for="regPass" aria-label="စကားဝှက်ပြရန်"></button>
+        </div>
+      </label>
+      <label class="field">
+        <span>စကားဝှက်ကို ပြန်ရိုက်ပါ</span>
+        <div class="input-box">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>
+          <input type="password" id="regPass2" autocomplete="new-password" placeholder="စကားဝှက်ကို ထပ်ရိုက်ပါ">
+          <button type="button" class="eye" data-for="regPass2" aria-label="စကားဝှက်ပြရန်"></button>
+        </div>
+      </label>
+      <button type="button" class="btn-primary" id="regBtn">အကောင့်ဖွင့်မည်</button>
+      <div class="msg" id="regMsg" role="status"></div>
+    </div>
   </div>
 </div>
 
 <!-- ================= Main App ================= -->
 <div class="screen" id="appScreen" hidden>
-<header>
-  သင့်ရဲ့ Credit : <span id="credit">0</span>
-  <div class="who">👤 <span id="who"></span><button type="button" id="logoutBtn">ထွက်ရန်</button></div>
-</header>
+  <header class="top">
+    <div class="who"><span class="avatar" id="avatar">?</span><span id="who"></span></div>
+    <button type="button" class="ghost" id="logoutBtn">ထွက်ရန်</button>
+  </header>
 
-<main>
-  <h2>ရွေးချယ်ပါ</h2>
+  <section class="wallet" aria-live="polite">
+    <div class="coin" id="coin" aria-hidden="true">C</div>
+    <div class="bal" id="credit">0</div>
+    <div class="bal-label">သင့်ရဲ့ Credit</div>
+  </section>
 
-  <div class="select-wrap">
-    <select id="action">
-      <option value="" selected disabled>Credit ယူရန်</option>
-      <option value="watch">TikTok ကြည့်ရန်</option>
-      <option value="like">TikTok Like ပေးရန်</option>
-    </select>
-  </div>
+  <div class="sheet">
+    <div class="tabs" id="appTabs" role="tablist">
+      <button type="button" class="tab active" data-view="earn" role="tab" aria-selected="true">Credit ယူရန်</button>
+      <button type="button" class="tab" data-view="spend" role="tab" aria-selected="false">Credit သုံးရန်</button>
+    </div>
 
-  <p class="hint" id="hint">အပေါ်က Dropdown မှာ ရွေးချယ်ပါ</p>
-
-  <!-- Clip -->
-  <div class="clip" id="clip">
-    <div class="bar">
-      <div>
-        <div class="title" id="clipTitle"></div>
-        <div class="desc" id="clipDesc"></div>
+    <!-- Credit ယူရန် -->
+    <div id="earnView">
+      <div class="tiles" id="earnTiles">
+        <button type="button" class="tile" data-v="watch">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.5C7 4.5 2.7 7.6 1 12c1.7 4.4 6 7.5 11 7.5s9.3-3.1 11-7.5c-1.7-4.4-6-7.5-11-7.5zM12 17a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/></svg>
+          <b>TikTok ကြည့်ရန်</b><small class="rw"></small>
+        </button>
+        <button type="button" class="tile" data-v="like">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+          <b>TikTok Like ပေးရန်</b><small class="rw"></small>
+        </button>
       </div>
-      <button class="btn" id="clipBtn"></button>
-    </div>
-    <div class="progress" id="progress"><div id="progressFill"></div></div>
-  </div>
 
-  <!-- Credit သုံးရန် -->
-  <div class="use">
-    <div class="select-wrap">
-      <select id="useCredit">
-        <option value="" selected disabled>Credit ကိုသုံးရန်</option>
-        <option value="like">TikTok Like</option>
-        <option value="views">TikTok ကြည့်ရှုမှု</option>
-      </select>
-    </div>
+      <p class="hint" id="hint">အပေါ်က တစ်ခုကို ရွေးပါ</p>
 
-    <div class="use-panel" id="usePanel">
-      <div class="type" id="useTitle"></div>
-
-      <div class="label">သင့်ရဲ့ TikTok Video Link</div>
-      <input type="url" id="videoLink" inputmode="url" placeholder="https://www.tiktok.com/@name/video/...">
-
-      <div id="durBlock" style="display:none">
-        <div class="label">ကြည့်ရှုမည့် ကြာချိန်</div>
-        <div class="chips dur-chips" id="durChips">
-          <button type="button" class="chip active" data-sec="6" data-cost="8">6 စက္ကန့်</button>
-          <button type="button" class="chip" data-sec="30" data-cost="30">30 စက္ကန့်</button>
-          <button type="button" class="chip" data-sec="60" data-cost="50">1 မိနစ်</button>
+      <div class="task" id="clip" hidden>
+        <div class="task-row">
+          <div>
+            <div class="reward" id="clipTitle"></div>
+            <div class="desc" id="clipDesc"></div>
+          </div>
+          <button type="button" class="btn" id="clipBtn"></button>
         </div>
-        <div class="cost-box"><span>ကုန်ကျမည့် Credit</span><b id="costVal">8 Credit</b></div>
+        <div class="progress" id="progress"><div id="progressFill"></div></div>
+      </div>
+    </div>
+
+    <!-- Credit သုံးရန် -->
+    <div id="spendView" hidden>
+      <div class="tiles" id="useTiles">
+        <button type="button" class="tile" data-v="like">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+          <b>TikTok Like</b><small>ကိုယ့် Video အတွက်</small>
+        </button>
+        <button type="button" class="tile" data-v="views">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.5C7 4.5 2.7 7.6 1 12c1.7 4.4 6 7.5 11 7.5s9.3-3.1 11-7.5c-1.7-4.4-6-7.5-11-7.5zM12 17a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/></svg>
+          <b>TikTok ကြည့်ရှုမှု</b><small>ကိုယ့် Video အတွက်</small>
+        </button>
       </div>
 
-      <div id="amountBlock">
-      <div class="label">အသုံးပြုမယ့် Credit ပမာဏ</div>
-      <div class="note">လုပ်ဆောင်မှု တစ်ခုအတွက်သုံးမည့် Credit ပမာဏ များလေ ပိုမိုမြန်ဆန်လေဖြစ်သည်</div>
-      <div class="chips" id="chips">
-        <button type="button" class="chip active" data-n="1">1</button>
-        <button type="button" class="chip" data-n="2">2</button>
-        <button type="button" class="chip" data-n="3">3</button>
-        <button type="button" class="chip" data-n="4">4</button>
-        <button type="button" class="chip" data-n="5">5</button>
-        <button type="button" class="chip" data-n="6">6</button>
-      </div>
-      </div>
+      <div class="use-panel" id="usePanel" hidden>
+        <div class="type" id="useTitle"></div>
 
-      <button type="button" class="done-btn" id="doneBtn">ရပြီ</button>
-      <div class="msg" id="useMsg"></div>
+        <div class="field-label">သင့်ရဲ့ TikTok Video Link</div>
+        <input class="text" type="url" id="videoLink" inputmode="url" autocapitalize="none" placeholder="https://www.tiktok.com/@name/video/...">
+
+        <div id="durBlock" hidden>
+          <div class="field-label">ကြည့်ရှုမည့် ကြာချိန်</div>
+          <div class="chips c3" id="durChips">
+            <button type="button" class="chip active" data-sec="6" data-cost="8">6 စက္ကန့်</button>
+            <button type="button" class="chip" data-sec="30" data-cost="30">30 စက္ကန့်</button>
+            <button type="button" class="chip" data-sec="60" data-cost="50">1 မိနစ်</button>
+          </div>
+        </div>
+
+        <div id="amountBlock">
+          <div class="field-label">အသုံးပြုမယ့် Credit ပမာဏ</div>
+          <p class="note">သုံးမည့် Credit များလေ ပိုမြန်လေ ဖြစ်သည်</p>
+          <div class="chips c6" id="chips">
+            <button type="button" class="chip active" data-n="1">1</button>
+            <button type="button" class="chip" data-n="2">2</button>
+            <button type="button" class="chip" data-n="3">3</button>
+            <button type="button" class="chip" data-n="4">4</button>
+            <button type="button" class="chip" data-n="5">5</button>
+            <button type="button" class="chip" data-n="6">6</button>
+          </div>
+        </div>
+
+        <div class="cost"><span>ကုန်ကျမည့် Credit</span><b><span id="costVal">1</span><small>Credit</small></b></div>
+        <button type="button" class="btn-primary" id="doneBtn">မှာယူမည်</button>
+        <div class="msg" id="useMsg" role="status"></div>
+      </div>
     </div>
   </div>
-</main>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="script.js"></script>
+<script>
+// ================= Config (Supabase URL + anon public key) =================
+window.APP_CONFIG = {
+  SUPABASE_URL: 'https://dzszuhsfrfaumcvrtouf.supabase.co',
+  SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR6c3p1aHNmcmZhdW1jdnJ0b3VmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ0MjM4OTUsImV4cCI6MjEwOTk5OTg5NX0.ovpL1EAi2pRRoyCCxe3vRLlkobRLgfUR9FJCJv__9rk',
+  EMAIL_DOMAIN: 'gmail.com'
+};
 
+// ================= Supabase =================
+const cfg = window.APP_CONFIG || {};
+const configured = !!(cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY &&
+                      !/YOUR[-_]/i.test(cfg.SUPABASE_URL + cfg.SUPABASE_ANON_KEY));
+const sb = configured && window.supabase
+  ? window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY)
+  : null;
+
+const ERR = {
+  INSUFFICIENT_CREDIT: 'Credit မလုံလောက်ပါ',
+  INVALID_LINK:        'TikTok Video Link ကို မှန်ကန်စွာ ထည့်ပါ',
+  INVALID_OPTION:      'ရွေးချယ်မှု မှားနေပါသည်',
+  TOO_EARLY:           'ခဏစောင့်ပြီး ထပ်နှိပ်ပါ',
+  NO_TASK:             'အစကပြန်စပါ'
+};
+function errText(e) {
+  const m = (e && e.message) || '';
+  for (const k in ERR) if (m.includes(k)) return ERR[k];
+  if (/JWT|expired|not authenticated/i.test(m)) return 'Login သက်တမ်းကုန်သွားပါပြီ၊ ပြန်ဝင်ပါ';
+  return 'ချိတ်ဆက်မှု မအောင်မြင်ပါ၊ ထပ်ကြိုးစားပါ';
+}
+
+const $ = (id) => document.getElementById(id);
+const REWARD = 3;          // ရရှိမည့် Credit (SQL ထဲက reward နဲ့ တူရမယ်)
+const WATCH_SECONDS = 5;   // (SQL ထဲက ၅ စက္ကန့်နဲ့ တူရမယ်)
+
+function restart(el, cls) { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
+
+// ---------- small UI helpers ----------
+function bindTabs(tabsEl, onPick) {
+  tabsEl.addEventListener('click', (e) => {
+    const t = e.target.closest('.tab');
+    if (!t) return;
+    tabsEl.querySelectorAll('.tab').forEach(x => {
+      x.classList.toggle('active', x === t);
+      x.setAttribute('aria-selected', x === t ? 'true' : 'false');
+    });
+    onPick(t.dataset);
+  });
+}
+function bindTiles(el, onPick) {
+  el.addEventListener('click', (e) => {
+    const t = e.target.closest('.tile');
+    if (!t) return;
+    el.querySelectorAll('.tile').forEach(x => x.classList.toggle('active', x === t));
+    onPick(t.dataset.v);
+  });
+}
+
+// ---------- Credit ----------
+const creditEl = $('credit');
+let credit = 0;
+function setCredit(n, animate) {
+  credit = n;
+  creditEl.textContent = n;
+  if (animate) restart(creditEl, 'bump');
+}
+document.querySelectorAll('.rw').forEach(el => el.textContent = '+' + REWARD + ' Credit');
+
+// ---------- Credit ယူရန် ----------
+const DATA = {
+  watch: { desc: 'TikTok ကြည့်ပါ',    btn: 'ကြည့်ရန်' },
+  like:  { desc: 'TikTok Like ပေးပါ', btn: 'Like ပေးရန်' }
+};
+const clip     = $('clip');
+const hint     = $('hint');
+const clipBtn  = $('clipBtn');
+const descEl   = $('clipDesc');
+const progress = $('progress');
+const fill     = $('progressFill');
+let kind  = '';
+let timer = null;
+let state = 'idle';            // idle | watching | ready | done
+
+bindTabs($('appTabs'), (d) => {
+  $('earnView').hidden  = d.view !== 'earn';
+  $('spendView').hidden = d.view !== 'spend';
+});
+
+bindTiles($('earnTiles'), (v) => {
+  kind = v;
+  clip.hidden = false;
+  restart(clip, 'pop');
+  $('clipTitle').innerHTML = 'ရရှိမည့် Credit <b>' + REWARD + '</b>';
+  hint.hidden = true;
+  resetWatch();
+});
+
+function resetWatch() {
+  clearInterval(timer);
+  state = 'idle';
+  const d = DATA[kind];
+  clipBtn.disabled = false;
+  clipBtn.classList.remove('claim', 'next');
+  clipBtn.textContent = d.btn;
+  descEl.textContent  = d.desc;
+  progress.classList.remove('on');
+  fill.style.width = '0';
+}
+
+function startWatch() {
+  state = 'watching';
+  let left = WATCH_SECONDS;
+  clipBtn.disabled = true;
+  clipBtn.textContent = left + 's';
+  descEl.textContent  = 'ကြည့်နေသည်... ' + left + ' စက္ကန့်';
+  progress.classList.add('on');
+  fill.style.transition = 'none';
+  fill.style.width = '0';
+  void fill.offsetWidth;
+  fill.style.transition = 'width 1s linear';
+
+  timer = setInterval(() => {
+    if (document.hidden) return;          // tab ကိုမြင်နေမှသာ ရေတွက်မယ်
+    left--;
+    fill.style.width = ((WATCH_SECONDS - left) / WATCH_SECONDS * 100) + '%';
+    if (left > 0) {
+      clipBtn.textContent = left + 's';
+      descEl.textContent  = 'ကြည့်နေသည်... ' + left + ' စက္ကန့်';
+    } else {
+      clearInterval(timer);
+      showClaim(WATCH_SECONDS + ' စက္ကန့် ပြည့်ပါပြီ!');
+    }
+  }, 1000);
+}
+
+function showClaim(msg) {
+  state = 'ready';
+  clipBtn.disabled = false;
+  clipBtn.classList.add('claim');
+  clipBtn.textContent = 'Credit ' + REWARD + ' ရယူပါ';
+  descEl.textContent  = msg;
+}
+
+async function claimCredit() {
+  const { data, error } = await sb.rpc('claim_reward');
+  if (error) {
+    descEl.textContent = errText(error);
+    if ((error.message || '').includes('NO_TASK')) resetWatch();
+    return;
+  }
+  setCredit(data, true);
+  state = 'done';
+  clipBtn.classList.remove('claim');
+  clipBtn.classList.add('next');
+  clipBtn.textContent = 'နောက်တစ်ပုဒ်';
+  descEl.textContent  = '+' + REWARD + ' Credit ရပါပြီ ✓';
+}
+
+let busy = false;
+clipBtn.addEventListener('click', async () => {
+  if (!kind || busy) return;
+  busy = true;
+  try {
+    if (state === 'idle') {
+      const { error } = await sb.rpc('start_task', { p_kind: kind });
+      if (error) { descEl.textContent = errText(error); return; }
+      if (kind === 'watch') startWatch();                 // 5s timer
+      else showClaim('Like ပေးပြီးပါပြီ!');                // Like: timer မပါ
+    } else if (state === 'ready') {
+      await claimCredit();
+    } else if (state === 'done') {
+      resetWatch();
+    }
+  } catch (e) {
+    descEl.textContent = errText(e);
+  } finally { busy = false; }
+});
+
+// ---------- Credit သုံးရန် ----------
+const usePanel    = $('usePanel');
+const useTitle    = $('useTitle');
+const linkInput   = $('videoLink');
+const chipsEl     = $('chips');
+const durChips    = $('durChips');
+const durBlock    = $('durBlock');
+const amountBlock = $('amountBlock');
+const costVal     = $('costVal');
+const doneBtn     = $('doneBtn');
+const useMsg      = $('useMsg');
+const USE_LABEL = { like: 'TikTok Like', views: 'TikTok ကြည့်ရှုမှု' };
+let service = '';
+let amount = 1;
+let viewCost = 8, viewLabel = '6 စက္ကန့်', viewSec = 6;
+
+function cost() { return service === 'views' ? viewCost : amount; }
+function updateCost() { costVal.textContent = cost(); }
+function setMsg(text, ok) {
+  useMsg.textContent = text;
+  useMsg.className = 'msg ' + (ok ? 'ok' : 'err');
+}
+function validTikTok(url) {
+  try {
+    const u = new URL(url.trim());
+    return /(^|\.)tiktok\.com$/i.test(u.hostname);
+  } catch (e) { return false; }
+}
+
+bindTiles($('useTiles'), (v) => {
+  service = v;
+  useTitle.textContent = USE_LABEL[v];
+  durBlock.hidden    = v !== 'views';
+  amountBlock.hidden = v === 'views';
+  usePanel.hidden = false;
+  restart(usePanel, 'pop');
+  useMsg.textContent = '';
+  updateCost();
+});
+
+chipsEl.addEventListener('click', (e) => {
+  const chip = e.target.closest('.chip');
+  if (!chip) return;
+  chipsEl.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  chip.classList.add('active');
+  amount = parseInt(chip.dataset.n, 10);
+  updateCost();
+});
+
+durChips.addEventListener('click', (e) => {
+  const chip = e.target.closest('.chip');
+  if (!chip) return;
+  durChips.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  chip.classList.add('active');
+  viewCost  = parseInt(chip.dataset.cost, 10);
+  viewLabel = chip.textContent;
+  viewSec   = parseInt(chip.dataset.sec, 10);
+  updateCost();
+});
+
+doneBtn.addEventListener('click', async () => {
+  if (!service || doneBtn.disabled) return;
+  if (!validTikTok(linkInput.value)) {
+    setMsg('TikTok Video Link ကို မှန်ကန်စွာ ထည့်ပါ', false);
+    return;
+  }
+  const price = cost();
+  if (credit < price) {
+    setMsg('Credit မလုံလောက်ပါ (လက်ကျန် ' + credit + ')', false);
+    return;
+  }
+  const isViews = service === 'views';
+  doneBtn.disabled = true;
+  try {
+    const { data, error } = await sb.rpc('spend_credit', {
+      p_service: service,
+      p_option:  isViews ? viewSec : amount,
+      p_link:    linkInput.value.trim()
+    });
+    if (error) { setMsg(errText(error), false); return; }
+    setCredit(data, true);
+    const extra = isViews ? ' (' + viewLabel + ')' : '';
+    setMsg('✓ ' + USE_LABEL[service] + extra + ' အတွက် Credit ' + price + ' သုံးပြီးပါပြီ', true);
+    linkInput.value = '';
+  } catch (e) {
+    setMsg(errText(e), false);
+  } finally {
+    doneBtn.disabled = false;
+  }
+});
+
+// ================= Login / Register =================
+const authScreen = $('authScreen');
+const appScreen  = $('appScreen');
+const loginPanel = $('loginPanel');
+const regPanel   = $('registerPanel');
+
+function authMsg(id, text, ok) {
+  const el = $(id);
+  el.textContent = text;
+  el.className = 'msg ' + (ok ? 'ok' : 'err');
+}
+
+// Supabase Auth ၏ login key အတွက် နာမည်ကနေ ID တစ်ခုကို အတွင်းမှာ ဖန်တီးသည် (user က email မထည့်ရ)
+async function nameToEmail(name) {
+  const key = name.trim().normalize('NFC').toLowerCase();
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(key));
+  const hex = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+  return 'u' + hex.slice(0, 40) + '@' + (cfg.EMAIL_DOMAIN || 'gmail.com');
+}
+
+let enterErr = null;
+function errSuffix() { return enterErr ? ' [' + (enterErr.code || enterErr.message || '') + ']' : ''; }
+
+function loadProfile(user) {
+  return sb.from('profiles').select('username, credit').eq('id', user.id).maybeSingle();
+}
+
+async function enterApp(user) {
+  enterErr = null;
+  let { data, error } = await loadProfile(user);
+  if (!error && !data) {                       // profile မရှိသေးရင် ဖန်တီးပြီး ပြန်ယူ
+    const r = await sb.rpc('ensure_profile');
+    if (r.error) error = r.error;
+    else ({ data, error } = await loadProfile(user));
+  }
+  if (error || !data) {
+    enterErr = error || { message: 'no profile' };
+    console.error('enterApp failed:', enterErr);
+    return false;
+  }
+  $('who').textContent = data.username;
+  $('avatar').textContent = (Array.from(data.username)[0] || '?').toUpperCase();
+  setCredit(data.credit);
+  authScreen.hidden = true;
+  appScreen.hidden = false;
+  window.scrollTo(0, 0);
+  restart($('coin'), 'drop');
+  return true;
+}
+
+function showPanel(panel) {
+  [loginPanel, regPanel].forEach(p => p.classList.remove('show'));
+  panel.classList.add('show');
+}
+
+bindTabs($('authTabs'), (d) => {
+  $('loginMsg').textContent = '';
+  $('regMsg').textContent = '';
+  showPanel(d.mode === 'login' ? loginPanel : regPanel);
+});
+
+$('loginBtn').addEventListener('click', async () => {
+  const btn  = $('loginBtn');
+  const name = $('loginName').value.trim();
+  const pass = $('loginPass').value;
+  if (!name || !pass) { authMsg('loginMsg', 'နာမည်နှင့် စကားဝှက်ကို ထည့်ပါ', false); return; }
+  btn.disabled = true;
+  try {
+    const { data, error } = await sb.auth.signInWithPassword({
+      email: await nameToEmail(name), password: pass
+    });
+    if (error) {
+      authMsg('loginMsg', 'နာမည် သို့မဟုတ် စကားဝှက် မှားနေပါသည်', false);
+      return;
+    }
+    $('loginPass').value = '';
+    if (!(await enterApp(data.user))) authMsg('loginMsg', 'အချက်အလက် ရယူမရပါ၊ ထပ်ကြိုးစားပါ' + errSuffix(), false);
+  } catch (e) {
+    authMsg('loginMsg', 'ချိတ်ဆက်မှု မအောင်မြင်ပါ (HTTPS သို့မဟုတ် localhost ဖြင့်ဖွင့်ပါ)', false);
+  } finally { btn.disabled = false; }
+});
+
+$('regBtn').addEventListener('click', async () => {
+  const btn   = $('regBtn');
+  const name  = $('regName').value.trim();
+  const pass  = $('regPass').value;
+  const pass2 = $('regPass2').value;
+
+  if (name.length < 3)  { authMsg('regMsg', 'နာမည် အနည်းဆုံး ၃ လုံးထည့်ပါ', false); return; }
+  if (name.length > 20) { authMsg('regMsg', 'နာမည် အများဆုံး ၂၀ လုံးသာ ထည့်နိုင်ပါသည်', false); return; }
+  if (pass.length < 6)  { authMsg('regMsg', 'စကားဝှက် အနည်းဆုံး ၆ လုံးထည့်ပါ', false); return; }
+  if (pass !== pass2)   { authMsg('regMsg', 'စကားဝှက် နှစ်ခု မတူပါ', false); return; }
+
+  btn.disabled = true;
+  try {
+    const { data, error } = await sb.auth.signUp({
+      email: await nameToEmail(name),
+      password: pass,
+      options: { data: { username: name } }
+    });
+    if (error) {
+      authMsg('regMsg', (error.code === 'user_already_exists' || /already|registered/i.test(error.message))
+        ? 'ဒီနာမည်ကို အသုံးပြုပြီးသားပါ'
+        : 'အကောင့်ဖွင့်မရပါ (' + (error.code || error.message) + ')', false);
+      return;
+    }
+    if (!data.session) { authMsg('regMsg', 'အကောင့်ဖွင့်မရပါ၊ ထပ်ကြိုးစားပါ', false); return; }
+
+    ['regName', 'regPass', 'regPass2'].forEach(id => $(id).value = '');
+    if (!(await enterApp(data.user))) authMsg('regMsg', 'အချက်အလက် ရယူမရပါ၊ ပြန်ဝင်ကြည့်ပါ' + errSuffix(), false);
+  } catch (e) {
+    authMsg('regMsg', 'ချိတ်ဆက်မှု မအောင်မြင်ပါ (HTTPS သို့မဟုတ် localhost ဖြင့်ဖွင့်ပါ)', false);
+  } finally { btn.disabled = false; }
+});
+
+// show / hide password
+const EYE_ON  = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#6B6890" d="M12 4.5C7 4.5 2.7 7.6 1 12c1.7 4.4 6 7.5 11 7.5s9.3-3.1 11-7.5c-1.7-4.4-6-7.5-11-7.5zM12 17a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/></svg>';
+const EYE_OFF = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#17143C" d="M12 7c2.8 0 5 2.2 5 5 0 .6-.1 1.3-.4 1.8l2.9 2.9c1.5-1.3 2.7-3 3.5-4.7-1.7-4.4-6-7.5-11-7.5-1.4 0-2.7.2-4 .7l2.2 2.2c.6-.3 1.2-.4 1.8-.4zM2 4.3l2.3 2.3.5.5C3.1 8.5 1.8 10.2 1 12c1.7 4.4 6 7.5 11 7.5 1.5 0 3-.3 4.4-.8l.4.4 2.9 2.9 1.3-1.3L3.3 3 2 4.3zM7.5 9.8l1.5 1.5c-.1.2-.1.5-.1.7 0 1.7 1.3 3 3 3 .2 0 .5 0 .7-.1l1.5 1.5c-.7.3-1.4.5-2.2.5-2.8 0-5-2.2-5-5 0-.8.2-1.5.6-2.1zm4.3-.8 3.1 3.1v-.2c0-1.7-1.3-3-3-3h-.1z"/></svg>';
+document.querySelectorAll('.eye').forEach(btn => {
+  btn.innerHTML = EYE_ON;
+  btn.addEventListener('click', () => {
+    const inp = $(btn.dataset.for);
+    const show = inp.type === 'password';
+    inp.type = show ? 'text' : 'password';
+    btn.innerHTML = show ? EYE_OFF : EYE_ON;
+  });
+});
+
+// Enter key submits
+[['loginName','loginBtn'],['loginPass','loginBtn'],['regName','regBtn'],['regPass','regBtn'],['regPass2','regBtn']]
+  .forEach(([i, b]) => $(i).addEventListener('keydown', e => {
+    if (e.key === 'Enter') $(b).click();
+  }));
+
+$('logoutBtn').addEventListener('click', async () => {
+  try { await sb.auth.signOut(); } catch (e) {}
+  location.reload();
+});
+
+if (!sb) {
+  const m = !window.supabase
+    ? 'Supabase library ကို load မရပါ၊ internet စစ်ပြီး page ကို refresh လုပ်ပါ'
+    : 'Supabase URL/Key ကိုစစ်ပါ (index.html ထဲက APP_CONFIG)';
+  authMsg('loginMsg', m, false);
+  authMsg('regMsg', m, false);
+  $('loginBtn').disabled = true;
+  $('regBtn').disabled = true;
+} else {
+  // Stay logged in after refresh
+  (async function restoreSession() {
+    try {
+      const { data } = await sb.auth.getSession();
+      if (data.session && !(await enterApp(data.session.user))) await sb.auth.signOut();
+    } catch (e) { /* network error: stay on login screen */ }
+  })();
+}
+</script>
 </body>
 </html>
