@@ -838,12 +838,41 @@ function tiktokVideoId(url) {
   const m = url.trim().match(/^https:\/\/(?:www\.)?tiktok\.com\/@[^\/?#]+\/video\/(\d{8,25})/i);
   return m ? m[1] : null;
 }
-linkInput.addEventListener('change', () => {
+// Link ကို ID ပါတဲ့ ပုံစံအဖြစ် အလိုအလျောက် ပြောင်း (short link / tracking parameter ဖယ်)
+let resolving = false;
+async function normalizeLink() {
+  if (resolving) return;
+  let raw = linkInput.value.trim();
+  if (!raw) return;
+  if (!/^https?:\/\//i.test(raw) && /tiktok\.com/i.test(raw)) raw = 'https://' + raw;
+  let u;
+  try { u = new URL(raw); } catch (e) { return; }
+  if (!/(^|\.)tiktok\.com$/i.test(u.hostname)) return;
+
+  const id = tiktokVideoId(raw);
+  if (id) {                                   // full link ဖြစ်ပြီးသား၊ ?_r=1... ဖယ်ရုံ
+    const m = raw.match(/^https:\/\/(?:www\.)?tiktok\.com\/(@[^\/?#]+)\/video\/\d+/i);
+    linkInput.value = 'https://www.tiktok.com/' + m[1] + '/video/' + id;
+  } else {                                    // short link → server မှာ ပြန်ဖြေရှင်း
+    resolving = true; doneBtn.disabled = true;
+    setMsg('Link ကို ပြောင်းနေသည်...', true);
+    try {
+      const { data, error } = await sb.functions.invoke('resolve-tiktok', { body: { url: raw } });
+      if (error || !data || !data.url) throw error || new Error('x');
+      linkInput.value = data.url;
+      useMsg.textContent = '';
+    } catch (e) {
+      setMsg('Link ကို မပြောင်းနိုင်ပါ၊ TikTok app ထဲက Share → Copy link ကို ပြန်ထည့်ပါ', false);
+    } finally { resolving = false; doneBtn.disabled = false; }
+  }
   previewDur = null;
-  const id = service === 'like' ? tiktokVideoId(linkInput.value) : null;
-  previewBox.hidden = !id;
-  pvFrame.src = id ? playerUrl(id, false) : 'about:blank';
-});
+  const vid = service === 'like' ? tiktokVideoId(linkInput.value) : null;
+  previewBox.hidden = !vid;
+  pvFrame.src = vid ? playerUrl(vid, false) : 'about:blank';
+}
+linkInput.addEventListener('change', normalizeLink);
+linkInput.addEventListener('paste', () => setTimeout(normalizeLink, 0));
+
 
 durChips.addEventListener('click', (e) => {
   const chip = e.target.closest('.chip');
