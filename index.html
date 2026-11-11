@@ -223,6 +223,21 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--pink); outl
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* ---------- like marketplace ---------- */
+.player-wrap { position: relative; width: 100%; aspect-ratio: 9 / 14; max-height: 70vh; background: #000; }
+.player-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.lk-info { padding: 14px 16px 10px; }
+.lk-bar { height: 10px; background: var(--line); }
+.lk-bar div { width: 0; height: 100%; background: var(--pink); transition: width .25s linear; }
+.lk-steps { padding: 12px 16px 16px; display: grid; gap: 10px; }
+.lk-steps .btn { width: 100%; text-align: center; text-decoration: none; display: block; }
+.lk-steps .btn[aria-disabled="true"], .lk-steps .btn:disabled { opacity: .45; pointer-events: none; }
+.lk-step { font-size: 13px; color: var(--muted); }
+.lk-step.ok { color: var(--ok); font-weight: 600; }
+.lk-skip { background: transparent; color: var(--muted); border: 1.5px solid var(--line); }
+.preview { margin-top: 12px; }
+.preview .player-wrap { max-height: 320px; border-radius: 14px; overflow: hidden; }
 </style>
 </head>
 <body>
@@ -339,6 +354,23 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--pink); outl
         </div>
         <div class="progress" id="progress"><div id="progressFill"></div></div>
       </div>
+
+      <div class="task" id="likeTask" hidden>
+        <div class="lk-info">
+          <div class="reward">ရရှိမည့် Credit <b id="lkReward">0</b></div>
+          <div class="desc" id="lkStatus"></div>
+        </div>
+        <div class="player-wrap" id="lkPlayerWrap" hidden>
+          <iframe id="lkFrame" allow="autoplay; fullscreen" allowfullscreen title="TikTok video"></iframe>
+        </div>
+        <div class="lk-bar"><div id="lkFill"></div></div>
+        <div class="lk-steps">
+          <div class="lk-step" id="lkS1">၁။ Video ကို အဆုံးထိ ကြည့်ပါ</div>
+          <a class="btn" id="lkOpen" href="#" target="_blank" rel="noopener noreferrer" aria-disabled="true">၂။ TikTok မှာဖွင့်ပြီး Like လုပ်ပါ</a>
+          <button type="button" class="btn claim" id="lkClaim" disabled>၃။ Credit ရယူပါ</button>
+          <button type="button" class="btn lk-skip" id="lkSkip">ဒီ Video ကို ကျော်မည်</button>
+        </div>
+      </div>
     </div>
 
     <!-- Credit သုံးရန် -->
@@ -370,8 +402,8 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--pink); outl
         </div>
 
         <div id="amountBlock">
-          <div class="field-label">အသုံးပြုမယ့် Credit ပမာဏ</div>
-          <p class="note">သုံးမည့် Credit များလေ ပိုမြန်လေ ဖြစ်သည်</p>
+          <div class="field-label" id="amountLabel">အသုံးပြုမယ့် Credit ပမာဏ</div>
+          <p class="note" id="amountNote">သုံးမည့် Credit များလေ ပိုမြန်လေ ဖြစ်သည်</p>
           <div class="chips c6" id="chips">
             <button type="button" class="chip active" data-n="1">1</button>
             <button type="button" class="chip" data-n="2">2</button>
@@ -380,6 +412,21 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--pink); outl
             <button type="button" class="chip" data-n="5">5</button>
             <button type="button" class="chip" data-n="6">6</button>
           </div>
+        </div>
+
+        <div id="countBlock" hidden>
+          <div class="field-label">လိုချင်တဲ့ Like အရေအတွက်</div>
+          <div class="chips" id="countChips" style="grid-template-columns:repeat(5,1fr)">
+            <button type="button" class="chip active" data-c="1">1</button>
+            <button type="button" class="chip" data-c="5">5</button>
+            <button type="button" class="chip" data-c="10">10</button>
+            <button type="button" class="chip" data-c="20">20</button>
+            <button type="button" class="chip" data-c="50">50</button>
+          </div>
+        </div>
+        <div class="preview" id="previewBox" hidden>
+          <p class="note">Video မှန်/မမှန် စစ်ကြည့်ပါ (Play နှိပ်ရင် ကြာချိန်ကိုပါ မှတ်ထားမည်)</p>
+          <div class="player-wrap"><iframe id="pvFrame" allow="autoplay; fullscreen" allowfullscreen title="preview"></iframe></div>
         </div>
 
         <div class="cost"><span>ကုန်ကျမည့် Credit</span><b><span id="costVal">1</span><small>Credit</small></b></div>
@@ -411,8 +458,10 @@ const ERR = {
   INSUFFICIENT_CREDIT: 'Credit မလုံလောက်ပါ',
   INVALID_LINK:        'TikTok Video Link ကို မှန်ကန်စွာ ထည့်ပါ',
   INVALID_OPTION:      'ရွေးချယ်မှု မှားနေပါသည်',
-  TOO_EARLY:           'ခဏစောင့်ပြီး ထပ်နှိပ်ပါ',
-  NO_TASK:             'အစကပြန်စပါ'
+  NO_TASK:             'အစကပြန်စပါ',
+  NO_VIDEO:            'ယခု Like ပေးစရာ Video မရှိသေးပါ၊ နောက်မှ ပြန်စစ်ပါ',
+  ORDER_FULL:          'ဒီ Video အတွက် Like ပြည့်သွားပါပြီ',
+  TOO_EARLY:           'Video ကို အဆုံးထိ မကြည့်ရသေးပါ'
 };
 function errText(e) {
   const m = (e && e.message) || '';
@@ -476,14 +525,29 @@ let state = 'idle';            // idle | watching | ready | done
 bindTabs($('appTabs'), (d) => {
   $('earnView').hidden  = d.view !== 'earn';
   $('spendView').hidden = d.view !== 'spend';
+  if (d.view !== 'earn') { lkStop(); }
+  else if (lk && !lkFinished && !likeTaskEl.hidden && !lkWrap.hidden) {
+    lkWatched = 0; lkLast = null; lkUI();      // ပြန်ကြည့်ရင် အစကပြန်တွက်
+    lkFrame.src = playerUrl(lk.video_id, false);
+  }
 });
 
 bindTiles($('earnTiles'), (v) => {
   kind = v;
+  hint.hidden = true;
+  if (v === 'like') {
+    clip.hidden = true;
+    clearInterval(timer);
+    likeTaskEl.hidden = false;
+    restart(likeTaskEl, 'pop');
+    loadLikeTask();
+    return;
+  }
+  likeTaskEl.hidden = true;
+  lkStop();
   clip.hidden = false;
   restart(clip, 'pop');
   $('clipTitle').innerHTML = 'ရရှိမည့် Credit <b>' + REWARD + '</b>';
-  hint.hidden = true;
   resetWatch();
 });
 
@@ -556,8 +620,7 @@ clipBtn.addEventListener('click', async () => {
     if (state === 'idle') {
       const { error } = await sb.rpc('start_task', { p_kind: kind });
       if (error) { descEl.textContent = errText(error); return; }
-      if (kind === 'watch') startWatch();                 // 5s timer
-      else showClaim('Like ပေးပြီးပါပြီ!');                // Like: timer မပါ
+      startWatch();                                       // 5s timer
     } else if (state === 'ready') {
       await claimCredit();
     } else if (state === 'done') {
@@ -566,6 +629,142 @@ clipBtn.addEventListener('click', async () => {
   } catch (e) {
     descEl.textContent = errText(e);
   } finally { busy = false; }
+});
+
+
+// ---------- Like marketplace : ကြည့်သူ ----------
+const likeTaskEl = $('likeTask');
+const lkFrame = $('lkFrame'), lkWrap = $('lkPlayerWrap'), lkFill = $('lkFill');
+const lkStatus = $('lkStatus'), lkOpen = $('lkOpen'), lkClaim = $('lkClaim'), lkSkip = $('lkSkip');
+const lkS1 = $('lkS1');
+let lk = null;                       // လက်ရှိ task
+let lkWatched = 0, lkLast = null, lkDur = 0, lkFinished = false, lkOpened = false;
+let previewDur = null;               // poster ရဲ့ preview က ရတဲ့ Video ကြာချိန်
+
+function playerUrl(id, autoplay) {
+  return 'https://www.tiktok.com/player/v1/' + id +
+    '?autoplay=' + (autoplay ? 1 : 0) + '&loop=0&music_info=0&description=0&controls=1';
+}
+function lkStop() { lkFrame.src = 'about:blank'; }
+
+function lkUI() {
+  const pct = lkDur > 0 ? Math.min(100, lkWatched / lkDur * 100) : 0;
+  lkFill.style.width = pct + '%';
+  lkS1.classList.toggle('ok', lkFinished);
+  lkS1.textContent = lkFinished
+    ? '၁။ အဆုံးထိ ကြည့်ပြီးပါပြီ ✓'
+    : '၁။ Video ကို အဆုံးထိ ကြည့်ပါ' + (lkDur ? ' (' + Math.floor(lkWatched) + '/' + Math.round(lkDur) + 's)' : '');
+  lkOpen.setAttribute('aria-disabled', lkFinished ? 'false' : 'true');
+  lkClaim.disabled = !(lkFinished && lkOpened);
+}
+
+async function loadLikeTask() {
+  lkWatched = 0; lkLast = null; lkDur = 0; lkFinished = false; lkOpened = false;
+  lkClaim.classList.remove('next');
+  lkClaim.textContent = '၃။ Credit ရယူပါ';
+  lkSkip.hidden = false; lkOpen.hidden = false;
+  lkWrap.hidden = true; lkStop();
+  lkStatus.textContent = 'Video ရှာနေသည်...';
+  lkUI();
+  const { data, error } = await sb.rpc('next_like_task');
+  if (error) {
+    lk = null;
+    lkStatus.textContent = errText(error);
+    lkOpen.hidden = true; lkSkip.hidden = true; lkClaim.disabled = true;
+    return;
+  }
+  lk = data;
+  $('lkReward').textContent = lk.reward;
+  lkStatus.textContent = 'Play နှိပ်ပြီး အဆုံးထိ ကြည့်ပါ၊ ပြီးမှ TikTok မှာ Like လုပ်ပါ';
+  lkOpen.href = lk.video_url;
+  lkWrap.hidden = false;
+  lkFrame.src = playerUrl(lk.video_id, true);
+  lkUI();
+}
+
+// TikTok player က ပို့တဲ့ message ကို ဖတ်ခြင်း
+function readPlayerMsg(e) {
+  let host = '';
+  try { host = new URL(e.origin).hostname; } catch (x) { return null; }
+  if (!/(^|\.)tiktok\.com$/i.test(host)) return null;
+  let m = e.data;
+  if (typeof m === 'string') { try { m = JSON.parse(m); } catch (x) { return null; } }
+  return (m && m['x-tiktok-player']) ? m : null;
+}
+
+window.addEventListener('message', (e) => {
+  const m = readPlayerMsg(e);
+  if (!m) return;
+
+  // Poster preview (Credit သုံးရန်)
+  if (e.source === $('pvFrame').contentWindow) {
+    if (m.type === 'onCurrentTime' && m.value && m.value.duration > 0) {
+      previewDur = Math.round(m.value.duration);
+    }
+    return;
+  }
+
+  // ကြည့်သူ
+  if (!lk || e.source !== lkFrame.contentWindow) return;
+  if (m.type === 'onCurrentTime' && m.value) {
+    const t = Number(m.value.currentTime), dur = Number(m.value.duration);
+    if (dur > 0) lkDur = dur;
+    if (lkLast !== null) {
+      const d = t - lkLast;
+      if (d > 0 && d <= 2) lkWatched += d;      // ကျော်ကြည့်ရင် (seek) မရေတွက်
+    }
+    lkLast = t;
+    if (!lkFinished && lkDur > 0 && lkWatched >= lkDur - 1.5) {
+      lkFinished = true;
+      lkStatus.textContent = 'ကြည့်ပြီးပါပြီ! အခု TikTok မှာဖွင့်ပြီး Like လုပ်ပါ';
+    }
+    lkUI();
+  } else if (m.type === 'onStateChange') {
+    if (m.value !== 1) lkLast = null;           // pause / buffer ဖြစ်ရင် ပြန်စတွက်
+  }
+});
+
+lkOpen.addEventListener('click', (e) => {
+  if (!lkFinished) { e.preventDefault(); return; }
+  lkOpened = true;
+  lkStatus.textContent = 'Like လုပ်ပြီးရင် ပြန်လာပြီး Credit ရယူပါ';
+  lkUI();
+});
+
+let lkBusy = false;
+lkClaim.addEventListener('click', async () => {
+  if (lkBusy) return;
+  if (lkClaim.classList.contains('next')) { loadLikeTask(); return; }
+  if (!lk) return;
+  lkBusy = true; lkClaim.disabled = true;
+  try {
+    const { data, error } = await sb.rpc('complete_like_task', {
+      p_task: lk.task_id, p_duration: Math.round(lkDur) || null
+    });
+    if (error) {
+      lkStatus.textContent = errText(error);
+      lkClaim.disabled = false;
+      if (/NO_TASK|ORDER_FULL/.test(error.message || '')) {
+        lkClaim.classList.add('next'); lkClaim.textContent = 'နောက်တစ်ပုဒ်';
+      }
+      return;
+    }
+    setCredit(data, true);
+    lkStatus.textContent = '+' + lk.reward + ' Credit ရပါပြီ ✓';
+    lkClaim.classList.add('next');
+    lkClaim.textContent = 'နောက်တစ်ပုဒ်';
+    lkClaim.disabled = false;
+    lkOpen.hidden = true; lkSkip.hidden = true;
+    lkWrap.hidden = true; lkStop();
+  } catch (e) {
+    lkStatus.textContent = errText(e); lkClaim.disabled = false;
+  } finally { lkBusy = false; }
+});
+
+lkSkip.addEventListener('click', async () => {
+  if (!lk || lkBusy) return;
+  try { await sb.rpc('skip_like_task', { p_task: lk.task_id }); } catch (e) {}
+  loadLikeTask();
 });
 
 // ---------- Credit သုံးရန် ----------
@@ -583,8 +782,11 @@ const USE_LABEL = { like: 'TikTok Like', views: 'TikTok ကြည့်ရှု
 let service = '';
 let amount = 1;
 let viewCost = 8, viewLabel = '6 စက္ကန့်', viewSec = 6;
+let likes = 1;
+const countBlock = $('countBlock'), countChips = $('countChips');
+const previewBox = $('previewBox'), pvFrame = $('pvFrame');
 
-function cost() { return service === 'views' ? viewCost : amount; }
+function cost() { return service === 'views' ? viewCost : service === 'like' ? amount * likes : amount; }
 function updateCost() { costVal.textContent = cost(); }
 function setMsg(text, ok) {
   useMsg.textContent = text;
@@ -602,6 +804,12 @@ bindTiles($('useTiles'), (v) => {
   useTitle.textContent = USE_LABEL[v];
   durBlock.hidden    = v !== 'views';
   amountBlock.hidden = v === 'views';
+  countBlock.hidden  = v !== 'like';
+  previewBox.hidden  = true; pvFrame.src = 'about:blank'; previewDur = null;
+  $('amountLabel').textContent = v === 'like' ? 'Like တစ်ခုအတွက် ပေးမည့် Credit' : 'အသုံးပြုမယ့် Credit ပမာဏ';
+  $('amountNote').textContent  = v === 'like'
+    ? 'Credit များလေ တခြားသူတွေ ပိုလုပ်ချင်လေ၊ မြန်လေ ဖြစ်သည်'
+    : 'သုံးမည့် Credit များလေ ပိုမြန်လေ ဖြစ်သည်';
   usePanel.hidden = false;
   restart(usePanel, 'pop');
   useMsg.textContent = '';
@@ -617,6 +825,26 @@ chipsEl.addEventListener('click', (e) => {
   updateCost();
 });
 
+countChips.addEventListener('click', (e) => {
+  const chip = e.target.closest('.chip');
+  if (!chip) return;
+  countChips.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  chip.classList.add('active');
+  likes = parseInt(chip.dataset.c, 10);
+  updateCost();
+});
+
+function tiktokVideoId(url) {
+  const m = url.trim().match(/^https:\/\/(?:www\.)?tiktok\.com\/@[^\/?#]+\/video\/(\d{8,25})/i);
+  return m ? m[1] : null;
+}
+linkInput.addEventListener('change', () => {
+  previewDur = null;
+  const id = service === 'like' ? tiktokVideoId(linkInput.value) : null;
+  previewBox.hidden = !id;
+  pvFrame.src = id ? playerUrl(id, false) : 'about:blank';
+});
+
 durChips.addEventListener('click', (e) => {
   const chip = e.target.closest('.chip');
   if (!chip) return;
@@ -630,8 +858,8 @@ durChips.addEventListener('click', (e) => {
 
 doneBtn.addEventListener('click', async () => {
   if (!service || doneBtn.disabled) return;
-  if (!validTikTok(linkInput.value)) {
-    setMsg('TikTok Video Link ကို မှန်ကန်စွာ ထည့်ပါ', false);
+  if (!validTikTok(linkInput.value) || (service === 'like' && !tiktokVideoId(linkInput.value))) {
+    setMsg('Link အပြည့်အစုံ ထည့်ပါ (https://www.tiktok.com/@name/video/...)', false);
     return;
   }
   const price = cost();
@@ -642,16 +870,21 @@ doneBtn.addEventListener('click', async () => {
   const isViews = service === 'views';
   doneBtn.disabled = true;
   try {
-    const { data, error } = await sb.rpc('spend_credit', {
-      p_service: service,
-      p_option:  isViews ? viewSec : amount,
-      p_link:    linkInput.value.trim()
-    });
+    const { data, error } = service === 'like'
+      ? await sb.rpc('create_like_order', {
+          p_link: linkInput.value.trim(), p_reward: amount, p_likes: likes, p_duration: previewDur
+        })
+      : await sb.rpc('spend_credit', {
+          p_service: service,
+          p_option:  isViews ? viewSec : amount,
+          p_link:    linkInput.value.trim()
+        });
     if (error) { setMsg(errText(error), false); return; }
     setCredit(data, true);
-    const extra = isViews ? ' (' + viewLabel + ')' : '';
+    const extra = isViews ? ' (' + viewLabel + ')' : service === 'like' ? ' ' + likes + ' ခု' : '';
     setMsg('✓ ' + USE_LABEL[service] + extra + ' အတွက် Credit ' + price + ' သုံးပြီးပါပြီ', true);
     linkInput.value = '';
+    previewBox.hidden = true; pvFrame.src = 'about:blank'; previewDur = null;
   } catch (e) {
     setMsg(errText(e), false);
   } finally {
