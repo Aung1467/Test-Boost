@@ -1,54 +1,74 @@
-// Supabase Edge Function: resolve-tiktok
-// Deploy:  supabase functions deploy resolve-tiktok
-// (JWT verify ဖွင့်ထားပါ — login ဝင်ထားသူသာ ခေါ်နိုင်မယ်)
+// Supabase Edge Function: fetch-trending
+// Deploy:  supabase functions deploy fetch-trending
+// Trending TikTok video တွေကို ပြင်ပ source ကနေ ဆွဲပြီး trending_videos table ထဲ သိမ်းပေးသည်
+// (SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY ကို Supabase က အလိုအလျောက် ပေးထားပြီးသား)
+
+import { createClient } from "npm:@supabase/supabase-js@2";
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
-const HOSTS = new Set(["vm.tiktok.com", "vt.tiktok.com", "m.tiktok.com", "www.tiktok.com", "tiktok.com"]);
-const FULL = /^\/@([^\/?#]+)\/video\/(\d{8,25})/;
-const UA = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Version/17.0 Mobile/15E148 Safari/604.1";
-
 const json = (b: unknown, status = 200) =>
   new Response(JSON.stringify(b), { status, headers: { ...CORS, "Content-Type": "application/json" } });
 
-function canonical(u: URL): string | null {
-  const m = u.pathname.match(FULL);
-  return m ? `https://www.tiktok.com/@${m[1]}/video/${m[2]}` : null;
+const REGIONS = ["US", "GB", "SG", "TH", "ID", "PH"];   // ဘယ် region က trending ယူမလဲ
+const COOLDOWN_MIN = 10;                                 // source ကို မကြာခဏ မခေါ်အောင်
+const KEEP_DAYS = 3;                                     // ဟောင်းတာတွေ ဖျက်
+
+type Item = { video_id?: string; id?: string; author?: { unique_id?: string } };
+
+async function pull(region: string): Promise<{ url: string; id: string }[]> {
+  // ⚠️ တရားဝင် TikTok API မဟုတ်ပါ — ပြင်ပ service တစ်ခု၊ ရပ်သွား/ပြောင်းသွားနိုင်သည်
+  const r = await fetch(`https://www.tikwm.com/api/feed/list?region=${region}&count=30`, {
+    headers: { "User-Agent": "Mozilla/5.0", "Accept": "application/json" },
+  });
+  if (!r.ok) return [];
+  const j = await r.json();
+  const out: { url: string; id: string }[] = [];
+  for (const it of (j?.data ?? []) as Item[]) {
+    const id = String(it.video_id ?? it.id ?? "");
+    const user = it.author?.unique_id;
+    if (/^\d{8,25}$/.test(id) && user && /^[\w.]+$/.test(user)) {
+      out.push({ url: `https://www.tiktok.com/@${user}/video/${id}`, id });
+    }
+  }
+  return out;
 }
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
   try {
-    const { url } = await req.json();
-    let cur = new URL(String(url).trim());
+    const db = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 
-    for (let hop = 0; hop < 6; hop++) {
-      // SSRF ကာကွယ်: https + TikTok host သာ
-      if (cur.protocol !== "https:" || !HOSTS.has(cur.hostname)) return json({ error: "INVALID_LINK" }, 400);
-
-      const c = canonical(cur);
-      if (c) return json({ url: c });
-
-      const r = await fetch(cur.toString(), { redirect: "manual", headers: { "User-Agent": UA } });
-      const loc = r.headers.get("location");
-      if (r.status >= 300 && r.status < 400 && loc) {
-        cur = new URL(loc, cur);
-        continue;
-      }
-      // redirect မရှိရင် page ထဲက canonical / og:url ကို ရှာ
-      const html = await r.text();
-      const m = html.match(/(?:rel="canonical"\s+href|property="og:url"\s+content)="([^"]+)"/i);
-      if (m) {
-        const c2 = canonical(new URL(m[1]));
-        if (c2) return json({ url: c2 });
-      }
-      break;
+    // cooldown: မကြာသေးခင်က ဆွဲပြီးသားဆိုရင် ထပ်မဆွဲ
+    const { data: last } = await db.from("trending_videos")
+      .select("fetched_at").order("fetched_at", { ascending: false }).limit(1).maybeSingle();
+    if (last && Date.now() - new Date(last.fetched_at).getTime() < COOLDOWN_MIN * 60_000) {
+      return json({ added: 0, cached: true });
     }
-    return json({ error: "INVALID_LINK" }, 422);
+
+    const seen = new Set<string>();
+    const rows: { video_url: string; video_id: string; active: boolean; fetched_at: string }[] = [];
+    for (const region of REGIONS) {
+      try {
+        for (const v of await pull(region)) {
+          if (seen.has(v.id)) continue;
+          seen.add(v.id);
+          rows.push({ video_url: v.url, video_id: v.id, active: true, fetched_at: new Date().toISOString() });
+        }
+      } catch (_e) { /* region တစ်ခု မရရင် ကျော် */ }
+      if (rows.length >= 60) break;
+    }
+    if (!rows.length) return json({ error: "SOURCE_UNAVAILABLE" }, 502);
+
+    await db.from("trending_videos").upsert(rows, { onConflict: "video_url" });
+    await db.from("trending_videos").delete()
+      .lt("fetched_at", new Date(Date.now() - KEEP_DAYS * 86400_000).toISOString());
+
+    return json({ added: rows.length });
   } catch (_e) {
-    return json({ error: "INVALID_LINK" }, 400);
+    return json({ error: "FETCH_FAILED" }, 500);
   }
 });

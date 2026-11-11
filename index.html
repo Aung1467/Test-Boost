@@ -285,6 +285,37 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--pink); outl
 .ord-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .ord-edit .msg { margin: 0; min-height: 0; font-size: 12px; }
 .ord-empty { padding: 14px; text-align: center; font-size: 13px; color: var(--muted); background: var(--soft); border-radius: 12px; }
+
+/* ===== layout polish ===== */
+.screen { max-width: 480px; }
+.auth-top { padding: 56px 24px 34px; }
+.sheet { padding: 20px 18px calc(32px + env(safe-area-inset-bottom)); box-shadow: 0 -10px 30px rgba(0,0,0,.18); }
+.tabs { margin-bottom: 18px; padding: 5px; }
+.tab { padding: 11px 6px; font-size: 14px; transition: background .15s, color .15s; }
+.wallet { padding: 10px 20px 26px; gap: 16px; }
+.bal { font-size: 42px; }
+.tiles { gap: 12px; }
+.tile { padding: 14px; border-radius: 16px; min-height: 104px; justify-content: flex-start; }
+.tile svg { width: 26px; height: 26px; margin-bottom: 8px; }
+.tile b { font-size: 15px; }
+.tile small { font-size: 12.5px; }
+.hint { padding: 26px 0 8px; }
+.task { margin-top: 18px; border-radius: 20px; }
+.lk-head { padding: 14px 16px 10px; background: var(--soft); border-bottom: 2px solid var(--line); }
+.lk-reward b { font-size: 26px; color: var(--pink); }
+.player-wrap { height: auto; width: min(100%, 250px); aspect-ratio: 9 / 16; max-height: 62vh; margin: 14px auto 0; border-radius: 16px; box-shadow: 0 8px 24px rgba(23,20,60,.28); }
+.lk-bar { height: 8px; margin: 14px 16px 0; }
+.lk-status { padding: 8px 16px 0; font-size: 13px; text-align: center; color: var(--muted); }
+.lk-actions { padding: 12px 16px 4px; gap: 10px; }
+.lk-actions .btn { padding: 13px 8px; font-size: 15px; border-radius: 14px; }
+.lk-skip-link { margin: 4px auto 14px; font-size: 13px; }
+.preview .player-wrap { height: auto; width: min(100%, 200px); max-height: 46vh; margin: 10px auto 0; }
+.use-panel { margin-top: 18px; padding: 16px; background: #fff; border: 2px solid var(--line); border-radius: 18px; }
+.use-panel .type { font-size: 17px; }
+.chip { padding: 11px 0; }
+.cost { margin-top: 18px; }
+.orders { margin-top: 26px; }
+.ord { padding: 12px 14px; }
 </style>
 </head>
 <body>
@@ -615,7 +646,17 @@ async function loadLikeTask() {
   lkStatus.textContent = 'Video ရှာနေသည်...';
   lkTime.textContent = '';
   lkUI();
-  const { data, error } = await sb.rpc('next_like_task', { p_kind: earnKind });
+  let { data, error } = await sb.rpc('next_like_task', { p_kind: earnKind });
+  // ကြည့်ရန် / Like ပေးရန် နှစ်မျိုးလုံးမှာ မှာထားတဲ့ Video မရှိရင် Trending pool ထဲက random ယူ (Credit 2-3 random)
+  if (error && /NO_VIDEO/.test(error.message || '')) {
+    let t = await sb.rpc('next_trending_task');
+    if (t.error && /NO_VIDEO/.test(t.error.message || '')) {
+      lkStatus.textContent = 'Trending Video အသစ်ရှာနေသည်...';
+      try { await sb.functions.invoke('fetch-trending'); } catch (e) {}
+      t = await sb.rpc('next_trending_task');
+    }
+    if (!t.error && t.data) { data = t.data; data.trending = true; error = null; }
+  }
   if (error) {
     lk = null;
     lkStatus.textContent = errText(error);
@@ -623,7 +664,7 @@ async function loadLikeTask() {
     return;
   }
   lk = data;
-  $('lkReward').textContent = lk.reward;
+  $('lkReward').textContent = lk.trending ? '2-3' : lk.reward;
   lkStatus.textContent = isWatch ? 'Play နှိပ်ပါ' : 'Play နှိပ်ပြီး ကြည့်ပါ၊ ပြီးမှ TikTok မှာ Like လုပ်ပါ';
   lkOpen.href = lk.video_url;
   lkWrap.hidden = false;
@@ -688,10 +729,11 @@ lkClaim.addEventListener('click', async () => {
   if (lkClaim.classList.contains('next')) { loadLikeTask(); return; }
   if (!lk) return;
   lkBusy = true; lkClaim.disabled = true;
+  const credit0 = credit;
   try {
-    const { data, error } = await sb.rpc('complete_like_task', {
-      p_task: lk.task_id, p_duration: Math.round(lkDur) || null
-    });
+    const { data, error } = lk.trending
+      ? await sb.rpc('complete_trending_task', { p_task: lk.task_id, p_duration: Math.round(lkDur) || null })
+      : await sb.rpc('complete_like_task', { p_task: lk.task_id, p_duration: Math.round(lkDur) || null });
     if (error) {
       const gone = /NO_TASK|ORDER_FULL/.test(error.message || '');
       if (gone) lkNextState(errText(error));
@@ -703,7 +745,7 @@ lkClaim.addEventListener('click', async () => {
       return;
     }
     setCredit(data, true);
-    lkNextState('+' + lk.reward + ' Credit ရပါပြီ ✓');
+    lkNextState('+' + (lk.trending ? (data - credit0) : lk.reward) + ' Credit ရပါပြီ ✓');
     lkFill.style.width = '0'; lkTime.textContent = '';
   } catch (e) {
     lkStatus.textContent = errText(e); lkClaim.disabled = false;
@@ -712,7 +754,7 @@ lkClaim.addEventListener('click', async () => {
 
 lkSkip.addEventListener('click', async () => {
   if (!lk || lkBusy) return;
-  try { await sb.rpc('skip_like_task', { p_task: lk.task_id }); } catch (e) {}
+  if (!lk.trending) { try { await sb.rpc('skip_like_task', { p_task: lk.task_id }); } catch (e) {} }
   loadLikeTask();
 });
 
