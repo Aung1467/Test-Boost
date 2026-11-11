@@ -1,5 +1,5 @@
 window.APP_CONFIG = {
-  SUPABASE_URL: 'https://xaorhezqwahcsdvpxehl.supabase.co',
-  SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtveWJ4eW91Y3lxbml4dndwbGtlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEwNDE4NzYsImV4cCI6MjEwNjY',
+  SUPABASE_URL: 'https://dzszuhsfrfaumcvrtouf.supabase.co',
+  SUPABASE_ANON_KEY: 'sb_publishable_HStMBG_k2kvl4KyW0m5y1w_v4J2Xh5B',
   EMAIL_DOMAIN: 'users.tiktokboost.app'
 };
