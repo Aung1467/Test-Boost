@@ -1,5 +1,3 @@
-// Supabase Dashboard > Project Settings > API (သို့) "API Keys" ကနေ ယူပါ
-// anon / publishable key သာ ထည့်ပါ။ service_role / secret key ကို ဘယ်တော့မှ မထည့်ပါနဲ့။
 window.APP_CONFIG = {
   SUPABASE_URL: 'https://xaorhezqwahcsdvpxehl.supabase.co',
   SUPABASE_ANON_KEY: 'sb_publishable_MqEPI9WRAMoweLFdAMa4LA_b1XJxymN',
