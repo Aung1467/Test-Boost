@@ -334,26 +334,15 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--pink); outl
       <div class="tiles" id="earnTiles">
         <button type="button" class="tile" data-v="watch">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.5C7 4.5 2.7 7.6 1 12c1.7 4.4 6 7.5 11 7.5s9.3-3.1 11-7.5c-1.7-4.4-6-7.5-11-7.5zM12 17a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/></svg>
-          <b>TikTok ကြည့်ရန်</b><small class="rw"></small>
+          <b>TikTok ကြည့်ရန်</b><small>Trending Video ကြည့်ပါ</small>
         </button>
         <button type="button" class="tile" data-v="like">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-          <b>TikTok Like ပေးရန်</b><small class="rw"></small>
+          <b>TikTok Like ပေးရန်</b><small>ကြည့်ပြီး Like လုပ်ပါ</small>
         </button>
       </div>
 
       <p class="hint" id="hint">အပေါ်က တစ်ခုကို ရွေးပါ</p>
-
-      <div class="task" id="clip" hidden>
-        <div class="task-row">
-          <div>
-            <div class="reward" id="clipTitle"></div>
-            <div class="desc" id="clipDesc"></div>
-          </div>
-          <button type="button" class="btn" id="clipBtn"></button>
-        </div>
-        <div class="progress" id="progress"><div id="progressFill"></div></div>
-      </div>
 
       <div class="task" id="likeTask" hidden>
         <div class="lk-info">
@@ -471,8 +460,6 @@ function errText(e) {
 }
 
 const $ = (id) => document.getElementById(id);
-const REWARD = 3;          // ရရှိမည့် Credit (SQL ထဲက reward နဲ့ တူရမယ်)
-const WATCH_SECONDS = 5;   // (SQL ထဲက ၅ စက္ကန့်နဲ့ တူရမယ်)
 
 function restart(el, cls) { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
 
@@ -505,22 +492,10 @@ function setCredit(n, animate) {
   creditEl.textContent = n;
   if (animate) restart(creditEl, 'bump');
 }
-document.querySelectorAll('.rw').forEach(el => el.textContent = '+' + REWARD + ' Credit');
 
 // ---------- Credit ယူရန် ----------
-const DATA = {
-  watch: { desc: 'TikTok ကြည့်ပါ',    btn: 'ကြည့်ရန်' },
-  like:  { desc: 'TikTok Like ပေးပါ', btn: 'Like ပေးရန်' }
-};
-const clip     = $('clip');
-const hint     = $('hint');
-const clipBtn  = $('clipBtn');
-const descEl   = $('clipDesc');
-const progress = $('progress');
-const fill     = $('progressFill');
-let kind  = '';
-let timer = null;
-let state = 'idle';            // idle | watching | ready | done
+const hint = $('hint');
+let earnKind = '';                 // 'watch' | 'like'
 
 bindTabs($('appTabs'), (d) => {
   $('earnView').hidden  = d.view !== 'earn';
@@ -532,105 +507,14 @@ bindTabs($('appTabs'), (d) => {
   }
 });
 
+// Credit ကို Video အပြည့်ကြည့်ပြီးမှသာ ရမယ် (အလိုအလျောက် မရတော့)
 bindTiles($('earnTiles'), (v) => {
-  kind = v;
+  earnKind = v;
   hint.hidden = true;
-  if (v === 'like') {
-    clip.hidden = true;
-    clearInterval(timer);
-    likeTaskEl.hidden = false;
-    restart(likeTaskEl, 'pop');
-    loadLikeTask();
-    return;
-  }
-  likeTaskEl.hidden = true;
-  lkStop();
-  clip.hidden = false;
-  restart(clip, 'pop');
-  $('clipTitle').innerHTML = 'ရရှိမည့် Credit <b>' + REWARD + '</b>';
-  resetWatch();
+  likeTaskEl.hidden = false;
+  restart(likeTaskEl, 'pop');
+  loadLikeTask();
 });
-
-function resetWatch() {
-  clearInterval(timer);
-  state = 'idle';
-  const d = DATA[kind];
-  clipBtn.disabled = false;
-  clipBtn.classList.remove('claim', 'next');
-  clipBtn.textContent = d.btn;
-  descEl.textContent  = d.desc;
-  progress.classList.remove('on');
-  fill.style.width = '0';
-}
-
-function startWatch() {
-  state = 'watching';
-  let left = WATCH_SECONDS;
-  clipBtn.disabled = true;
-  clipBtn.textContent = left + 's';
-  descEl.textContent  = 'ကြည့်နေသည်... ' + left + ' စက္ကန့်';
-  progress.classList.add('on');
-  fill.style.transition = 'none';
-  fill.style.width = '0';
-  void fill.offsetWidth;
-  fill.style.transition = 'width 1s linear';
-
-  timer = setInterval(() => {
-    if (document.hidden) return;          // tab ကိုမြင်နေမှသာ ရေတွက်မယ်
-    left--;
-    fill.style.width = ((WATCH_SECONDS - left) / WATCH_SECONDS * 100) + '%';
-    if (left > 0) {
-      clipBtn.textContent = left + 's';
-      descEl.textContent  = 'ကြည့်နေသည်... ' + left + ' စက္ကန့်';
-    } else {
-      clearInterval(timer);
-      showClaim(WATCH_SECONDS + ' စက္ကန့် ပြည့်ပါပြီ!');
-    }
-  }, 1000);
-}
-
-function showClaim(msg) {
-  state = 'ready';
-  clipBtn.disabled = false;
-  clipBtn.classList.add('claim');
-  clipBtn.textContent = 'Credit ' + REWARD + ' ရယူပါ';
-  descEl.textContent  = msg;
-}
-
-async function claimCredit() {
-  const { data, error } = await sb.rpc('claim_reward');
-  if (error) {
-    descEl.textContent = errText(error);
-    if ((error.message || '').includes('NO_TASK')) resetWatch();
-    return;
-  }
-  setCredit(data, true);
-  state = 'done';
-  clipBtn.classList.remove('claim');
-  clipBtn.classList.add('next');
-  clipBtn.textContent = 'နောက်တစ်ပုဒ်';
-  descEl.textContent  = '+' + REWARD + ' Credit ရပါပြီ ✓';
-}
-
-let busy = false;
-clipBtn.addEventListener('click', async () => {
-  if (!kind || busy) return;
-  busy = true;
-  try {
-    if (state === 'idle') {
-      const { error } = await sb.rpc('start_task', { p_kind: kind });
-      if (error) { descEl.textContent = errText(error); return; }
-      startWatch();                                       // 5s timer
-    } else if (state === 'ready') {
-      await claimCredit();
-    } else if (state === 'done') {
-      resetWatch();
-    }
-  } catch (e) {
-    descEl.textContent = errText(e);
-  } finally { busy = false; }
-});
-
 
 // ---------- Like marketplace : ကြည့်သူ ----------
 const likeTaskEl = $('likeTask');
@@ -655,18 +539,19 @@ function lkUI() {
     ? '၁။ အဆုံးထိ ကြည့်ပြီးပါပြီ ✓'
     : '၁။ Video ကို အဆုံးထိ ကြည့်ပါ' + (lkDur ? ' (' + Math.floor(lkWatched) + '/' + Math.round(lkDur) + 's)' : '');
   lkOpen.setAttribute('aria-disabled', lkFinished ? 'false' : 'true');
-  lkClaim.disabled = !(lkFinished && lkOpened);
+  lkClaim.disabled = !(lkFinished && (earnKind === 'watch' || lkOpened));
 }
 
 async function loadLikeTask() {
   lkWatched = 0; lkLast = null; lkDur = 0; lkFinished = false; lkOpened = false;
   lkClaim.classList.remove('next');
-  lkClaim.textContent = '၃။ Credit ရယူပါ';
-  lkSkip.hidden = false; lkOpen.hidden = false;
+  const isWatch = earnKind === 'watch';
+  lkClaim.textContent = (isWatch ? '၂။' : '၃။') + ' Credit ရယူပါ';
+  lkSkip.hidden = false; lkOpen.hidden = isWatch;
   lkWrap.hidden = true; lkStop();
   lkStatus.textContent = 'Video ရှာနေသည်...';
   lkUI();
-  const { data, error } = await sb.rpc('next_like_task');
+  const { data, error } = await sb.rpc('next_like_task', { p_kind: earnKind });
   if (error) {
     lk = null;
     lkStatus.textContent = errText(error);
@@ -675,7 +560,9 @@ async function loadLikeTask() {
   }
   lk = data;
   $('lkReward').textContent = lk.reward;
-  lkStatus.textContent = 'Play နှိပ်ပြီး အဆုံးထိ ကြည့်ပါ၊ ပြီးမှ TikTok မှာ Like လုပ်ပါ';
+  lkStatus.textContent = earnKind === 'watch'
+    ? 'Play နှိပ်ပြီး အဆုံးထိ ကြည့်ပါ'
+    : 'Play နှိပ်ပြီး အဆုံးထိ ကြည့်ပါ၊ ပြီးမှ TikTok မှာ Like လုပ်ပါ';
   lkOpen.href = lk.video_url;
   lkWrap.hidden = false;
   lkFrame.src = playerUrl(lk.video_id, true);
@@ -716,7 +603,9 @@ window.addEventListener('message', (e) => {
     lkLast = t;
     if (!lkFinished && lkDur > 0 && lkWatched >= lkDur - 1.5) {
       lkFinished = true;
-      lkStatus.textContent = 'ကြည့်ပြီးပါပြီ! အခု TikTok မှာဖွင့်ပြီး Like လုပ်ပါ';
+      lkStatus.textContent = earnKind === 'watch'
+        ? 'ကြည့်ပြီးပါပြီ! Credit ရယူပါ'
+        : 'ကြည့်ပြီးပါပြီ! အခု TikTok မှာဖွင့်ပြီး Like လုပ်ပါ';
     }
     lkUI();
   } else if (m.type === 'onStateChange') {
@@ -756,6 +645,7 @@ lkClaim.addEventListener('click', async () => {
     lkClaim.disabled = false;
     lkOpen.hidden = true; lkSkip.hidden = true;
     lkWrap.hidden = true; lkStop();
+    lkFill.style.width = '0';
   } catch (e) {
     lkStatus.textContent = errText(e); lkClaim.disabled = false;
   } finally { lkBusy = false; }
