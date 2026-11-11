@@ -307,7 +307,7 @@ function errText(e) {
     const key = name.trim().normalize('NFC').toLowerCase();
     const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(key));
     const hex = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
-    return 'u' + hex.slice(0, 40) + '@' + (cfg.EMAIL_DOMAIN || 'users.tiktokboost.app');
+    return 'u' + hex.slice(0, 40) + '@' + (cfg.EMAIL_DOMAIN || 'gmail.com');
   }
 
   async function enterApp(user) {
@@ -377,8 +377,9 @@ function errText(e) {
         options: { data: { username: name } }
       });
       if (error) {
-        authMsg('regMsg', /already|registered/i.test(error.message)
-          ? 'ဒီနာမည်ကို အသုံးပြုပြီးသားပါ' : 'အကောင့်ဖွင့်မရပါ၊ ထပ်ကြိုးစားပါ', false);
+        authMsg('regMsg', (error.code === 'user_already_exists' || /already|registered/i.test(error.message))
+          ? 'ဒီနာမည်ကို အသုံးပြုပြီးသားပါ'
+          : 'အကောင့်ဖွင့်မရပါ (' + (error.code || error.message) + ')', false);
         return;
       }
       if (!data.session) { authMsg('regMsg', CONFIRM_MSG, false); return; }
