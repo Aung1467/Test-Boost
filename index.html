@@ -46,19 +46,19 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--pink); outl
   flex: 1;
   background: var(--sheet);
   border-radius: 28px 28px 0 0;
-  padding: 22px 20px calc(36px + env(safe-area-inset-bottom));
+  padding: 16px 16px calc(28px + env(safe-area-inset-bottom));
 }
 
 /* ---------- tabs (login/register, earn/spend) ---------- */
 .tabs {
   display: grid; grid-template-columns: 1fr 1fr; gap: 4px;
-  padding: 4px; margin-bottom: 20px;
+  padding: 4px; margin-bottom: 14px;
   background: #E9E6FA; border-radius: 14px;
 }
 .tab {
   border: 0; background: transparent; cursor: pointer;
-  padding: 11px 6px; border-radius: 11px;
-  font-size: 15px; font-weight: 700; color: var(--muted);
+  padding: 9px 6px; border-radius: 11px;
+  font-size: 14px; font-weight: 700; color: var(--muted);
 }
 .tab.active { background: var(--ink); color: #fff; }
 
@@ -102,8 +102,8 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--pink); outl
 .eye svg { width: 22px; height: 22px; }
 
 .btn-primary {
-  width: 100%; margin-top: 10px; padding: 15px;
-  font-size: 17px; font-weight: 700; color: #fff;
+  width: 100%; margin-top: 12px; padding: 13px;
+  font-size: 16px; font-weight: 700; color: #fff;
   background: var(--ink); border: 0; border-radius: 14px; cursor: pointer;
   box-shadow: 4px 4px 0 var(--pink);
   transition: transform .1s, box-shadow .1s;
@@ -133,39 +133,43 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--pink); outl
   padding: 4px 14px; font-size: 13px; font-weight: 600;
 }
 
-.wallet { text-align: center; padding: 14px 24px 36px; color: #fff; }
+.wallet {
+  display: flex; align-items: center; justify-content: center; gap: 14px;
+  padding: 8px 20px 22px; color: #fff;
+}
 .coin {
-  width: 72px; height: 72px; margin: 0 auto; border-radius: 50%;
+  flex: none; width: 46px; height: 46px; border-radius: 50%;
   display: grid; place-items: center;
   background: var(--gold); color: var(--ink);
-  font: 800 34px/1 var(--display);
-  box-shadow: -4px -4px 0 var(--cyan), 4px 4px 0 var(--pink), inset 0 0 0 5px #FFE08A;
+  font: 800 22px/1 var(--display);
+  box-shadow: -3px -3px 0 var(--cyan), 3px 3px 0 var(--pink), inset 0 0 0 3px #FFE08A;
 }
 .coin.drop { animation: drop .7s cubic-bezier(.2, 1.3, .4, 1); }
-.bal { margin-top: 22px; font: 800 64px/1 var(--display); letter-spacing: -.03em; }
+.wallet-text { text-align: left; }
+.bal-label { font-size: 12px; line-height: 1.2; color: #CBC7F2; }
+.bal { font: 800 38px/1.1 var(--display); letter-spacing: -.02em; }
 .bal.bump { animation: bump .35s ease; }
-.bal-label { margin-top: 6px; font-size: 14px; color: #CBC7F2; }
 
 /* ---------- choice tiles ---------- */
 .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .tile {
   display: flex; flex-direction: column; gap: 2px; text-align: left;
-  padding: 14px; cursor: pointer; color: var(--ink);
-  background: #fff; border: 2px solid var(--line); border-radius: 16px;
+  padding: 10px 12px; cursor: pointer; color: var(--ink);
+  background: #fff; border: 2px solid var(--line); border-radius: 14px;
   transition: box-shadow .12s, transform .12s;
 }
-.tile svg { width: 26px; height: 26px; fill: var(--ink); margin-bottom: 6px; }
-.tile b { font-size: 15px; line-height: 1.5; }
-.tile small { font-size: 13px; color: var(--muted); }
+.tile svg { width: 20px; height: 20px; fill: var(--ink); margin-bottom: 3px; }
+.tile b { font-size: 14px; line-height: 1.4; }
+.tile small { font-size: 12px; line-height: 1.4; color: var(--muted); }
 .tile.active { background: var(--cyan); border-color: var(--ink); box-shadow: 4px 4px 0 var(--ink); transform: translate(-1px, -1px); }
 .tile.active small { color: var(--ink); }
 
-.hint { padding: 30px 0 6px; text-align: center; font-size: 14px; color: var(--muted); }
+.hint { padding: 18px 0 4px; text-align: center; font-size: 14px; color: var(--muted); }
 
 /* ---------- earn task ---------- */
 .task {
-  margin-top: 20px; overflow: hidden;
-  background: #fff; border: 2px solid var(--ink); border-radius: 18px;
+  margin-top: 14px; overflow: hidden;
+  background: #fff; border: 2px solid var(--ink); border-radius: 16px;
   box-shadow: 4px 4px 0 var(--pink);
 }
 .task.pop, .use-panel.pop { animation: pop .3s ease; }
@@ -186,12 +190,12 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--pink); outl
 .progress div { width: 0; height: 100%; background: var(--pink); transition: width 1s linear; }
 
 /* ---------- spend panel ---------- */
-.use-panel { margin-top: 20px; }
-.use-panel .type { font-size: 18px; font-weight: 700; }
-.field-label { margin: 18px 0 8px; font-size: 14px; font-weight: 600; }
+.use-panel { margin-top: 14px; }
+.use-panel .type { font-size: 16px; font-weight: 700; }
+.field-label { margin: 14px 0 6px; font-size: 13px; font-weight: 600; }
 .note { margin: -2px 0 10px; font-size: 13px; line-height: 1.7; color: var(--muted); }
 .text {
-  width: 100%; padding: 13px 14px;
+  width: 100%; padding: 11px 12px;
   font: inherit; font-size: 16px; color: var(--ink);
   background: #fff; border: 2px solid var(--line); border-radius: 14px;
   transition: border-color .15s, box-shadow .15s;
@@ -201,15 +205,15 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--pink); outl
 .c6 { grid-template-columns: repeat(6, 1fr); }
 .c3 { grid-template-columns: repeat(3, 1fr); }
 .chip {
-  padding: 12px 0; cursor: pointer; color: var(--ink);
-  font-size: 16px; font-weight: 700;
+  padding: 9px 0; cursor: pointer; color: var(--ink);
+  font-size: 15px; font-weight: 700;
   background: #fff; border: 2px solid var(--line); border-radius: 12px;
 }
 .c3 .chip { font-size: 14px; }
 .chip.active { background: var(--cyan); border-color: var(--ink); box-shadow: 2px 2px 0 var(--ink); }
 .cost {
   display: flex; align-items: baseline; justify-content: space-between;
-  margin-top: 20px; padding: 14px 16px;
+  margin-top: 14px; padding: 10px 14px;
   background: var(--soft); border-radius: 14px;
   font-size: 14px; color: var(--muted);
 }
@@ -224,20 +228,63 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--pink); outl
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
 
-/* ---------- like marketplace ---------- */
-.player-wrap { position: relative; width: 100%; aspect-ratio: 9 / 14; max-height: 70vh; background: #000; }
+/* ---------- like marketplace (ကြည့်သူ) ---------- */
+.player-wrap {
+  position: relative; height: min(46vh, 380px); aspect-ratio: 9 / 16;
+  max-width: 100%; margin: 0 auto; background: #000;
+  border-radius: 12px; overflow: hidden;
+}
 .player-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
-.lk-info { padding: 14px 16px 10px; }
-.lk-bar { height: 10px; background: var(--line); }
+.lk-head { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px 8px; }
+.lk-reward { font-size: 13px; font-weight: 600; color: var(--muted); }
+.lk-reward b { margin: 0 2px; font: 800 22px var(--display); color: var(--ink); }
+.lk-time { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.lk-bar { height: 6px; margin: 10px 14px 0; background: var(--line); border-radius: 99px; overflow: hidden; }
 .lk-bar div { width: 0; height: 100%; background: var(--pink); transition: width .25s linear; }
-.lk-steps { padding: 12px 16px 16px; display: grid; gap: 10px; }
-.lk-steps .btn { width: 100%; text-align: center; text-decoration: none; display: block; }
-.lk-steps .btn[aria-disabled="true"], .lk-steps .btn:disabled { opacity: .45; pointer-events: none; }
-.lk-step { font-size: 13px; color: var(--muted); }
-.lk-step.ok { color: var(--ok); font-weight: 600; }
-.lk-skip { background: transparent; color: var(--muted); border: 1.5px solid var(--line); }
-.preview { margin-top: 12px; }
-.preview .player-wrap { max-height: 320px; border-radius: 14px; overflow: hidden; }
+.lk-status { padding: 6px 14px 0; font-size: 12px; min-height: 1.7em; }
+.lk-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 8px 14px 2px; }
+.lk-actions.one { grid-template-columns: 1fr; }
+.lk-actions .btn {
+  display: block; width: 100%; text-align: center; text-decoration: none;
+  padding: 10px 8px; font-size: 14px; border-radius: 12px; white-space: normal;
+}
+.lk-actions .btn[aria-disabled="true"], .lk-actions .btn:disabled { opacity: .4; pointer-events: none; }
+.lk-skip-link {
+  display: block; margin: 2px auto 10px; padding: 6px 10px; cursor: pointer;
+  background: none; border: 0; font-size: 12px; color: var(--muted); text-decoration: underline;
+}
+.preview { margin-top: 10px; }
+.preview .player-wrap { height: 220px; }
+.cost-note { display: block; margin-top: 1px; font-size: 11px; }
+
+/* ---------- မှတ်တမ်း ---------- */
+.orders { margin-top: 22px; }
+.orders-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; font-size: 14px; font-weight: 700; }
+.orders-head span { font-size: 12px; font-weight: 500; color: var(--muted); }
+.ord { margin-bottom: 8px; padding: 10px 12px; background: #fff; border: 2px solid var(--line); border-radius: 14px; }
+.ord-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.ord-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; font-weight: 700; color: var(--ink); text-decoration: none; }
+.badge { flex: none; padding: 2px 8px; border-radius: 99px; font-size: 11px; font-weight: 700; }
+.st-open { background: #DDF5EC; color: var(--ok); }
+.st-warn { background: #FFE9C4; color: #8A5A00; }
+.st-done { background: var(--soft); color: var(--muted); }
+.ord-meta { margin-top: 4px; font-size: 12px; color: var(--muted); }
+.ord-bar { height: 5px; margin-top: 6px; background: var(--line); border-radius: 99px; overflow: hidden; }
+.ord-bar div { height: 100%; background: var(--pink); }
+.ord-act { display: flex; gap: 8px; margin-top: 8px; }
+.ord-act button {
+  flex: 1; padding: 7px 0; cursor: pointer; border-radius: 10px;
+  font-size: 13px; font-weight: 600; color: var(--ink);
+  background: #fff; border: 1.5px solid var(--line);
+}
+.ord-act .del { color: var(--err); }
+.ord-edit { display: grid; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--line); }
+.ord-edit label { display: grid; gap: 4px; font-size: 12px; font-weight: 600; }
+.ord-edit .text { padding: 8px 10px; font-size: 15px; border-radius: 10px; }
+.ord-edit .text:disabled { opacity: .55; }
+.ord-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.ord-edit .msg { margin: 0; min-height: 0; font-size: 12px; }
+.ord-empty { padding: 14px; text-align: center; font-size: 13px; color: var(--muted); background: var(--soft); border-radius: 12px; }
 </style>
 </head>
 <body>
@@ -319,8 +366,10 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--pink); outl
 
   <section class="wallet" aria-live="polite">
     <div class="coin" id="coin" aria-hidden="true">C</div>
-    <div class="bal" id="credit">0</div>
-    <div class="bal-label">သင့်ရဲ့ Credit</div>
+    <div class="wallet-text">
+      <div class="bal-label">သင့်ရဲ့ Credit</div>
+      <div class="bal" id="credit">0</div>
+    </div>
   </section>
 
   <div class="sheet">
@@ -345,20 +394,20 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--pink); outl
       <p class="hint" id="hint">အပေါ်က တစ်ခုကို ရွေးပါ</p>
 
       <div class="task" id="likeTask" hidden>
-        <div class="lk-info">
-          <div class="reward">ရရှိမည့် Credit <b id="lkReward">0</b></div>
-          <div class="desc" id="lkStatus"></div>
+        <div class="lk-head">
+          <span class="lk-reward">ရမည့် Credit <b id="lkReward">0</b></span>
+          <span class="lk-time" id="lkTime"></span>
         </div>
         <div class="player-wrap" id="lkPlayerWrap" hidden>
           <iframe id="lkFrame" allow="autoplay; fullscreen" allowfullscreen title="TikTok video"></iframe>
         </div>
         <div class="lk-bar"><div id="lkFill"></div></div>
-        <div class="lk-steps">
-          <div class="lk-step" id="lkS1">၁။ Video ကို အဆုံးထိ ကြည့်ပါ</div>
-          <a class="btn" id="lkOpen" href="#" target="_blank" rel="noopener noreferrer" aria-disabled="true">၂။ TikTok မှာဖွင့်ပြီး Like လုပ်ပါ</a>
-          <button type="button" class="btn claim" id="lkClaim" disabled>၃။ Credit ရယူပါ</button>
-          <button type="button" class="btn lk-skip" id="lkSkip">ဒီ Video ကို ကျော်မည်</button>
+        <div class="desc lk-status" id="lkStatus"></div>
+        <div class="lk-actions" id="lkActions">
+          <a class="btn" id="lkOpen" href="#" target="_blank" rel="noopener noreferrer" aria-disabled="true">TikTok မှာ Like လုပ်ရန်</a>
+          <button type="button" class="btn claim" id="lkClaim" disabled>Credit ရယူမည်</button>
         </div>
+        <button type="button" class="lk-skip-link" id="lkSkip">ဒီ Video ကို ကျော်မည်</button>
       </div>
     </div>
 
@@ -418,9 +467,14 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--pink); outl
           <div class="player-wrap"><iframe id="pvFrame" allow="autoplay; fullscreen" allowfullscreen title="preview"></iframe></div>
         </div>
 
-        <div class="cost"><span>ကုန်ကျမည့် Credit</span><b><span id="costVal">1</span><small>Credit</small></b></div>
+        <div class="cost"><span>ကုန်ကျမည့် Credit<small id="costNote" class="cost-note"></small></span><b><span id="costVal">1</span><small>Credit</small></b></div>
         <button type="button" class="btn-primary" id="doneBtn">မှာယူမည်</button>
         <div class="msg" id="useMsg" role="status"></div>
+      </div>
+
+      <div class="orders" id="ordersBox">
+        <div class="orders-head"><b>Like မှတ်တမ်း</b><span id="ordersCount"></span></div>
+        <div id="ordersList"></div>
       </div>
     </div>
   </div>
@@ -500,6 +554,7 @@ let earnKind = '';                 // 'watch' | 'like'
 bindTabs($('appTabs'), (d) => {
   $('earnView').hidden  = d.view !== 'earn';
   $('spendView').hidden = d.view !== 'spend';
+  if (d.view === 'spend') loadOrders();
   if (d.view !== 'earn') { lkStop(); }
   else if (lk && !lkFinished && !likeTaskEl.hidden && !lkWrap.hidden) {
     lkWatched = 0; lkLast = null; lkUI();      // ပြန်ကြည့်ရင် အစကပြန်တွက်
@@ -520,7 +575,7 @@ bindTiles($('earnTiles'), (v) => {
 const likeTaskEl = $('likeTask');
 const lkFrame = $('lkFrame'), lkWrap = $('lkPlayerWrap'), lkFill = $('lkFill');
 const lkStatus = $('lkStatus'), lkOpen = $('lkOpen'), lkClaim = $('lkClaim'), lkSkip = $('lkSkip');
-const lkS1 = $('lkS1');
+const lkTime = $('lkTime'), lkActions = $('lkActions');
 let lk = null;                       // လက်ရှိ task
 let lkWatched = 0, lkLast = null, lkDur = 0, lkFinished = false, lkOpened = false;
 let previewDur = null;               // poster ရဲ့ preview က ရတဲ့ Video ကြာချိန်
@@ -534,22 +589,31 @@ function lkStop() { lkFrame.src = 'about:blank'; }
 function lkUI() {
   const pct = lkDur > 0 ? Math.min(100, lkWatched / lkDur * 100) : 0;
   lkFill.style.width = pct + '%';
-  lkS1.classList.toggle('ok', lkFinished);
-  lkS1.textContent = lkFinished
-    ? '၁။ အဆုံးထိ ကြည့်ပြီးပါပြီ ✓'
-    : '၁။ Video ကို အဆုံးထိ ကြည့်ပါ' + (lkDur ? ' (' + Math.floor(lkWatched) + '/' + Math.round(lkDur) + 's)' : '');
+  lkTime.textContent = lkDur ? Math.floor(lkWatched) + ' / ' + Math.round(lkDur) + 's' : '';
   lkOpen.setAttribute('aria-disabled', lkFinished ? 'false' : 'true');
   lkClaim.disabled = !(lkFinished && (earnKind === 'watch' || lkOpened));
 }
 
+function lkNextState(msg) {
+  lkStatus.textContent = msg;
+  lkClaim.classList.add('next');
+  lkClaim.textContent = 'နောက်တစ်ပုဒ်';
+  lkClaim.disabled = false;
+  lkActions.classList.add('one');
+  lkOpen.hidden = true; lkSkip.hidden = true;
+  lkWrap.hidden = true; lkStop();
+}
+
 async function loadLikeTask() {
   lkWatched = 0; lkLast = null; lkDur = 0; lkFinished = false; lkOpened = false;
-  lkClaim.classList.remove('next');
   const isWatch = earnKind === 'watch';
-  lkClaim.textContent = (isWatch ? '၂။' : '၃။') + ' Credit ရယူပါ';
-  lkSkip.hidden = false; lkOpen.hidden = isWatch;
+  lkClaim.classList.remove('next');
+  lkClaim.textContent = 'Credit ရယူမည်';
+  lkActions.classList.toggle('one', isWatch);
+  lkOpen.hidden = isWatch; lkSkip.hidden = false;
   lkWrap.hidden = true; lkStop();
   lkStatus.textContent = 'Video ရှာနေသည်...';
+  lkTime.textContent = '';
   lkUI();
   const { data, error } = await sb.rpc('next_like_task', { p_kind: earnKind });
   if (error) {
@@ -560,9 +624,7 @@ async function loadLikeTask() {
   }
   lk = data;
   $('lkReward').textContent = lk.reward;
-  lkStatus.textContent = earnKind === 'watch'
-    ? 'Play နှိပ်ပြီး အဆုံးထိ ကြည့်ပါ'
-    : 'Play နှိပ်ပြီး အဆုံးထိ ကြည့်ပါ၊ ပြီးမှ TikTok မှာ Like လုပ်ပါ';
+  lkStatus.textContent = isWatch ? 'Play နှိပ်ပါ' : 'Play နှိပ်ပြီး ကြည့်ပါ၊ ပြီးမှ TikTok မှာ Like လုပ်ပါ';
   lkOpen.href = lk.video_url;
   lkWrap.hidden = false;
   lkFrame.src = playerUrl(lk.video_id, true);
@@ -604,8 +666,8 @@ window.addEventListener('message', (e) => {
     if (!lkFinished && lkDur > 0 && lkWatched >= lkDur - 1.5) {
       lkFinished = true;
       lkStatus.textContent = earnKind === 'watch'
-        ? 'ကြည့်ပြီးပါပြီ! Credit ရယူပါ'
-        : 'ကြည့်ပြီးပါပြီ! အခု TikTok မှာဖွင့်ပြီး Like လုပ်ပါ';
+        ? 'ပြီးပါပြီ ✓ Credit ရယူနိုင်ပါပြီ'
+        : 'ပြီးပါပြီ ✓ TikTok မှာ Like လုပ်ပြီး Credit ရယူပါ';
     }
     lkUI();
   } else if (m.type === 'onStateChange') {
@@ -631,21 +693,18 @@ lkClaim.addEventListener('click', async () => {
       p_task: lk.task_id, p_duration: Math.round(lkDur) || null
     });
     if (error) {
-      lkStatus.textContent = errText(error);
-      lkClaim.disabled = false;
-      if (/NO_TASK|ORDER_FULL/.test(error.message || '')) {
-        lkClaim.classList.add('next'); lkClaim.textContent = 'နောက်တစ်ပုဒ်';
-      }
+      const gone = /NO_TASK|ORDER_FULL/.test(error.message || '');
+      if (gone) lkNextState(errText(error));
+      else { lkStatus.textContent = errText(error); lkClaim.disabled = false; }
+      return;
+    }
+    if (data < 0) {                              // ပိုင်ရှင် Credit မလောက်/ဖျက်ပြီး/ပြည့်ပြီ
+      lkNextState('ဒီ Video အတွက် Credit မရတော့ပါ၊ နောက်တစ်ပုဒ် ယူပါ');
       return;
     }
     setCredit(data, true);
-    lkStatus.textContent = '+' + lk.reward + ' Credit ရပါပြီ ✓';
-    lkClaim.classList.add('next');
-    lkClaim.textContent = 'နောက်တစ်ပုဒ်';
-    lkClaim.disabled = false;
-    lkOpen.hidden = true; lkSkip.hidden = true;
-    lkWrap.hidden = true; lkStop();
-    lkFill.style.width = '0';
+    lkNextState('+' + lk.reward + ' Credit ရပါပြီ ✓');
+    lkFill.style.width = '0'; lkTime.textContent = '';
   } catch (e) {
     lkStatus.textContent = errText(e); lkClaim.disabled = false;
   } finally { lkBusy = false; }
@@ -703,6 +762,7 @@ bindTiles($('useTiles'), (v) => {
   usePanel.hidden = false;
   restart(usePanel, 'pop');
   useMsg.textContent = '';
+  $('costNote').textContent = v === 'like' ? 'Like တစ်ခုရတိုင်း တစ်ခုချင်း နုတ်မည်' : '';
   updateCost();
 });
 
@@ -782,8 +842,9 @@ doneBtn.addEventListener('click', async () => {
     return;
   }
   const price = cost();
-  if (credit < price) {
-    setMsg('Credit မလုံလောက်ပါ (လက်ကျန် ' + credit + ')', false);
+  const have = service === 'like' ? availableCredit() : credit;
+  if (have < price) {
+    setMsg('Credit မလုံလောက်ပါ (သုံးနိုင်သည့် လက်ကျန် ' + Math.max(have, 0) + ')', false);
     return;
   }
   const isViews = service === 'views';
@@ -799,9 +860,14 @@ doneBtn.addEventListener('click', async () => {
           p_link:    linkInput.value.trim()
         });
     if (error) { setMsg(errText(error), false); return; }
-    setCredit(data, true);
-    const extra = isViews ? ' (' + viewLabel + ')' : service === 'like' ? ' ' + likes + ' ခု' : '';
-    setMsg('✓ ' + USE_LABEL[service] + extra + ' အတွက် Credit ' + price + ' သုံးပြီးပါပြီ', true);
+    if (service === 'like') {
+      setCredit(data);                         // Credit မနုတ်သေး
+      setMsg('✓ Like ' + likes + ' ခု တင်ပြီးပါပြီ၊ တစ်ယောက်ယောက် Like ပေးတိုင်း Credit ' + amount + ' နုတ်မည်', true);
+      loadOrders();
+    } else {
+      setCredit(data, true);
+      setMsg('✓ ' + USE_LABEL[service] + ' (' + viewLabel + ') အတွက် Credit ' + price + ' သုံးပြီးပါပြီ', true);
+    }
     linkInput.value = '';
     previewBox.hidden = true; pvFrame.src = 'about:blank'; previewDur = null;
   } catch (e) {
@@ -810,6 +876,152 @@ doneBtn.addEventListener('click', async () => {
     doneBtn.disabled = false;
   }
 });
+
+// ---------- မှတ်တမ်း (ကိုယ်တင်ထားတဲ့ Like order များ) ----------
+const ordersList = $('ordersList'), ordersCount = $('ordersCount');
+let myOrders = [];
+
+function committed() {
+  return myOrders
+    .filter(o => o.status === 'open' || o.status === 'paused')
+    .reduce((a, o) => a + (o.target - o.done) * o.reward, 0);
+}
+function availableCredit() { return credit - committed(); }
+
+function el(tag, cls, text) {
+  const n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (text !== undefined) n.textContent = text;
+  return n;
+}
+function canonLink(url) {
+  const m = String(url).trim().match(/^https:\/\/(?:www\.)?tiktok\.com\/(@[^\/?#]+)\/video\/(\d{8,25})/i);
+  return m ? 'https://www.tiktok.com/' + m[1] + '/video/' + m[2] : null;
+}
+
+async function loadOrders() {
+  const { data, error } = await sb.from('like_orders')
+    .select('id, video_url, reward, target, done, status, created_at')
+    .neq('status', 'cancelled')
+    .order('created_at', { ascending: false })
+    .limit(30);
+  if (error) return;
+  myOrders = data || [];
+  renderOrders();
+}
+
+function renderOrders() {
+  ordersList.replaceChildren();
+  ordersCount.textContent = myOrders.length ? myOrders.length + ' ခု' : '';
+  if (!myOrders.length) {
+    ordersList.appendChild(el('div', 'ord-empty', 'မှတ်တမ်း မရှိသေးပါ'));
+    return;
+  }
+  myOrders.forEach(o => ordersList.appendChild(orderCard(o)));
+}
+
+function orderCard(o) {
+  const card = el('div', 'ord');
+  const name = (o.video_url.match(/\/(@[^\/?#]+)/) || [])[1] || 'TikTok Video';
+
+  const low = (o.status === 'open' || o.status === 'paused') && credit < o.reward;
+  const st = o.status === 'closed' ? ['ပြည့်ပြီ', 'st-done']
+           : (o.status === 'paused' || low) ? ['Credit မလောက်', 'st-warn']
+           : ['လုပ်ဆောင်နေ', 'st-open'];
+
+  const top = el('div', 'ord-top');
+  const a = el('a', 'ord-name', name);
+  a.href = o.video_url; a.target = '_blank'; a.rel = 'noopener noreferrer';
+  top.append(a, el('span', 'badge ' + st[1], st[0]));
+
+  const meta = el('div', 'ord-meta',
+    'Like ' + o.done + '/' + o.target + ' · တစ်ခုကို ' + o.reward + ' Credit · သုံးပြီး ' + (o.done * o.reward));
+  const bar = el('div', 'ord-bar');
+  const fillEl = el('div');
+  fillEl.style.width = Math.min(100, o.done / o.target * 100) + '%';
+  bar.appendChild(fillEl);
+
+  const act = el('div', 'ord-act');
+  const editBtn = el('button', '', 'ပြင်မည်');
+  const delBtn = el('button', 'del', 'ဖျက်မည်');
+  editBtn.type = delBtn.type = 'button';
+  act.append(editBtn, delBtn);
+
+  const form = buildEditForm(o);
+  form.hidden = true;
+  editBtn.addEventListener('click', () => { form.hidden = !form.hidden; });
+
+  delBtn.addEventListener('click', async () => {
+    if (!confirm('ဒီမှတ်တမ်းကို ဖျက်မလား?\nကျန်တဲ့ Like တွေ မလုပ်တော့ပါ၊ ပေးပြီးသား Credit ပြန်မရပါ')) return;
+    delBtn.disabled = true;
+    const { error } = await sb.rpc('cancel_like_order', { p_id: o.id });
+    if (error) { delBtn.disabled = false; alert(errText(error)); return; }
+    loadOrders();
+  });
+
+  card.append(top, meta, bar, act, form);
+  return card;
+}
+
+function buildEditForm(o) {
+  const f = el('div', 'ord-edit');
+
+  const row = el('div', 'ord-row');
+  const l1 = el('label', '', 'Like တစ်ခုအတွက် Credit');
+  const sel = el('select', 'text');
+  for (let i = 1; i <= 10; i++) {
+    const op = el('option', '', String(i)); op.value = i; if (i === o.reward) op.selected = true;
+    sel.appendChild(op);
+  }
+  l1.appendChild(sel);
+
+  const l2 = el('label', '', 'Like အရေအတွက်');
+  const num = el('input', 'text');
+  num.type = 'number'; num.inputMode = 'numeric';
+  num.min = Math.max(o.done, 1); num.max = 100; num.value = o.target;
+  l2.appendChild(num);
+  row.append(l1, l2);
+
+  const l3 = el('label', '', o.done > 0 ? 'Video Link (Like ရပြီးသားမို့ မပြင်နိုင်ပါ)' : 'Video Link');
+  const link = el('input', 'text');
+  link.type = 'url'; link.value = o.video_url; link.disabled = o.done > 0;
+  l3.appendChild(link);
+
+  const btns = el('div', 'ord-row');
+  const save = el('button', 'btn-primary', 'သိမ်းမည်');
+  const cancel = el('button', 'btn-primary', 'မလုပ်တော့ပါ');
+  save.type = cancel.type = 'button';
+  save.style.margin = cancel.style.margin = '0';
+  save.style.padding = cancel.style.padding = '9px';
+  save.style.fontSize = cancel.style.fontSize = '14px';
+  cancel.style.background = '#fff'; cancel.style.color = 'var(--ink)';
+  cancel.style.boxShadow = 'none'; cancel.style.border = '1.5px solid var(--line)';
+  btns.append(save, cancel);
+
+  const msg = el('div', 'msg');
+
+  cancel.addEventListener('click', () => { f.hidden = true; msg.textContent = ''; });
+  save.addEventListener('click', async () => {
+    const r = parseInt(sel.value, 10), n = parseInt(num.value, 10);
+    const fail = (t) => { msg.textContent = t; msg.className = 'msg err'; };
+    if (!(n >= Math.max(o.done, 1) && n <= 100)) return fail('Like အရေအတွက်ကို ' + Math.max(o.done, 1) + ' မှ 100 ကြားထည့်ပါ');
+    let newLink = null;
+    if (o.done === 0 && link.value.trim() !== o.video_url) {
+      newLink = canonLink(link.value);
+      if (!newLink) return fail('Link အပြည့်အစုံ ထည့်ပါ (…/@name/video/…)');
+    }
+    const extra = (n - o.done) * r + committed() - (o.status === 'closed' ? 0 : (o.target - o.done) * o.reward);
+    if (credit < extra) return fail('Credit မလုံလောက်ပါ');
+    save.disabled = true;
+    const { error } = await sb.rpc('update_like_order', { p_id: o.id, p_reward: r, p_likes: n, p_link: newLink });
+    save.disabled = false;
+    if (error) return fail(/NO_TASK/.test(error.message || '') ? 'ဒီမှတ်တမ်း မရှိတော့ပါ' : errText(error));
+    loadOrders();
+  });
+
+  f.append(row, l3, btns, msg);
+  return f;
+}
 
 // ================= Login / Register =================
 const authScreen = $('authScreen');
