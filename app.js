@@ -58,7 +58,7 @@ function errText(e) {
   function setCredit(n) { credit = n; creditEl.textContent = n; }
 
   let timer = null;
-  let state = 'idle';            // idle | watching | ready
+  let state = 'idle';            // idle | watching | ready | done
 
   function resetWatch() {
     clearInterval(timer);
@@ -220,17 +220,22 @@ function errText(e) {
     }
     const isViews = useSelect.value === 'views';
     doneBtn.disabled = true;
-    const { data, error } = await sb.rpc('spend_credit', {
-      p_service: useSelect.value,
-      p_option:  isViews ? viewSec : amount,
-      p_link:    linkInput.value.trim()
-    });
-    doneBtn.disabled = false;
-    if (error) { setMsg(errText(error), false); return; }
-    setCredit(data);
-    const extra = isViews ? ' (' + viewLabel + ')' : '';
-    setMsg('✓ ' + USE_LABEL[useSelect.value] + extra + ' အတွက် Credit ' + price + ' သုံးပြီးပါပြီ', true);
-    linkInput.value = '';
+    try {
+      const { data, error } = await sb.rpc('spend_credit', {
+        p_service: useSelect.value,
+        p_option:  isViews ? viewSec : amount,
+        p_link:    linkInput.value.trim()
+      });
+      if (error) { setMsg(errText(error), false); return; }
+      setCredit(data);
+      const extra = isViews ? ' (' + viewLabel + ')' : '';
+      setMsg('✓ ' + USE_LABEL[useSelect.value] + extra + ' အတွက် Credit ' + price + ' သုံးပြီးပါပြီ', true);
+      linkInput.value = '';
+    } catch (e) {
+      setMsg(errText(e), false);
+    } finally {
+      doneBtn.disabled = false;
+    }
   });
 
 
@@ -302,7 +307,7 @@ function errText(e) {
     el.className = 'msg ' + (ok ? 'ok' : 'err');
   }
 
-  // Supabase Auth က email လိုတာကြောင့် နာမည်ကနေ email တစ်ခုကို တည်ဆောက်ပေးသည်
+  // Supabase Auth ၏ login key အတွက် နာမည်ကနေ ID တစ်ခုကို အတွင်းမှာ ဖန်တီးသည် (user က email မထည့်ရ)
   async function nameToEmail(name) {
     const key = name.trim().normalize('NFC').toLowerCase();
     const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(key));
@@ -334,8 +339,6 @@ function errText(e) {
     showPanel(authMode.value === 'login' ? loginPanel : regPanel);
   });
 
-  const CONFIRM_MSG = 'Supabase > Authentication > Email ထဲမှာ "Confirm email" ကို ပိတ်ထားပါ';
-
   document.getElementById('loginBtn').addEventListener('click', async () => {
     const btn  = document.getElementById('loginBtn');
     const name = document.getElementById('loginName').value.trim();
@@ -347,8 +350,7 @@ function errText(e) {
         email: await nameToEmail(name), password: pass
       });
       if (error) {
-        authMsg('loginMsg', /confirm/i.test(error.message) ? CONFIRM_MSG
-                            : 'နာမည် သို့မဟုတ် စကားဝှက် မှားနေပါသည်', false);
+        authMsg('loginMsg', 'နာမည် သို့မဟုတ် စကားဝှက် မှားနေပါသည်', false);
         return;
       }
       document.getElementById('loginPass').value = '';
@@ -382,7 +384,7 @@ function errText(e) {
           : 'အကောင့်ဖွင့်မရပါ (' + (error.code || error.message) + ')', false);
         return;
       }
-      if (!data.session) { authMsg('regMsg', CONFIRM_MSG, false); return; }
+      if (!data.session) { authMsg('regMsg', 'အကောင့်ဖွင့်မရပါ၊ ထပ်ကြိုးစားပါ', false); return; }
 
       ['regName', 'regPass', 'regPass2'].forEach(id => document.getElementById(id).value = '');
       if (!(await enterApp(data.user))) authMsg('regMsg', 'အချက်အလက် ရယူမရပါ၊ ပြန်ဝင်ကြည့်ပါ', false);
@@ -418,7 +420,7 @@ function errText(e) {
   if (!sb) {
     const m = !window.supabase
       ? 'Supabase library ကို load မရပါ၊ internet စစ်ပြီး page ကို refresh လုပ်ပါ'
-      : 'config.js မဖတ်မရပါ၊ Supabase URL/Key ကိုစစ်ပါ (ဖိုင်အဆုံးမှာ မလိုတဲ့စာ မပါရ)';
+      : 'config.js ဖတ်မရပါ၊ Supabase URL/Key ကိုစစ်ပါ (ဖိုင်အဆုံးမှာ မလိုတဲ့စာ မပါရ)';
     authMsg('loginMsg', m, false);
     authMsg('regMsg', m, false);
     document.getElementById('loginBtn').disabled = true;
@@ -426,7 +428,9 @@ function errText(e) {
   } else {
     // Stay logged in after refresh
     (async function restoreSession() {
-      const { data } = await sb.auth.getSession();
-      if (data.session && !(await enterApp(data.session.user))) await sb.auth.signOut();
+      try {
+        const { data } = await sb.auth.getSession();
+        if (data.session && !(await enterApp(data.session.user))) await sb.auth.signOut();
+      } catch (e) { /* network error: stay on login screen */ }
     })();
   }
