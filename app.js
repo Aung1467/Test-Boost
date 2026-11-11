@@ -415,7 +415,9 @@ function errText(e) {
   showPanel(loginPanel);
 
   if (!sb) {
-    const m = 'config.js ထဲမှာ Supabase URL နှင့် Key ကို အရင်ထည့်ပါ';
+    const m = !window.supabase
+      ? 'Supabase library ကို load မရပါ၊ internet စစ်ပြီး page ကို refresh လုပ်ပါ'
+      : 'config.js မဖတ်မရပါ၊ Supabase URL/Key ကိုစစ်ပါ (ဖိုင်အဆုံးမှာ မလိုတဲ့စာ မပါရ)';
     authMsg('loginMsg', m, false);
     authMsg('regMsg', m, false);
     document.getElementById('loginBtn').disabled = true;
