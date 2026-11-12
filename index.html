@@ -729,8 +729,7 @@ async function loadLikeTask() {
     lkUI();
     return;
   }
-  lkStatus.textContent = lk.view ? 'Play နှိပ်ပြီး ' + lk.seconds + ' စက္ကန့် ကြည့်ပါ'
-    : (lk.trending ? 'Play နှိပ်ပါ (Video ၃၀ စက္ကန့်နှင့်အထက် = ၃၀ စက္ကန့်ကြည့်၊ Credit 30 / ၃၀ အောက် = ၁၀ စက္ကန့်ကြည့်၊ Credit 10)' : 'Play နှိပ်ပါ');
+  lkStatus.textContent = lk.view ? 'Play နှိပ်ပြီး ' + lk.seconds + ' စက္ကန့် ကြည့်ပါ' : 'Play နှိပ်ပါ';
   lkWrap.hidden = false;
   lkFrame.src = playerUrl(lk.video_id, false);   // autoplay မလုပ် — ကြည့်သူ ကိုယ်တိုင် Play နှိပ်ရမည်
   lkUI();
