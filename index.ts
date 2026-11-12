@@ -1,8 +1,4 @@
-// Supabase Edge Function: verify-like  (deploy: supabase functions deploy verify-like)
-// Like တကယ်ပေးမပေး စစ်ပြီးမှ Credit ထည့်ပေးသည်။
-// နည်းလမ်း: Video ရဲ့ Like အရေအတွက်ကို "စတင်ချိန်" နဲ့ "ရယူချိန်" နှိုင်းယှဉ် (tikwm.com သုံး)
-// ⚠️ TikTok တရားဝင် API မဟုတ်ပါ။ အရေအတွက် တိုးမတိုး ကြည့်ခြင်းသာဖြစ်ပြီး "ဘယ်သူ ပေးသလဲ" ကို အတိအကျ မသိနိုင်ပါ။
-// Video URL ကို Client ကပို့တာ မယုံ — Task ကနေ Server ကိုယ်တိုင် ရှာသည်။
+
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const CORS = {
@@ -15,8 +11,8 @@ const json = (b: unknown) =>
 
 const URL_RE = /^https:\/\/www\.tiktok\.com\/@[\w.]+\/video\/\d{8,25}$/;
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const MAX_AGE_MS = 30 * 60_000;     // စတင်ပြီး မိနစ် ၃၀ ကျော်ရင် မရတော့
-const TRIES = 3;                    // TikTok count update နောက်ကျတတ်လို့ ၃ ကြိမ်စစ်
+const MAX_AGE_MS = 30 * 60_000;     
+const TRIES = 3;                    
 const GAP_MS = 2500;
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
