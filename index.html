@@ -680,7 +680,7 @@ async function loadLikeTask() {
   $('lkReward').textContent = lk.trending ? '2-3' : lk.reward;
   lkStatus.textContent = isWatch ? (lk.view ? 'Play နှိပ်ပြီး ' + lk.seconds + ' စက္ကန့် ကြည့်ပါ' : 'Play နှိပ်ပါ') : 'Play နှိပ်ပြီး ၃ စက္ကန့် ကြည့်ပါ';
   lkWrap.hidden = false;
-  lkFrame.src = playerUrl(lk.video_id, true);
+  lkFrame.src = playerUrl(lk.video_id, false);   // autoplay မလုပ် — ကြည့်သူ ကိုယ်တိုင် Play နှိပ်ရမည်
   lkUI();
 }
 
