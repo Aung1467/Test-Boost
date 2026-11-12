@@ -529,7 +529,6 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--pink); outl
 window.APP_CONFIG = {
   SUPABASE_URL: 'https://dzszuhsfrfaumcvrtouf.supabase.co',
   SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR6c3p1aHNmcmZhdW1jdnJ0b3VmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ0MjM4OTUsImV4cCI6MjEwOTk5OTg5NX0.ovpL1EAi2pRRoyCCxe3vRLlkobRLgfUR9FJCJv__9rk',
-  EMAIL_DOMAIN: 'gmail.com'
 };
 
 // ================= Supabase =================
@@ -1154,12 +1153,28 @@ function authMsg(id, text, ok) {
   el.className = 'msg ' + (ok ? 'ok' : 'err');
 }
 
-// Supabase Auth ၏ login key အတွက် နာမည်ကနေ ID တစ်ခုကို အတွင်းမှာ ဖန်တီးသည် (user က email မထည့်ရ)
+// နာမည် → အတွင်း ID (Supabase Auth က email ပုံစံ ID ပဲ လက်ခံလို့)။ user မမြင်ရ။
+// ဒီ function ကို မပြောင်းပါနဲ့ — ပြောင်းရင် အကောင့်ဟောင်းတွေ ဝင်မရတော့ပါ
 async function nameToEmail(name) {
   const key = name.trim().normalize('NFC').toLowerCase();
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(key));
   const hex = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
-  return 'u' + hex.slice(0, 40) + '@' + (cfg.EMAIL_DOMAIN || 'gmail.com');
+  return 'u' + hex.slice(0, 40) + '@gmail.com';
+}
+
+// နာမည် ရှိ/မရှိ — true / false / null (စစ်မရ၊ SQL function မရှိသေးတာ အပါအဝင်)
+async function nameExists(email) {
+  try {
+    const { data, error } = await sb.rpc('auth_email_exists', { p_email: email });
+    if (error) { console.warn('auth_email_exists:', error); return null; }
+    return data === true;
+  } catch (e) { return null; }
+}
+
+// user ကို စာရှင်းရှင်းပြ၊ နည်းပညာအချက်အလက်ကို console ထဲမှာပဲ မှတ်
+function fail(id, userMsg, detail) {
+  if (detail) console.error('[auth]', detail);
+  authMsg(id, userMsg, false);
 }
 
 let enterErr = null;
@@ -1211,17 +1226,25 @@ $('loginBtn').addEventListener('click', async () => {
   if (!name || !pass) { authMsg('loginMsg', 'နာမည်နှင့် စကားဝှက်ကို ထည့်ပါ', false); return; }
   btn.disabled = true;
   try {
-    const { data, error } = await sb.auth.signInWithPassword({
-      email: await nameToEmail(name), password: pass
-    });
+    const email = await nameToEmail(name);
+    const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
     if (error) {
-      authMsg('loginMsg', 'နာမည် သို့မဟုတ် စကားဝှက် မှားနေပါသည်', false);
+      if (error.code === 'invalid_credentials' || /invalid login/i.test(error.message || '')) {
+        // နာမည်မရှိတာလား၊ စကားဝှက်မှားတာလား ခွဲပြရန်
+        const exists = await nameExists(email);
+        authMsg('loginMsg',
+          exists === false ? 'ဒီနာမည်နဲ့ အကောင့် မရှိပါ'
+          : exists === true ? 'စကားဝှက် မှားနေပါသည်'
+          : 'နာမည် သို့မဟုတ် စကားဝှက် မှားနေပါသည်', false);
+      } else {
+        fail('loginMsg', 'အကောင့်ဝင်မရပါ၊ ထပ်ကြိုးစားပါ', error);
+      }
       return;
     }
     $('loginPass').value = '';
     if (!(await enterApp(data.user))) authMsg('loginMsg', 'အချက်အလက် ရယူမရပါ၊ ထပ်ကြိုးစားပါ' + errSuffix(), false);
   } catch (e) {
-    authMsg('loginMsg', 'ချိတ်ဆက်မှု မအောင်မြင်ပါ (HTTPS သို့မဟုတ် localhost ဖြင့်ဖွင့်ပါ)', false);
+    fail('loginMsg', 'ချိတ်ဆက်မှု မအောင်မြင်ပါ၊ ထပ်ကြိုးစားပါ', e);
   } finally { btn.disabled = false; }
 });
 
@@ -1238,23 +1261,41 @@ $('regBtn').addEventListener('click', async () => {
 
   btn.disabled = true;
   try {
+    const TAKEN = 'ဒီနာမည်ကို အသုံးပြုပြီးသားပါ၊ တခြားနာမည် ရွေးပါ';
+    const email = await nameToEmail(name);
+
+    // ၁) နာမည်တူ ကြိုစစ် (Confirm email ဖွင့်ထားရင်တောင် မှန်အောင်)
+    if (await nameExists(email) === true) { authMsg('regMsg', TAKEN, false); return; }
+
+    // ၂) အကောင့်ဖွင့်
     const { data, error } = await sb.auth.signUp({
-      email: await nameToEmail(name),
+      email,
       password: pass,
       options: { data: { username: name } }
     });
     if (error) {
-      authMsg('regMsg', (error.code === 'user_already_exists' || /already|registered/i.test(error.message))
-        ? 'ဒီနာမည်ကို အသုံးပြုပြီးသားပါ'
-        : 'အကောင့်ဖွင့်မရပါ (' + (error.code || error.message) + ')', false);
+      const c = error.code || '', t = error.message || '';
+      if (c === 'user_already_exists' || /already|registered/i.test(t)) authMsg('regMsg', TAKEN, false);
+      else if (c === 'weak_password') fail('regMsg', 'စကားဝှက် အားနည်းလွန်းပါသည်၊ ပိုရှည်/ခက်အောင် ပြောင်းပါ', error);
+      else if (c === 'signup_disabled') fail('regMsg', 'အကောင့်သစ်ဖွင့်ခြင်းကို ယာယီပိတ်ထားပါသည်', error);
+      else if (/rate.?limit/i.test(c || t)) fail('regMsg', 'ခဏစောင့်ပြီး ပြန်ကြိုးစားပါ', error);
+      else fail('regMsg', 'အကောင့်ဖွင့်မရပါ (' + (c || t) + ')', error);   // မသိတဲ့ error ဆိုရင်တော့ code ကို ပြထားမည်
       return;
     }
-    if (!data.session) { authMsg('regMsg', 'အကောင့်ဖွင့်မရပါ၊ ထပ်ကြိုးစားပါ', false); return; }
+    // Confirm email ဖွင့်ထားချိန် နာမည်တူရင် error မပေးဘဲ identities ဗလာနဲ့ ပြန်လာတတ်သည်
+    if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+      authMsg('regMsg', TAKEN, false); return;
+    }
+    if (!data.session) {
+      fail('regMsg', 'အကောင့်ဖွင့်မရပါ၊ ထပ်ကြိုးစားပါ',
+        'signUp က session မပြန်ပေးဘူး — Supabase → Authentication → Sign In / Providers → Email မှာ "Confirm email" ကို ပိတ်ပါ');
+      return;
+    }
 
     ['regName', 'regPass', 'regPass2'].forEach(id => $(id).value = '');
     if (!(await enterApp(data.user))) authMsg('regMsg', 'အချက်အလက် ရယူမရပါ၊ ပြန်ဝင်ကြည့်ပါ' + errSuffix(), false);
   } catch (e) {
-    authMsg('regMsg', 'ချိတ်ဆက်မှု မအောင်မြင်ပါ (HTTPS သို့မဟုတ် localhost ဖြင့်ဖွင့်ပါ)', false);
+    fail('regMsg', 'ချိတ်ဆက်မှု မအောင်မြင်ပါ၊ ထပ်ကြိုးစားပါ', e);
   } finally { btn.disabled = false; }
 });
 
@@ -1283,9 +1324,8 @@ $('logoutBtn').addEventListener('click', async () => {
 });
 
 if (!sb) {
-  const m = !window.supabase
-    ? 'Supabase library ကို load မရပါ၊ internet စစ်ပြီး page ကို refresh လုပ်ပါ'
-    : 'Supabase URL/Key ကိုစစ်ပါ (index.html ထဲက APP_CONFIG)';
+  console.error('[auth]', !window.supabase ? 'Supabase library load မရပါ' : 'Supabase URL/Key ကို စစ်ပါ (APP_CONFIG)');
+  const m = 'ချိတ်ဆက်မှု မအောင်မြင်ပါ၊ internet စစ်ပြီး page ကို refresh လုပ်ပါ';
   authMsg('loginMsg', m, false);
   authMsg('regMsg', m, false);
   $('loginBtn').disabled = true;
