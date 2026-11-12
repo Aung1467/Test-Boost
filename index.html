@@ -650,12 +650,15 @@ function lkNeed() {
   if (!lk) return 0;
   if (lk.view) return lkDur > 0 ? Math.min(lk.seconds, Math.max(lkDur - 1.5, 1)) : lk.seconds;
   if (earnKind === 'like') return lkDur > 0 ? Math.min(3, Math.max(lkDur - 0.5, 1)) : 3;   // Like: ၃ စက္ကန့် ဖွင့်ရုံ
-  return lkDur > 0 ? lkDur - 1.5 : 0;                                                      // Trending ကြည့်ရန်: အပြည့်
+  // Trending ကြည့်ရန်: Video ၃၀ စက္ကန့်နှင့်အထက် = ၃၀ စက္ကန့်ကြည့် (Credit 30)၊ ၃၀ အောက် = ၁၀ စက္ကန့်ကြည့် (Credit 10)
+  if (lkDur > 0) return Math.min(trendTier(), Math.max(lkDur - 1.5, 1));
+  return 0;
 }
+function trendTier() { return Math.round(lkDur) >= 30 ? 30 : 10; }   // server ကို ပို့တဲ့ p_duration နဲ့ တူအောင် round သုံး
 
 function lkUI() {
   if (earnKind === 'like') { lkTime.textContent = ''; lkClaim.disabled = !lkFinished; return; }
-  const tot = (lk && lk.view) ? lkNeed() : lkDur;
+  const tot = (lk && (lk.view || (lk.trending && earnKind === 'watch'))) ? lkNeed() : lkDur;
   const pct = tot > 0 ? Math.min(100, lkWatched / tot * 100) : 0;
   lkFill.style.width = pct + '%';
   lkTime.textContent = tot ? '⏱ ' + fmtT(lkWatched) + ' / ' + fmtT(tot) : '';
@@ -705,7 +708,7 @@ async function loadLikeTask() {
     return;
   }
   lk = data;
-  $('lkReward').textContent = lk.trending ? '2-3' : lk.reward;
+  $('lkReward').textContent = (lk.trending && !isLike) ? '10 / 30' : (lk.trending ? '2-3' : lk.reward);
   if (isLike) {                                   // Like: Video မပြ၊ စက္ကန့်မရှိ — နှိပ်တာနဲ့ TikTok ဆီ တန်းသွား
     const mine = lk;
     lkClaim.textContent = 'စစ်ဆေးရန် ပြင်ဆင်နေသည်...';
@@ -726,7 +729,8 @@ async function loadLikeTask() {
     lkUI();
     return;
   }
-  lkStatus.textContent = lk.view ? 'Play နှိပ်ပြီး ' + lk.seconds + ' စက္ကန့် ကြည့်ပါ' : 'Play နှိပ်ပါ';
+  lkStatus.textContent = lk.view ? 'Play နှိပ်ပြီး ' + lk.seconds + ' စက္ကန့် ကြည့်ပါ'
+    : (lk.trending ? 'Play နှိပ်ပါ (Video ၃၀ စက္ကန့်နှင့်အထက် = ၃၀ စက္ကန့်ကြည့်၊ Credit 30 / ၃၀ အောက် = ၁၀ စက္ကန့်ကြည့်၊ Credit 10)' : 'Play နှိပ်ပါ');
   lkWrap.hidden = false;
   lkFrame.src = playerUrl(lk.video_id, false);   // autoplay မလုပ် — ကြည့်သူ ကိုယ်တိုင် Play နှိပ်ရမည်
   lkUI();
@@ -758,7 +762,10 @@ window.addEventListener('message', (e) => {
   if (!lk || e.source !== lkFrame.contentWindow) return;
   if (m.type === 'onCurrentTime' && m.value) {
     const t = Number(m.value.currentTime), dur = Number(m.value.duration);
-    if (dur > 0) { lkDur = dur; lkErr = 0; }
+    if (dur > 0) {
+      lkDur = dur; lkErr = 0;
+      if (lk.trending && earnKind === 'watch') $('lkReward').textContent = trendTier();
+    }
     if (lkLast !== null) {
       const d = t - lkLast;
       if (d > 0 && d <= 2) lkWatched += d;      // ကျော်ကြည့်ရင် (seek) မရေတွက်
