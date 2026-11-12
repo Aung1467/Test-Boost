@@ -335,6 +335,23 @@ select.text {
 .cl-credit { flex: none; font: 800 17px var(--display); font-variant-numeric: tabular-nums; }
 .credit-list .btn { display: block; width: 100%; margin-top: 10px; background: var(--soft); color: var(--ink); }
 
+/* ---------- admin: tidy layout ---------- */
+.adm-tabs { grid-template-columns: repeat(4, 1fr); }
+.adm-tabs .tab { padding: 8px 2px; font-size: 13px; }
+.adm-dot { display: inline-block; min-width: 18px; margin-left: 4px; padding: 0 5px; border-radius: 99px; background: var(--pink); color: #fff; font-size: 11px; line-height: 18px; vertical-align: 1px; }
+.adm-search { display: flex; gap: 8px; }
+.adm-status { margin-top: 10px; min-height: 0; font-size: 13px; color: var(--muted); }
+.adm-status.err { color: var(--err); }
+.adm-more { display: block; width: 100%; margin-top: 10px; background: var(--soft); color: var(--ink); }
+.adm-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+.adm-stat { padding: 12px 14px; background: var(--card); border: 1.5px solid var(--line); border-radius: var(--r-md); box-shadow: var(--sh-card); }
+.adm-stat small { display: block; font-size: 12px; color: var(--muted); }
+.adm-stat b { display: block; margin-top: 2px; font: 800 20px var(--display); font-variant-numeric: tabular-nums; }
+#clList { max-height: 58vh; overflow-y: auto; overscroll-behavior: contain; }
+.cl-go { cursor: pointer; }
+.cl-go:active { background: var(--soft); }
+.cl-row:nth-child(-n+3) .cl-rank { color: var(--pink); }
+
 /* ---------- motion ---------- */
 .task.pop, .use-panel.pop { animation: pop .3s var(--ease); }
 .coin.drop { animation: drop .7s cubic-bezier(.2, 1.3, .4, 1); }
@@ -551,26 +568,49 @@ select.text {
 
     <!-- Admin -->
     <div id="adminView" hidden>
-      <section class="credit-list">
-        <div class="orders-head"><b>User Credit စာရင်း</b><span id="clSum"></span></div>
-        <div id="clList"></div>
-        <button type="button" class="btn" id="clMore" hidden>နောက်ထပ်ကြည့်မည်</button>
-      </section>
-      <div class="field-label">စာပို့ရန် (Mail Box)</div>
-      <input class="text" type="text" id="admMailTitle" maxlength="100" placeholder="ခေါင်းစဉ်">
-      <textarea class="text" id="admMailBody" rows="3" maxlength="1000" placeholder="စာအကြောင်းအရာ" style="margin-top:8px;resize:vertical;font-family:inherit"></textarea>
-      <button type="button" class="btn" id="admMailAll" style="margin-top:8px">User အားလုံးသို့ ပို့မည်</button>
-      <div class="msg" id="admMailMsg" role="status"></div>
-      <p class="note">တစ်ယောက်တည်းကို ပို့ချင်ရင် အောက်မှာ User ရှာပြီး ၎င်းရဲ့ "စာပို့" ကိုနှိပ်ပါ</p>
-      <div class="field-label">User တွေဆီက စာများ <span id="admFbCount" style="color:var(--pink)"></span></div>
-      <div id="admFb"></div>
-      <div class="field-label">User ရှာရန်</div>
-      <div style="display:flex;gap:8px">
-        <input class="text" type="text" id="admQ" placeholder="နာမည် (အလွတ်ထားရင် အကုန်)" autocapitalize="none">
-        <button type="button" class="btn" id="admSearch">ရှာ</button>
+      <div class="tabs adm-tabs" id="admTabs" role="tablist">
+        <button type="button" class="tab active" data-pane="user" role="tab" aria-selected="true">User</button>
+        <button type="button" class="tab" data-pane="credit" role="tab" aria-selected="false">Credit</button>
+        <button type="button" class="tab" data-pane="mail" role="tab" aria-selected="false">စာပို့</button>
+        <button type="button" class="tab" data-pane="fb" role="tab" aria-selected="false">စာများ<span class="adm-dot" id="admFbCount" hidden></span></button>
       </div>
-      <div class="msg" id="admMsg" role="status"></div>
-      <div id="admList"></div>
+
+      <!-- User: ရှာ + စီမံ -->
+      <div class="adm-pane" id="admPane-user">
+        <div class="adm-search">
+          <input class="text" type="search" id="admQ" placeholder="User နာမည် ရှာရန်..." autocapitalize="none" autocomplete="off">
+          <button type="button" class="btn" id="admSearch">ရှာ</button>
+        </div>
+        <div class="msg adm-status" id="admMsg" role="status"></div>
+        <div id="admList"></div>
+        <button type="button" class="btn adm-more" id="admMore" hidden></button>
+      </div>
+
+      <!-- Credit စာရင်း -->
+      <div class="adm-pane" id="admPane-credit" hidden>
+        <div class="adm-stats">
+          <div class="adm-stat"><small>User စုစုပေါင်း</small><b id="clUsers">–</b></div>
+          <div class="adm-stat"><small>Credit စုစုပေါင်း</small><b id="clTotal">–</b></div>
+        </div>
+        <p class="note" id="clSum">Credit များသူ စီထားသည် · နာမည်ကို နှိပ်ရင် User tab မှာ ဖွင့်ပေးမည်</p>
+        <div id="clList"></div>
+        <button type="button" class="btn adm-more" id="clMore" hidden>နောက်ထပ်ကြည့်မည်</button>
+      </div>
+
+      <!-- စာပို့ -->
+      <div class="adm-pane" id="admPane-mail" hidden>
+        <div class="field-label" style="margin-top:0">User အားလုံးသို့ စာပို့ရန်</div>
+        <input class="text" type="text" id="admMailTitle" maxlength="100" placeholder="ခေါင်းစဉ်">
+        <textarea class="text" id="admMailBody" rows="4" maxlength="1000" placeholder="စာအကြောင်းအရာ" style="margin-top:8px;resize:vertical;font-family:inherit"></textarea>
+        <button type="button" class="btn adm-more" id="admMailAll">User အားလုံးသို့ ပို့မည်</button>
+        <div class="msg" id="admMailMsg" role="status"></div>
+        <p class="note">တစ်ယောက်တည်းကို ပို့ချင်ရင် User tab မှာ ရှာပြီး ၎င်းရဲ့ "စာပို့" ကိုနှိပ်ပါ (ဒီမှာ ရေးထားတဲ့ စာကို သုံးမည်)</p>
+      </div>
+
+      <!-- User တွေဆီက စာများ -->
+      <div class="adm-pane" id="admPane-fb" hidden>
+        <div id="admFb"></div>
+      </div>
     </div>
 
     <!-- Spend -->
@@ -1351,16 +1391,28 @@ async function checkAdmin() {
 const admList = $('admList'), admMsg = $('admMsg'), admQ = $('admQ');
 function admSay(t, ok) { admMsg.textContent = t; admMsg.className = 'msg ' + (ok ? 'ok' : 'err'); }
 
-let admTok = 0;
+let admTok = 0, admRows = [], admShown = 0;
+const ADM_PAGE = 20;
+const admMore = $('admMore');
+function admRender() {
+  const next = admRows.slice(admShown, admShown + ADM_PAGE);
+  next.forEach(u => admList.appendChild(admCard(u)));
+  admShown += next.length;
+  const left = admRows.length - admShown;
+  admMore.hidden = left <= 0;
+  admMore.textContent = 'နောက်ထပ်ကြည့်မည် (ကျန် ' + left + ' ဦး)';
+}
+admMore.addEventListener('click', admRender);
 async function admSearchUsers() {
   const my = ++admTok;
   const { data, error } = await sb.rpc('admin_list_users', { p_search: admQ.value.trim() || null });
   if (my !== admTok) return;                       // နောက်ဆုံးရိုက်တာကိုသာ ပြ
   if (error) { admSay('ယူမရပါ (' + (error.message || '') + ')', false); return; }
   admList.replaceChildren();
+  admRows = data; admShown = 0; admMore.hidden = true;
   if (!data.length) { admSay('', true); admList.appendChild(el('div', 'ord-empty', 'User မတွေ့ပါ')); return; }
-  admSay('User ' + data.length + ' ဦး တွေ့ပါသည် — နာမည်ကို နှိပ်ပြီး ဖွင့်ပါ', true);
-  data.forEach(u => admList.appendChild(admCard(u)));
+  admSay('User ' + data.length + ' ဦး · နာမည်ကို နှိပ်ပြီး ဖွင့်ပါ', true);
+  admRender();
   if (data.length === 1) admList.firstChild.admToggle(true);   // တစ်ယောက်တည်းဆို အလိုအလျောက် ဖွင့်
 }
 async function admLoad() {
@@ -1382,20 +1434,29 @@ async function creditListLoad(reset) {
     clMore.hidden = true;
     return;
   }
-  if (data.length) clSum.textContent = 'User ' + fmtNum(data[0].total_users) + ' ဦး · စုစုပေါင်း ' + fmtNum(data[0].total_credit);
+  if (data.length) { $('clUsers').textContent = fmtNum(data[0].total_users); $('clTotal').textContent = fmtNum(data[0].total_credit); }
   data.forEach((u, i) => {
-    const row = el('div', 'cl-row');
+    const row = el('div', 'cl-row cl-go');
+    row.addEventListener('click', () => { admQ.value = u.username || ''; admGoUser(); });
     row.append(el('span', 'cl-rank', String(clOffset + i + 1)), el('span', 'cl-name', u.username || '-'), el('b', 'cl-credit', fmtNum(u.credit)));
     clList.appendChild(row);
   });
   clOffset += data.length;
   clMore.hidden = data.length < CL_PAGE;
   clMore.disabled = false;
-  if (!clOffset) { clSum.textContent = ''; clList.appendChild(el('div', 'ord-empty', 'User မရှိသေးပါ')); }
+  if (!clOffset) { clList.appendChild(el('div', 'ord-empty', 'User မရှိသေးပါ')); }
 }
 clMore.addEventListener('click', () => creditListLoad(false));
 $('admSearch').addEventListener('click', admLoad);
 admQ.addEventListener('keydown', e => { if (e.key === 'Enter') admLoad(); });
+// ---- Admin sub-tabs ----
+const admPanes = { user: $('admPane-user'), credit: $('admPane-credit'), mail: $('admPane-mail'), fb: $('admPane-fb') };
+bindTabs($('admTabs'), (d) => { for (const k in admPanes) admPanes[k].hidden = k !== d.pane; });
+function admGoUser() {                              // Credit စာရင်းကနေ နာမည်နှိပ်ရင် User tab ကို ပြောင်းပြီး ရှာ
+  $('admTabs').querySelector('[data-pane="user"]').click();
+  admSearchUsers();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 let admTimer = null;
 admQ.addEventListener('input', () => { clearTimeout(admTimer); admTimer = setTimeout(admSearchUsers, 300); });   // ရိုက်ရင်း ရှာ
 
@@ -1555,7 +1616,7 @@ async function admFbLoad() {
   if (res.error || !Array.isArray(data)) return;
   const unread = data.filter(f => !f.is_read).length;
   $('adminTab').textContent = unread ? 'Admin (' + unread + ')' : 'Admin';
-  $('admFbCount').textContent = unread ? '— မဖတ်ရသေး ' + unread : '';
+  $('admFbCount').textContent = unread > 9 ? '9+' : String(unread); $('admFbCount').hidden = !unread;
   const box = $('admFb');
   box.replaceChildren();
   if (!data.length) { box.appendChild(el('div', 'ord-empty', 'စာ မရှိသေးပါ')); return; }
