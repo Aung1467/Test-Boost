@@ -1328,7 +1328,7 @@ $('regBtn').addEventListener('click', async () => {
     const { data, error } = await sb.auth.signUp({
       email,
       password: pass,
-      options: { data: { username: name } }
+      options: { data: { username: name, display_name: name, full_name: name, name: name } }
     });
     if (error) {
       const c = error.code || '', t = error.message || '';
