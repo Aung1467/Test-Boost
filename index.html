@@ -590,8 +590,8 @@ select.text {
           <div class="field-label">ကြည့်ရှုမည့် ကြာချိန်</div>
           <div class="chips c3" id="durChips">
             <button type="button" class="chip active" data-sec="6" data-cost="8">6 စက္ကန့်</button>
-            <button type="button" class="chip" data-sec="30" data-cost="30">30 စက္ကန့်</button>
-            <button type="button" class="chip" data-sec="60" data-cost="50">1 မိနစ်</button>
+            <button type="button" class="chip" data-sec="30" data-cost="32">30 စက္ကန့်</button>
+            <button type="button" class="chip" data-sec="60" data-cost="64">1 မိနစ်</button>
           </div>
         </div>
 
@@ -599,12 +599,12 @@ select.text {
           <div class="field-label" id="amountLabel">အသုံးပြုမယ့် Credit ပမာဏ</div>
           <p class="note" id="amountNote">သုံးမည့် Credit များလေ ပိုမြန်လေ ဖြစ်သည်</p>
           <div class="chips c6" id="chips">
-            <button type="button" class="chip active" data-n="1">1</button>
-            <button type="button" class="chip" data-n="2">2</button>
             <button type="button" class="chip" data-n="3">3</button>
             <button type="button" class="chip" data-n="4">4</button>
-            <button type="button" class="chip" data-n="5">5</button>
+            <button type="button" class="chip active" data-n="5">5</button>
             <button type="button" class="chip" data-n="6">6</button>
+            <button type="button" class="chip" data-n="8">8</button>
+            <button type="button" class="chip" data-n="10">10</button>
           </div>
         </div>
 
@@ -623,7 +623,7 @@ select.text {
           <div class="player-wrap"><iframe id="pvFrame" allow="autoplay; fullscreen" allowfullscreen title="preview"></iframe></div>
         </div>
 
-        <div class="cost"><span>ကုန်ကျမည့် Credit<small id="costNote" class="cost-note"></small></span><b><span id="costVal">1</span><small>Credit</small></b></div>
+        <div class="cost"><span>ကုန်ကျမည့် Credit<small id="costNote" class="cost-note"></small></span><b><span id="costVal">5</span><small>Credit</small></b></div>
         <button type="button" class="btn-primary" id="doneBtn">မှာယူမည်</button>
         <div class="msg" id="useMsg" role="status"></div>
       </div>
@@ -667,10 +667,11 @@ const ERR = {
   NOT_ADMIN:           'Admin မဟုတ်ပါ',
   EMPTY:               'စာအကြောင်းအရာ ထည့်ပါ',
   TOO_MANY:            'ခဏနေမှ ထပ်ပို့ပါ (တစ်နာရီမှာ ၅ စောင်အထိသာ)',
-  DAILY_LIMIT:         'ဒီနေ့ ကြည့်ရန် Credit ယူခွင့် ပြည့်သွားပါပြီ၊ မနက်ဖြန် ပြန်လာပါ'
 };
 function errText(e) {
   const m = (e && e.message) || '';
+  const lock = m.match(/EARN_LOCKED:(\d+)/);
+  if (lock) return 'Credit 1000 စုပြီးပါပြီ၊ ခဏနားပါ — ' + fmtT(Number(lock[1])) + ' အကြာမှ ပြန်ယူနိုင်မည်';
   for (const k in ERR) if (m.includes(k)) return ERR[k];
   if (/JWT|expired|not authenticated/i.test(m)) return 'Login သက်တမ်းကုန်သွားပါပြီ၊ ပြန်ဝင်ပါ';
   return 'ချိတ်ဆက်မှု မအောင်မြင်ပါ၊ ထပ်ကြိုးစားပါ';
@@ -772,7 +773,7 @@ function lkNeed() {
   if (lkDur > 0) return Math.min(trendTier(), Math.max(lkDur - 1.5, 1));
   return 0;
 }
-function trendTier() { return Math.round(lkDur) >= 30 ? 30 : 10; }
+function trendTier() { return (lk && lk.reward) ? lk.reward : (Math.round(lkDur) >= 30 ? 30 : 10); }   // Server ပေးတဲ့ reward
 
 function lkUI() {
   if (earnKind === 'like') { lkTime.textContent = ''; lkClaim.disabled = !lkFinished; return; }
@@ -855,6 +856,7 @@ async function loadLikeTask() {
       t = await sb.rpc('next_trending_task', { p_kind: isLike ? 'like' : 'watch' });
     }
     if (!t.error && t.data) { data = t.data; data.trending = true; error = null; }
+    else if (t.error) { error = t.error; }
   }
   if (error) {
     lk = null;
@@ -863,7 +865,7 @@ async function loadLikeTask() {
     return;
   }
   lk = data;
-  $('lkReward').textContent = (lk.trending && !isLike) ? '10 / 30' : (lk.trending ? '2-3' : lk.reward);
+  $('lkReward').textContent = (lk.trending && isLike) ? '2-3' : lk.reward;
   if (isLike) {
     const mine = lk;
     lkClaim.textContent = 'စစ်ဆေးရန် ပြင်ဆင်နေသည်...';
@@ -1024,7 +1026,7 @@ const doneBtn     = $('doneBtn');
 const useMsg      = $('useMsg');
 const USE_LABEL = { like: 'TikTok Like', views: 'TikTok ကြည့်ရှုမှု' };
 let service = '';
-let amount = 1;
+let amount = 5;
 let viewCost = 8, viewLabel = '6 စက္ကန့်', viewSec = 6;
 let likes = 1;
 const countBlock = $('countBlock'), countChips = $('countChips');
@@ -1284,7 +1286,7 @@ function buildEditForm(o) {
   const f = el('div', 'ord-edit');
   const l1 = el('label', '', 'Like တစ်ခုအတွက် Credit');
   const sel = el('select', 'text');
-  for (let i = 1; i <= 10; i++) {
+  for (let i = 3; i <= 10; i++) {
     const op = el('option', '', String(i)); op.value = i; if (i === o.reward) op.selected = true;
     sel.appendChild(op);
   }
