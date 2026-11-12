@@ -318,6 +318,7 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--pink); outl
 .ord { padding: 12px 14px; }
 
 .lk-time { font-size: 18px; font-weight: 800; color: var(--ink); font-family: var(--display); }
+.chip:disabled{opacity:.35;cursor:not-allowed;text-decoration:line-through}
 </style>
 </head>
 <body>
@@ -881,6 +882,7 @@ bindTiles($('useTiles'), (v) => {
   amountBlock.hidden = v === 'views';
   countBlock.hidden  = true;                // အရေအတွက်မလို — Credit မကုန်မချင်း Link ရှိနေမည်
   previewBox.hidden  = true; pvFrame.src = 'about:blank'; previewDur = null;
+  setTimeout(loadDuration, 0);
   $('amountLabel').textContent = v === 'like' ? 'Like တစ်ခုအတွက် ပေးမည့် Credit' : 'အသုံးပြုမယ့် Credit ပမာဏ';
   $('amountNote').textContent  = v === 'like'
     ? 'Credit များလေ တခြားသူတွေ ပိုလုပ်ချင်လေ၊ မြန်လေ ဖြစ်သည်'
@@ -941,11 +943,42 @@ async function normalizeLink() {
       setMsg('Link ကို မပြောင်းနိုင်ပါ၊ TikTok app ထဲက Share → Copy link ကို ပြန်ထည့်ပါ', false);
     } finally { resolving = false; doneBtn.disabled = false; }
   }
-  previewDur = null;                           // Video preview မပြတော့ပါ
+  loadDuration();                              // Video အရှည်ကို စစ်ပြီး ရွေးလို့မရတဲ့ ကြာချိန်တွေ ပိတ်
 }
 linkInput.addEventListener('change', normalizeLink);
 linkInput.addEventListener('paste', () => setTimeout(normalizeLink, 0));
 
+
+// ---- Video အရှည်ထက် ပိုရှည်တဲ့ ကြာချိန် မရွေးနိုင်အောင် ----
+let durReq = 0;
+const fmtDur = (n) => n >= 60 ? Math.floor(n / 60) + ' မိနစ် ' + (n % 60 ? (n % 60) + ' စက္ကန့်' : '') : n + ' စက္ကန့်';
+function applyDurLimit() {
+  const chips = Array.from(durChips.querySelectorAll('.chip'));
+  chips.forEach(c => { c.disabled = previewDur != null && parseInt(c.dataset.sec, 10) > previewDur; });
+  const act = durChips.querySelector('.chip.active');
+  if (act && act.disabled) {
+    act.classList.remove('active');
+    const ok = chips.filter(c => !c.disabled).pop();      // ရွေးလို့ရတဲ့ အရှည်ဆုံးကို ပြောင်း
+    if (ok) ok.click();
+  }
+}
+async function loadDuration() {
+  const my = ++durReq;
+  previewDur = null; applyDurLimit();
+  if (service !== 'views' || !tiktokVideoId(linkInput.value)) return;
+  setMsg('Video အရှည် စစ်နေသည်...', true);
+  let d = null;
+  try {
+    const r = await sb.functions.invoke('verify-like', { body: { action: 'info', video_url: linkInput.value.trim() } });
+    if (r.data && r.data.ok && r.data.duration > 0) d = Math.round(r.data.duration);
+  } catch (e) {}
+  if (my !== durReq) return;                               // Link ပြောင်းသွားပြီ
+  previewDur = d;
+  applyDurLimit();
+  if (d == null) setMsg('Video အရှည် စစ်မရပါ၊ ခဏနေမှ Link ကို ပြန်ထည့်ပါ', false);
+  else if (d < 6) setMsg('Video အရှည် ' + fmtDur(d) + ' — တိုလွန်းလို့ ကြည့်ရှုမှု မတင်နိုင်ပါ', false);
+  else setMsg('Video အရှည် ' + fmtDur(d) + ' — ဒီထက်ပိုရှည်တဲ့ ကြာချိန် ရွေးလို့ မရပါ', true);
+}
 
 durChips.addEventListener('click', (e) => {
   const chip = e.target.closest('.chip');
@@ -971,6 +1004,18 @@ doneBtn.addEventListener('click', async () => {
     return;
   }
   const isViews = service === 'views';
+  if (isViews) {                                // Video အရှည်ထက် ကြာချိန် မများရ
+    if (previewDur == null) {
+      const wanted = viewSec;
+      doneBtn.disabled = true;
+      await loadDuration();
+      doneBtn.disabled = false;
+      if (previewDur != null && viewSec !== wanted) { setMsg('Video တိုလို့ ကြာချိန်ကို ပြောင်းထားသည်၊ စစ်ပြီး ထပ်နှိပ်ပါ', false); return; }
+    }
+    if (previewDur == null) { setMsg('Video အရှည် စစ်မရပါ၊ Link မှန်မမှန် စစ်ပြီး ထပ်ကြိုးစားပါ', false); return; }
+    if (previewDur < 6)       { setMsg('Video တိုလွန်းလို့ (' + fmtDur(previewDur) + ') ကြည့်ရှုမှု မတင်နိုင်ပါ', false); return; }
+    if (viewSec > previewDur) { setMsg('Video အရှည်ထက် ကြာချိန် မများရပါ၊ ထပ်ရွေးပါ', false); return; }
+  }
   doneBtn.disabled = true;
   try {
     const { data, error } = await sb.rpc('create_order', {

@@ -1,4 +1,8 @@
-
+// Supabase Edge Function: verify-like  (deploy: supabase functions deploy verify-like)
+// Like တကယ်ပေးမပေး စစ်ပြီးမှ Credit ထည့်ပေးသည်။
+// နည်းလမ်း: Video ရဲ့ Like အရေအတွက်ကို "စတင်ချိန်" နဲ့ "ရယူချိန်" နှိုင်းယှဉ် (tikwm.com သုံး)
+// ⚠️ TikTok တရားဝင် API မဟုတ်ပါ။ အရေအတွက် တိုးမတိုး ကြည့်ခြင်းသာဖြစ်ပြီး "ဘယ်သူ ပေးသလဲ" ကို အတိအကျ မသိနိုင်ပါ။
+// Video URL ကို Client ကပို့တာ မယုံ — Task ကနေ Server ကိုယ်တိုင် ရှာသည်။
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const CORS = {
@@ -11,23 +15,30 @@ const json = (b: unknown) =>
 
 const URL_RE = /^https:\/\/www\.tiktok\.com\/@[\w.]+\/video\/\d{8,25}$/;
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const MAX_AGE_MS = 30 * 60_000;     
-const TRIES = 3;                    
+const MAX_AGE_MS = 30 * 60_000;     // စတင်ပြီး မိနစ် ၃၀ ကျော်ရင် မရတော့
+const TRIES = 3;                    // TikTok count update နောက်ကျတတ်လို့ ၃ ကြိမ်စစ်
 const GAP_MS = 2500;
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-async function likeCount(url: string): Promise<number | null> {
+async function tikData(url: string): Promise<Record<string, unknown> | null> {
   try {
     const r = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`, {
       headers: { "User-Agent": "Mozilla/5.0", "Accept": "application/json" },
     });
     if (!r.ok) return null;
-    const n = (await r.json())?.data?.digg_count;
-    return typeof n === "number" ? n : null;
+    return (await r.json())?.data ?? null;
   } catch (_e) {
     return null;
   }
+}
+async function likeCount(url: string): Promise<number | null> {
+  const n = (await tikData(url))?.digg_count;
+  return typeof n === "number" ? n : null;
+}
+async function videoDuration(url: string): Promise<number | null> {
+  const n = (await tikData(url))?.duration;       // စက္ကန့်
+  return typeof n === "number" ? n : null;
 }
 
 // Task ရဲ့ Video URL ကို DB ကနေ ရှာ (ကိုယ့် Task၊ မ claim ရသေးတာ၊ Like အမျိုးအစားသာ)
@@ -66,6 +77,15 @@ Deno.serve(async (req) => {
 
     const body = await req.json().catch(() => ({}));
     const action = String(body.action ?? "");
+    // ---- info: Video အရှည် (စက္ကန့်) — ကြည့်ရှုမှု order မှာ ကြာချိန်ကန့်သတ်ဖို့ ----
+    if (action === "info") {
+      const vu = String(body.video_url ?? "").split("?")[0];
+      if (!URL_RE.test(vu)) return json({ ok: false, code: "NO_TASK" });
+      let d = await videoDuration(vu);
+      if (d === null) { await sleep(1200); d = await videoDuration(vu); }
+      return json(d === null ? { ok: false, code: "VERIFY_UNAVAILABLE" } : { ok: true, duration: Math.round(d) });
+    }
+
     const taskId = String(body.task_id ?? "");
     const trending = !!body.trending;
     if (!UUID_RE.test(taskId)) return json({ ok: false, code: "NO_TASK" });
