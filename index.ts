@@ -54,6 +54,7 @@ async function tikData(url: string): Promise<Record<string, unknown> | null> {
   try {
     const r = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`, {
       headers: { "User-Agent": "Mozilla/5.0", "Accept": "application/json" },
+      signal: AbortSignal.timeout(8000),   // tikwm ဖြေမလာရင် function မရပ်နေအောင် ၈ စက္ကန့်ထိသာစောင့်
     });
     if (!r.ok) return null;
     return (await r.json())?.data ?? null;
