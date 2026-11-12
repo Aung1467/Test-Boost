@@ -409,6 +409,7 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--pink); outl
     <div class="tabs" id="appTabs" role="tablist">
       <button type="button" class="tab active" data-view="earn" role="tab" aria-selected="true">Credit ယူရန်</button>
       <button type="button" class="tab" data-view="spend" role="tab" aria-selected="false">Credit သုံးရန်</button>
+      <button type="button" class="tab" data-view="admin" id="adminTab" role="tab" aria-selected="false" hidden>Admin</button>
     </div>
 
     <!-- Credit ယူရန် -->
@@ -440,6 +441,17 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--pink); outl
           <button type="button" class="btn claim" id="lkClaim" disabled>Credit ရယူမည်</button>
         </div>
       </div>
+    </div>
+
+    <!-- Admin -->
+    <div id="adminView" hidden>
+      <div class="field-label">User ရှာရန်</div>
+      <div style="display:flex;gap:8px">
+        <input class="text" type="text" id="admQ" placeholder="နာမည် (အလွတ်ထားရင် အကုန်)" autocapitalize="none">
+        <button type="button" class="btn" id="admSearch">ရှာ</button>
+      </div>
+      <div class="msg" id="admMsg" role="status"></div>
+      <div id="admList"></div>
     </div>
 
     <!-- Credit သုံးရန် -->
@@ -585,6 +597,8 @@ let earnKind = '';                 // 'watch' | 'like'
 bindTabs($('appTabs'), (d) => {
   $('earnView').hidden  = d.view !== 'earn';
   $('spendView').hidden = d.view !== 'spend';
+  $('adminView').hidden = d.view !== 'admin';
+  if (d.view === 'admin') admLoad();
   if (d.view === 'spend') loadOrders();
   if (d.view !== 'earn') { lkStop(); }
   else if (lk && !lkFinished && !likeTaskEl.hidden && !lkWrap.hidden) {
@@ -1056,6 +1070,78 @@ function buildEditForm(o) {
   return f;
 }
 
+// ================= Admin (server ဘက်က Admin ဟုတ်မှ အလုပ်လုပ်) =================
+let myId = null;
+async function checkAdmin() {
+  try {
+    const { data } = await sb.rpc('is_admin');
+    $('adminTab').hidden = !data;
+    $('appTabs').style.gridTemplateColumns = data ? 'repeat(3, 1fr)' : '';
+  } catch (e) {}
+}
+const admList = $('admList'), admMsg = $('admMsg'), admQ = $('admQ');
+function admSay(t, ok) { admMsg.textContent = t; admMsg.className = 'msg ' + (ok ? 'ok' : 'err'); }
+
+async function admLoad() {
+  admSay('', true);
+  const { data, error } = await sb.rpc('admin_list_users', { p_search: admQ.value.trim() || null });
+  if (error) { admSay('ယူမရပါ (' + (error.message || '') + ')', false); return; }
+  admList.replaceChildren();
+  if (!data.length) { admList.appendChild(el('div', 'ord-empty', 'User မတွေ့ပါ')); return; }
+  data.forEach(u => admList.appendChild(admCard(u)));
+}
+$('admSearch').addEventListener('click', admLoad);
+admQ.addEventListener('keydown', e => { if (e.key === 'Enter') admLoad(); });
+
+function admCard(u) {
+  const card = el('div', 'ord');
+  const top = el('div', 'ord-top');
+  const badge = el('span', 'badge st-open', u.credit + ' Credit');
+  top.append(el('span', 'ord-name', u.username), badge);
+
+  const inp = el('input', 'text');
+  inp.type = 'number'; inp.inputMode = 'numeric'; inp.placeholder = 'Credit ပမာဏ';
+  inp.style.margin = '8px 0';
+
+  const act = el('div', 'ord-act');
+  const add = el('button', '', 'ထည့်မည် (+)');
+  const set = el('button', '', 'သတ်မှတ် (=)');
+  const pw  = el('button', '', 'Password');
+  [add, set, pw].forEach(b => b.type = 'button');
+  act.append(add, set, pw);
+
+  const msg = el('div', 'msg'); msg.style.minHeight = '0'; msg.style.marginTop = '6px';
+  const say = (t, ok) => { msg.textContent = t; msg.className = 'msg ' + (ok ? 'ok' : 'err'); };
+  const done = (v) => {
+    badge.textContent = v + ' Credit'; u.credit = v; inp.value = '';
+    say('✓ ပြီးပါပြီ', true);
+    if (u.id === myId) setCredit(v, true);
+  };
+  const num = () => { const n = parseInt(inp.value, 10); if (isNaN(n)) { say('ပမာဏ ထည့်ပါ', false); return null; } return n; };
+
+  add.addEventListener('click', async () => {
+    const n = num(); if (n === null) return;
+    const { data, error } = await sb.rpc('admin_adjust_credit', { p_user: u.id, p_delta: n });
+    error ? say('မအောင်မြင်ပါ (' + (error.message || '') + ')', false) : done(data);
+  });
+  set.addEventListener('click', async () => {
+    const n = num(); if (n === null) return;
+    if (n < 0) { say('0 နှင့်အထက် ထည့်ပါ', false); return; }
+    const { data, error } = await sb.rpc('admin_set_credit', { p_user: u.id, p_credit: n });
+    error ? say('မအောင်မြင်ပါ (' + (error.message || '') + ')', false) : done(data);
+  });
+  pw.addEventListener('click', async () => {
+    const v = prompt(u.username + ' ၏ စကားဝှက်အသစ် (အနည်းဆုံး ၆ လုံး)');
+    if (!v) return;
+    if (v.length < 6) { say('အနည်းဆုံး ၆ လုံး ထည့်ပါ', false); return; }
+    const { error } = await sb.rpc('admin_set_password', { p_user: u.id, p_password: v });
+    error ? say('မအောင်မြင်ပါ (' + (error.message || '') + ')', false) : say('✓ စကားဝှက် ပြောင်းပြီးပါပြီ', true);
+  });
+
+  card.append(top, inp, act, msg);
+  return card;
+}
+
 // ================= Login / Register =================
 const authScreen = $('authScreen');
 const appScreen  = $('appScreen');
@@ -1099,6 +1185,7 @@ async function enterApp(user) {
   $('who').textContent = data.username;
   $('avatar').textContent = (Array.from(data.username)[0] || '?').toUpperCase();
   setCredit(data.credit);
+  myId = user.id; checkAdmin();
   authScreen.hidden = true;
   appScreen.hidden = false;
   window.scrollTo(0, 0);
