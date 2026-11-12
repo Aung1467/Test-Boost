@@ -622,12 +622,14 @@ function fmtT(sec) { sec = Math.max(0, Math.floor(sec)); return Math.floor(sec /
 
 // ကြည့်ရမည့် စက္ကန့် (ကြည့်ရှုမှု order = spender ရွေးထားတဲ့ စက္ကန့်၊ ကျန်တာ = Video အပြည့်)
 function lkNeed() {
-  if (lk && lk.view) return lkDur > 0 ? Math.min(lk.seconds, Math.max(lkDur - 1.5, 1)) : lk.seconds;
-  return lkDur > 0 ? lkDur - 1.5 : 0;
+  if (!lk) return 0;
+  if (lk.view) return lkDur > 0 ? Math.min(lk.seconds, Math.max(lkDur - 1.5, 1)) : lk.seconds;
+  if (earnKind === 'like') return lkDur > 0 ? Math.min(3, Math.max(lkDur - 0.5, 1)) : 3;   // Like: ၃ စက္ကန့် ဖွင့်ရုံ
+  return lkDur > 0 ? lkDur - 1.5 : 0;                                                      // Trending ကြည့်ရန်: အပြည့်
 }
 
 function lkUI() {
-  const tot = (lk && lk.view) ? lkNeed() : lkDur;
+  const tot = (lk && (lk.view || earnKind === 'like')) ? lkNeed() : lkDur;
   const pct = tot > 0 ? Math.min(100, lkWatched / tot * 100) : 0;
   lkFill.style.width = pct + '%';
   lkTime.textContent = tot ? '⏱ ' + fmtT(lkWatched) + ' / ' + fmtT(tot) : '';
@@ -676,7 +678,7 @@ async function loadLikeTask() {
   }
   lk = data;
   $('lkReward').textContent = lk.trending ? '2-3' : lk.reward;
-  lkStatus.textContent = isWatch ? (lk.view ? 'Play နှိပ်ပြီး ' + lk.seconds + ' စက္ကန့် ကြည့်ပါ' : 'Play နှိပ်ပါ') : 'Play နှိပ်ပြီး အဆုံးထိ ကြည့်ပါ';
+  lkStatus.textContent = isWatch ? (lk.view ? 'Play နှိပ်ပြီး ' + lk.seconds + ' စက္ကန့် ကြည့်ပါ' : 'Play နှိပ်ပါ') : 'Play နှိပ်ပြီး ၃ စက္ကန့် ကြည့်ပါ';
   lkWrap.hidden = false;
   lkFrame.src = playerUrl(lk.video_id, true);
   lkUI();
@@ -759,7 +761,9 @@ async function claimNow() {
   try {
     const { data, error } = lk.trending
       ? await sb.rpc('complete_trending_task', { p_task: lk.task_id, p_duration: Math.round(lkDur) || null })
-      : await sb.rpc('complete_order_task', { p_task: lk.task_id });
+      : await sb.rpc('complete_order_task', {
+          p_task: lk.task_id, p_watched: Math.round(lkWatched * 10) / 10, p_dur: Math.round(lkDur * 10) / 10
+        });
     if (error) {
       const gone = /NO_TASK|ORDER_FULL/.test(error.message || '');
       if (gone) lkNextState(errText(error));
@@ -877,10 +881,7 @@ async function normalizeLink() {
       setMsg('Link ကို မပြောင်းနိုင်ပါ၊ TikTok app ထဲက Share → Copy link ကို ပြန်ထည့်ပါ', false);
     } finally { resolving = false; doneBtn.disabled = false; }
   }
-  previewDur = null;
-  const vid = tiktokVideoId(linkInput.value);
-  previewBox.hidden = !vid;
-  pvFrame.src = vid ? playerUrl(vid, false) : 'about:blank';
+  previewDur = null;                           // Video preview မပြတော့ပါ
 }
 linkInput.addEventListener('change', normalizeLink);
 linkInput.addEventListener('paste', () => setTimeout(normalizeLink, 0));
