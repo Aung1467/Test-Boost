@@ -25,7 +25,6 @@
 /* =====================================================================
    TikTok Boost — design system v3
    Tokens → base → layout → components → states → breakpoints
-   (HTML / JS မပြောင်း၊ ဒီ stylesheet တစ်ခုတည်း ပြင်ထားသည်)
    ===================================================================== */
 :root {
   --ground: #1E1A4D;  --sheet: #F7F5FF;  --card: #FFFFFF;
@@ -319,6 +318,17 @@ select.text {
 .gift-count { flex: none; font: 800 15px var(--display); }
 .gift-pop { position: fixed; left: 50%; top: 40%; z-index: 60; pointer-events: none; font: 800 46px var(--display); color: var(--pink); text-shadow: 0 3px 0 var(--ink); animation: giftpop 1.3s ease forwards; }
 
+/* ---------- admin: credit list ---------- */
+.credit-list { margin-bottom: 26px; }
+#clList { background: var(--card); border: 1.5px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--sh-card); overflow: hidden; }
+#clList:empty { display: none; }
+.cl-row { display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-bottom: 1px solid var(--line); }
+.cl-row:last-child { border-bottom: 0; }
+.cl-rank { flex: none; min-width: 26px; font: 700 13px var(--display); color: var(--muted); font-variant-numeric: tabular-nums; }
+.cl-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; font-weight: 600; }
+.cl-credit { flex: none; font: 800 17px var(--display); font-variant-numeric: tabular-nums; }
+.credit-list .btn { display: block; width: 100%; margin-top: 10px; background: var(--soft); color: var(--ink); }
+
 /* ---------- motion ---------- */
 .task.pop, .use-panel.pop { animation: pop .3s var(--ease); }
 .coin.drop { animation: drop .7s cubic-bezier(.2, 1.3, .4, 1); }
@@ -387,7 +397,7 @@ select.text {
       <button type="button" class="tab" data-mode="register" role="tab" aria-selected="false">အကောင့်သစ်ဖွင့်မည်</button>
     </div>
 
-    <!-- Login (show ကို HTML ထဲမှာ ကြိုထည့်ထား၊ JS မလိုဘဲ ပေါ်မယ်) -->
+    <!-- Login -->
     <div class="panel show" id="loginPanel">
       <label class="field">
         <span>နာမည်</span>
@@ -482,7 +492,7 @@ select.text {
       <button type="button" class="tab" data-view="admin" id="adminTab" role="tab" aria-selected="false" hidden>Admin</button>
     </div>
 
-    <!-- Credit ယူရန် -->
+    <!-- Earn -->
     <div id="earnView">
       <div class="gift" id="giftCard" hidden>
         <button type="button" class="gift-box" id="giftBtn" aria-label="လက်ဆောင်ပုံး">
@@ -535,6 +545,11 @@ select.text {
 
     <!-- Admin -->
     <div id="adminView" hidden>
+      <section class="credit-list">
+        <div class="orders-head"><b>User Credit စာရင်း</b><span id="clSum"></span></div>
+        <div id="clList"></div>
+        <button type="button" class="btn" id="clMore" hidden>နောက်ထပ်ကြည့်မည်</button>
+      </section>
       <div class="field-label">စာပို့ရန် (Mail Box)</div>
       <input class="text" type="text" id="admMailTitle" maxlength="100" placeholder="ခေါင်းစဉ်">
       <textarea class="text" id="admMailBody" rows="3" maxlength="1000" placeholder="စာအကြောင်းအရာ" style="margin-top:8px;resize:vertical;font-family:inherit"></textarea>
@@ -552,7 +567,7 @@ select.text {
       <div id="admList"></div>
     </div>
 
-    <!-- Credit သုံးရန် -->
+    <!-- Spend -->
     <div id="spendView" hidden>
       <div class="tiles" id="useTiles">
         <button type="button" class="tile" data-v="like">
@@ -651,7 +666,8 @@ const ERR = {
   NO_GIFT:             'လက်ဆောင်ပုံး မရှိသေးပါ',
   NOT_ADMIN:           'Admin မဟုတ်ပါ',
   EMPTY:               'စာအကြောင်းအရာ ထည့်ပါ',
-  TOO_MANY:            'ခဏနေမှ ထပ်ပို့ပါ (တစ်နာရီမှာ ၅ စောင်အထိသာ)'
+  TOO_MANY:            'ခဏနေမှ ထပ်ပို့ပါ (တစ်နာရီမှာ ၅ စောင်အထိသာ)',
+  DAILY_LIMIT:         'ဒီနေ့ ကြည့်ရန် Credit ယူခွင့် ပြည့်သွားပါပြီ၊ မနက်ဖြန် ပြန်လာပါ'
 };
 function errText(e) {
   const m = (e && e.message) || '';
@@ -677,7 +693,7 @@ function bindTabs(tabsEl, onPick) {
     onPick(t.dataset);
   };
   tabsEl.addEventListener('click', (e) => { const t = e.target.closest('.tab'); if (t) pick(t); });
-  tabsEl.addEventListener('keydown', (e) => {          // ← → Home End နဲ့ tab ရွေးနိုင်
+  tabsEl.addEventListener('keydown', (e) => {
     const list = visible(), i = list.indexOf(document.activeElement);
     if (i < 0) return;
     let n = -1;
@@ -706,7 +722,7 @@ function setCredit(n, animate) {
   if (animate) restart(creditEl, 'bump');
 }
 
-// ---------- Credit ယူရန် ----------
+// ---------- Earn credit ----------
 const hint = $('hint');
 let earnKind = '';                 // 'watch' | 'like'
 
@@ -718,12 +734,11 @@ bindTabs($('appTabs'), (d) => {
   if (d.view === 'spend') loadOrders();
   if (d.view !== 'earn') { lkStop(); }
   else if (lk && !lkFinished && !likeTaskEl.hidden && !lkWrap.hidden) {
-    lkWatched = 0; lkLast = null; lkUI();      // ပြန်ကြည့်ရင် အစကပြန်တွက်
+    lkWatched = 0; lkLast = null; lkUI();
     lkFrame.src = playerUrl(lk.video_id, false);
   }
 });
 
-// Credit ကို Video အပြည့်ကြည့်ပြီးမှသာ ရမယ် (အလိုအလျောက် မရတော့)
 bindTiles($('earnTiles'), (v) => {
   earnKind = v;
   hint.hidden = true;
@@ -732,15 +747,15 @@ bindTiles($('earnTiles'), (v) => {
   loadLikeTask();
 });
 
-// ---------- Like marketplace : ကြည့်သူ ----------
+// ---------- Like / view tasks ----------
 const likeTaskEl = $('likeTask');
 const lkFrame = $('lkFrame'), lkWrap = $('lkPlayerWrap'), lkFill = $('lkFill');
 const lkStatus = $('lkStatus'), lkClaim = $('lkClaim');
 const lkTime = $('lkTime'), lkActions = $('lkActions'), lkBar = $('lkBar');
-let lk = null;                       // လက်ရှိ task
+let lk = null;
 let lkErr = 0;
 let lkWatched = 0, lkLast = null, lkDur = 0, lkFinished = false, lkOpened = false;
-let previewDur = null;               // poster ရဲ့ preview က ရတဲ့ Video ကြာချိန်
+let previewDur = null;
 
 function playerUrl(id, autoplay) {
   return 'https://www.tiktok.com/player/v1/' + id +
@@ -750,16 +765,14 @@ function lkStop() { lkFrame.src = 'about:blank'; }
 
 function fmtT(sec) { sec = Math.max(0, Math.floor(sec)); return Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0'); }
 
-// ကြည့်ရမည့် စက္ကန့် (ကြည့်ရှုမှု order = spender ရွေးထားတဲ့ စက္ကန့်၊ ကျန်တာ = Video အပြည့်)
 function lkNeed() {
   if (!lk) return 0;
   if (lk.view) return lkDur > 0 ? Math.min(lk.seconds, Math.max(lkDur - 1.5, 1)) : lk.seconds;
-  if (earnKind === 'like') return lkDur > 0 ? Math.min(3, Math.max(lkDur - 0.5, 1)) : 3;   // Like: ၃ စက္ကန့် ဖွင့်ရုံ
-  // Trending ကြည့်ရန်: Video ၃၀ စက္ကန့်နှင့်အထက် = ၃၀ စက္ကန့်ကြည့် (Credit 30)၊ ၃၀ အောက် = ၁၀ စက္ကန့်ကြည့် (Credit 10)
+  if (earnKind === 'like') return lkDur > 0 ? Math.min(3, Math.max(lkDur - 0.5, 1)) : 3;
   if (lkDur > 0) return Math.min(trendTier(), Math.max(lkDur - 1.5, 1));
   return 0;
 }
-function trendTier() { return Math.round(lkDur) >= 30 ? 30 : 10; }   // server ကို ပို့တဲ့ p_duration နဲ့ တူအောင် round သုံး
+function trendTier() { return Math.round(lkDur) >= 30 ? 30 : 10; }
 
 function lkUI() {
   if (earnKind === 'like') { lkTime.textContent = ''; lkClaim.disabled = !lkFinished; return; }
@@ -779,7 +792,7 @@ function lkNextState(msg) {
   lkWrap.hidden = true; lkStop();
 }
 
-// ---------- Like မပေးဘဲ တမင်လုပ်ရင် ၃ မိနစ် ပိတ်ထား ----------
+// ---------- Like lock ----------
 let likeLockUntil = 0, likeLockTimer = null;
 try { likeLockUntil = Number(localStorage.getItem('likeLockUntil')) || 0; } catch (e) {}
 function setLikeLock(sec) {
@@ -807,7 +820,6 @@ function showLikeLock() {
   tick();
   likeLockTimer = setInterval(tick, 1000);
 }
-// Like မတွေ့ရင် Credit မပေး၊ ပြန်မစစ်ခိုင်း၊ နောက်တစ်ပုဒ် အလိုအလျောက်ပြ (Server က ကြိမ်ရေများရင် lock ပေး)
 function likeFailed(lockSec) {
   if (lockSec > 0) { setLikeLock(lockSec); showLikeLock(); return; }
   const mine = lk;
@@ -831,11 +843,10 @@ async function loadLikeTask() {
   clearInterval(likeLockTimer);
   if (isLike && likeLockLeft() > 0) { showLikeLock(); return; }
   let data = null, error = null;
-  {                                                  // ကိုယ့်အမျိုးအစား order သာ (ကြည့်ရန်=view / Like=like)၊ Credit နှုန်းမြင့်ကို အရင်
+  {
     const r = await sb.rpc('next_order_task', { p_kind: earnKind === 'watch' ? 'view' : 'like' });
     if (!r.error && r.data) { data = r.data; data.view = data.kind === 'view'; } else error = r.error;
   }
-  // ကြည့်ရန် / Like ပေးရန် နှစ်မျိုးလုံးမှာ မှာထားတဲ့ Video မရှိရင် Trending pool ထဲက random ယူ (Credit 2-3 random)
   if (error && /NO_VIDEO/.test(error.message || '')) {
     let t = await sb.rpc('next_trending_task', { p_kind: isLike ? 'like' : 'watch' });
     if (t.error && /NO_VIDEO/.test(t.error.message || '')) {
@@ -853,7 +864,7 @@ async function loadLikeTask() {
   }
   lk = data;
   $('lkReward').textContent = (lk.trending && !isLike) ? '10 / 30' : (lk.trending ? '2-3' : lk.reward);
-  if (isLike) {                                   // Like: Video မပြ၊ စက္ကန့်မရှိ — နှိပ်တာနဲ့ TikTok ဆီ တန်းသွား
+  if (isLike) {
     const mine = lk;
     lkClaim.textContent = 'စစ်ဆေးရန် ပြင်ဆင်နေသည်...';
     lkStatus.textContent = '';
@@ -866,7 +877,7 @@ async function loadLikeTask() {
       ok = !r.error && r.data && r.data.ok;
       if (r.data && r.data.code === 'LOCKED') locked = r.data.wait || 180;
     } catch (e) {}
-    if (lk !== mine) return;                      // နောက်ထပ် task ပြောင်းသွားပြီ
+    if (lk !== mine) return;
     if (locked) { setLikeLock(locked); showLikeLock(); return; }
     if (!ok) { lkNextState('Like စစ်ဆေးရန် ပြင်ဆင်မရပါ၊ နောက်တစ်ပုဒ် ယူပါ'); return; }
     lkFinished = true;
@@ -877,11 +888,10 @@ async function loadLikeTask() {
   }
   lkStatus.textContent = lk.view ? 'Play နှိပ်ပြီး ' + lk.seconds + ' စက္ကန့် ကြည့်ပါ' : 'Play နှိပ်ပါ';
   lkWrap.hidden = false;
-  lkFrame.src = playerUrl(lk.video_id, false);   // autoplay မလုပ် — ကြည့်သူ ကိုယ်တိုင် Play နှိပ်ရမည်
+  lkFrame.src = playerUrl(lk.video_id, false);
   lkUI();
 }
 
-// TikTok player က ပို့တဲ့ message ကို ဖတ်ခြင်း
 function readPlayerMsg(e) {
   let host = '';
   try { host = new URL(e.origin).hostname; } catch (x) { return null; }
@@ -895,7 +905,6 @@ window.addEventListener('message', (e) => {
   const m = readPlayerMsg(e);
   if (!m) return;
 
-  // Poster preview (Credit သုံးရန်)
   if (e.source === $('pvFrame').contentWindow) {
     if (m.type === 'onCurrentTime' && m.value && m.value.duration > 0) {
       previewDur = Math.round(m.value.duration);
@@ -903,7 +912,6 @@ window.addEventListener('message', (e) => {
     return;
   }
 
-  // ကြည့်သူ
   if (!lk || e.source !== lkFrame.contentWindow) return;
   if (m.type === 'onCurrentTime' && m.value) {
     const t = Number(m.value.currentTime), dur = Number(m.value.duration);
@@ -913,7 +921,7 @@ window.addEventListener('message', (e) => {
     }
     if (lkLast !== null) {
       const d = t - lkLast;
-      if (d > 0 && d <= 2) lkWatched += d;      // ကျော်ကြည့်ရင် (seek) မရေတွက်
+      if (d > 0 && d <= 2) lkWatched += d;
     }
     lkLast = t;
     if (!lkFinished && lkDur > 0 && lkWatched >= lkNeed()) {
@@ -923,11 +931,11 @@ window.addEventListener('message', (e) => {
         : 'ပြီးပါပြီ ✓ Credit ရယူမည်ကို နှိပ်ပါ၊ TikTok ထဲရောက်ရင် Like ပေးပါ';
     }
     lkUI();
-  } else if (m.type === 'onError') {            // embed မရတဲ့ Video ဆိုရင် နောက်တစ်ပုဒ် အလိုအလျောက်ယူ
+  } else if (m.type === 'onError') {
     if (++lkErr <= 3) loadLikeTask();
     else lkStatus.textContent = 'Video ဖွင့်မရပါ၊ ခဏနေမှ ပြန်ကြိုးစားပါ';
   } else if (m.type === 'onStateChange') {
-    if (m.value !== 1) lkLast = null;           // pause / buffer ဖြစ်ရင် ပြန်စတွက်
+    if (m.value !== 1) lkLast = null;
   }
 });
 
@@ -936,7 +944,7 @@ lkClaim.addEventListener('click', () => {
   if (lkBusy) return;
   if (lkClaim.classList.contains('next')) { loadLikeTask(); return; }
   if (!lk) return;
-  if (earnKind === 'like' && !lkOpened) {         // TikTok app ထဲ Video ဆီ တန်းသွား၊ Like ပေးပြီး ပြန်လာရင် Credit ရမည်
+  if (earnKind === 'like' && !lkOpened) {
     lkOpened = true; lkAwayAt = 0;
     lkStatus.textContent = 'TikTok မှာ Like ပေးပြီး ဒီကိုပြန်လာပါ၊ Like စစ်ပြီး Credit ထည့်မည်';
     lkClaim.textContent = 'Like ပေးပြီးပြီ၊ စစ်ဆေးမည်';
@@ -946,7 +954,6 @@ lkClaim.addEventListener('click', () => {
   claimNow();
 });
 
-// TikTok ကနေ ပြန်လာတာနဲ့ Credit အလိုအလျောက်ယူ (အနည်းဆုံး ၃ စက္ကန့် ဝေးခဲ့မှ)
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) { if (lkOpened) lkAwayAt = Date.now(); return; }
   if (lk && earnKind === 'like' && lkOpened && lkAwayAt && Date.now() - lkAwayAt >= 3000 && !lkClaim.classList.contains('next')) {
@@ -959,7 +966,7 @@ async function claimNow() {
   lkBusy = true; lkClaim.disabled = true;
   const credit0 = credit;
   try {
-    if (earnKind === 'like') {                    // Like တကယ်ပေးမပေး Server မှာ စစ်ပြီးမှ Credit ထည့်
+    if (earnKind === 'like') {
       lkStatus.textContent = 'Like စစ်ဆေးနေသည်...';
       const r = await sb.functions.invoke('verify-like', {
         body: { action: 'claim', task_id: lk.task_id, trending: !!lk.trending }
@@ -967,7 +974,7 @@ async function claimNow() {
       const d = r.data;
       if (r.error || !d) { lkStatus.textContent = errText({ message: 'VERIFY_UNAVAILABLE' }); lkClaim.disabled = false; lkClaim.textContent = 'ထပ်စစ်မည်'; return; }
       if (!d.ok) {
-        if (d.code === 'LIKE_NOT_FOUND') { likeFailed(d.lock || 0); return; }   // Like မပေးထား: Credit မရ၊ ပြန်မစစ်၊ နောက်တစ်ပုဒ်
+        if (d.code === 'LIKE_NOT_FOUND') { likeFailed(d.lock || 0); return; }
         if (d.code === 'LOCKED') { setLikeLock(d.wait || 180); showLikeLock(); return; }
         const gone = /NO_TASK|ORDER_FULL|NO_BASELINE/.test(d.code || '');
         if (gone) { lkNextState(errText({ message: d.code })); return; }
@@ -992,7 +999,7 @@ async function claimNow() {
       else { lkStatus.textContent = errText(error); lkClaim.disabled = false; }
       return;
     }
-    if (data < 0) {                              // ပိုင်ရှင် Credit မလောက်/ဖျက်ပြီး/ပြည့်ပြီ
+    if (data < 0) {
       lkNextState('ဒီ Video အတွက် Credit မရတော့ပါ၊ နောက်တစ်ပုဒ် ယူပါ');
       return;
     }
@@ -1004,7 +1011,7 @@ async function claimNow() {
   } finally { lkBusy = false; }
 }
 
-// ---------- Credit သုံးရန် ----------
+// ---------- Spend credit ----------
 const usePanel    = $('usePanel');
 const useTitle    = $('useTitle');
 const linkInput   = $('videoLink');
@@ -1041,7 +1048,7 @@ bindTiles($('useTiles'), (v) => {
   useTitle.textContent = USE_LABEL[v];
   durBlock.hidden    = v !== 'views';
   amountBlock.hidden = v === 'views';
-  countBlock.hidden  = true;                // အရေအတွက်မလို — Credit မကုန်မချင်း Link ရှိနေမည်
+  countBlock.hidden  = true;
   previewBox.hidden  = true; pvFrame.src = 'about:blank'; previewDur = null;
   setTimeout(loadDuration, 0);
   $('amountLabel').textContent = v === 'like' ? 'Like တစ်ခုအတွက် ပေးမည့် Credit' : 'အသုံးပြုမယ့် Credit ပမာဏ';
@@ -1077,7 +1084,6 @@ function tiktokVideoId(url) {
   const m = url.trim().match(/^https:\/\/(?:www\.)?tiktok\.com\/@[^\/?#]+\/video\/(\d{8,25})/i);
   return m ? m[1] : null;
 }
-// Link ကို ID ပါတဲ့ ပုံစံအဖြစ် အလိုအလျောက် ပြောင်း (short link / tracking parameter ဖယ်)
 let resolving = false;
 async function normalizeLink() {
   if (resolving) return;
@@ -1089,10 +1095,10 @@ async function normalizeLink() {
   if (!/(^|\.)tiktok\.com$/i.test(u.hostname)) return;
 
   const id = tiktokVideoId(raw);
-  if (id) {                                   // full link ဖြစ်ပြီးသား၊ ?_r=1... ဖယ်ရုံ
+  if (id) {
     const m = raw.match(/^https:\/\/(?:www\.)?tiktok\.com\/(@[^\/?#]+)\/video\/\d+/i);
     linkInput.value = 'https://www.tiktok.com/' + m[1] + '/video/' + id;
-  } else {                                    // short link → server မှာ ပြန်ဖြေရှင်း
+  } else {
     resolving = true; doneBtn.disabled = true;
     setMsg('Link ကို ပြောင်းနေသည်...', true);
     try {
@@ -1104,13 +1110,13 @@ async function normalizeLink() {
       setMsg('Link ကို မပြောင်းနိုင်ပါ၊ TikTok app ထဲက Share → Copy link ကို ပြန်ထည့်ပါ', false);
     } finally { resolving = false; doneBtn.disabled = false; }
   }
-  loadDuration();                              // Video အရှည်ကို စစ်ပြီး ရွေးလို့မရတဲ့ ကြာချိန်တွေ ပိတ်
+  loadDuration();
 }
 linkInput.addEventListener('change', normalizeLink);
 linkInput.addEventListener('paste', () => setTimeout(normalizeLink, 0));
 
 
-// ---- Video အရှည်ထက် ပိုရှည်တဲ့ ကြာချိန် မရွေးနိုင်အောင် ----
+// ---------- Video duration limits ----------
 let durReq = 0;
 const fmtDur = (n) => n >= 60 ? Math.floor(n / 60) + ' မိနစ် ' + (n % 60 ? (n % 60) + ' စက္ကန့်' : '') : n + ' စက္ကန့်';
 function applyDurLimit() {
@@ -1119,7 +1125,7 @@ function applyDurLimit() {
   const act = durChips.querySelector('.chip.active');
   if (act && act.disabled) {
     act.classList.remove('active');
-    const ok = chips.filter(c => !c.disabled).pop();      // ရွေးလို့ရတဲ့ အရှည်ဆုံးကို ပြောင်း
+    const ok = chips.filter(c => !c.disabled).pop();
     if (ok) ok.click();
   }
 }
@@ -1133,7 +1139,7 @@ async function loadDuration() {
     const r = await sb.functions.invoke('verify-like', { body: { action: 'info', video_url: linkInput.value.trim() } });
     if (r.data && r.data.ok && r.data.duration > 0) d = Math.round(r.data.duration);
   } catch (e) {}
-  if (my !== durReq) return;                               // Link ပြောင်းသွားပြီ
+  if (my !== durReq) return;
   previewDur = d;
   applyDurLimit();
   if (d == null) setMsg('Video အရှည် စစ်မရပါ၊ ခဏနေမှ Link ကို ပြန်ထည့်ပါ', false);
@@ -1165,7 +1171,7 @@ doneBtn.addEventListener('click', async () => {
     return;
   }
   const isViews = service === 'views';
-  if (isViews) {                                // Video အရှည်ထက် ကြာချိန် မများရ
+  if (isViews) {
     if (previewDur == null) {
       const wanted = viewSec;
       doneBtn.disabled = true;
@@ -1184,7 +1190,7 @@ doneBtn.addEventListener('click', async () => {
       p_reward: price, p_seconds: isViews ? viewSec : null, p_duration: previewDur
     });
     if (error) { setMsg(errText(error), false); return; }
-    setCredit(data);                           // Credit မနုတ်သေး
+    setCredit(data);
     setMsg('✓ တင်ပြီးပါပြီ၊ တစ်ယောက် ' + (isViews ? 'ကြည့်' : 'Like ပေး') + 'တိုင်း Credit ' + price + ' နုတ်မည်၊ Credit ကုန်ရင် Link အလိုအလျောက် ပိတ်မည်', true);
     loadOrders();
     linkInput.value = '';
@@ -1196,7 +1202,7 @@ doneBtn.addEventListener('click', async () => {
   }
 });
 
-// ---------- မှတ်တမ်း (ကိုယ်တင်ထားတဲ့ Like / ကြည့်ရှုမှု order များ) ----------
+// ---------- Order history ----------
 const ordersList = $('ordersList'), ordersCount = $('ordersCount');
 let myOrders = [];
 function availableCredit() { return credit; }
@@ -1322,13 +1328,13 @@ function buildEditForm(o) {
   return f;
 }
 
-// ================= Admin (server ဘက်က Admin ဟုတ်မှ အလုပ်လုပ်) =================
+// ===== Admin =====
 let myId = null, isAdm = false;
 async function checkAdmin() {
   try {
     const { data } = await sb.rpc('is_admin');
     isAdm = !!data;
-    $('fbBox').hidden = isAdm;                 // Admin ကိုယ်တိုင်ကတော့ "Admin ကို စာပို့ရန်" form မလို
+    $('fbBox').hidden = isAdm;
     $('adminTab').hidden = !data;
     if (data) admFbLoad();
     $('appTabs').style.gridTemplateColumns = data ? 'repeat(3, 1fr)' : '';
@@ -1340,12 +1346,38 @@ function admSay(t, ok) { admMsg.textContent = t; admMsg.className = 'msg ' + (ok
 async function admLoad() {
   admSay('', true);
   admFbLoad();
+  creditListLoad(true);
   const { data, error } = await sb.rpc('admin_list_users', { p_search: admQ.value.trim() || null });
   if (error) { admSay('ယူမရပါ (' + (error.message || '') + ')', false); return; }
   admList.replaceChildren();
   if (!data.length) { admList.appendChild(el('div', 'ord-empty', 'User မတွေ့ပါ')); return; }
   data.forEach(u => admList.appendChild(admCard(u)));
 }
+const clList = $('clList'), clSum = $('clSum'), clMore = $('clMore');
+const CL_PAGE = 50;
+let clOffset = 0;
+const fmtNum = (n) => Number(n || 0).toLocaleString('en-US');
+async function creditListLoad(reset) {
+  if (reset) { clOffset = 0; clList.replaceChildren(); }
+  clMore.disabled = true;
+  const { data, error } = await sb.rpc('admin_credit_list', { p_limit: CL_PAGE, p_offset: clOffset });
+  if (error || !Array.isArray(data)) {
+    clSum.textContent = 'စာရင်း ယူမရပါ';
+    clMore.hidden = true;
+    return;
+  }
+  if (data.length) clSum.textContent = 'User ' + fmtNum(data[0].total_users) + ' ဦး · စုစုပေါင်း ' + fmtNum(data[0].total_credit);
+  data.forEach((u, i) => {
+    const row = el('div', 'cl-row');
+    row.append(el('span', 'cl-rank', String(clOffset + i + 1)), el('span', 'cl-name', u.username || '-'), el('b', 'cl-credit', fmtNum(u.credit)));
+    clList.appendChild(row);
+  });
+  clOffset += data.length;
+  clMore.hidden = data.length < CL_PAGE;
+  clMore.disabled = false;
+  if (!clOffset) { clSum.textContent = ''; clList.appendChild(el('div', 'ord-empty', 'User မရှိသေးပါ')); }
+}
+clMore.addEventListener('click', () => creditListLoad(false));
 $('admSearch').addEventListener('click', admLoad);
 admQ.addEventListener('keydown', e => { if (e.key === 'Enter') admLoad(); });
 
@@ -1373,6 +1405,7 @@ function admCard(u) {
     badge.textContent = v + ' Credit'; u.credit = v; inp.value = '';
     say('✓ ပြီးပါပြီ', true);
     if (u.id === myId) setCredit(v, true);
+    creditListLoad(true);
   };
   const num = () => { const n = parseInt(inp.value, 10); if (isNaN(n)) { say('ပမာဏ ထည့်ပါ', false); return null; } return n; };
 
@@ -1437,12 +1470,12 @@ mailBtn.addEventListener('click', async () => {
   mailList.replaceChildren(el('div', 'ord-empty', 'ယူနေသည်...'));
   const ok = await loadMail(true);
   if (ok) {
-    const { error } = await sb.rpc('mark_inbox_read');   // ဖွင့်ကြည့်ပြီးရင် ဖတ်ပြီးမှတ်
+    const { error } = await sb.rpc('mark_inbox_read');
     if (!error) mailBadge.hidden = true;
   }
 });
 function closeMail() {
-  if (mailModal.hidden) return;                 // Escape ကို modal မဖွင့်ဘဲ နှိပ်လည်း focus မလုယူစေ
+  if (mailModal.hidden) return;
   mailModal.hidden = true;
   document.body.classList.remove('modal-open');
   mailBtn.focus();
@@ -1456,7 +1489,6 @@ function startMailPolling() {
   if (!mailTimer) mailTimer = setInterval(() => { if (!appScreen.hidden && mailModal.hidden) { loadMail(false); if (isAdm) admFbLoad(); } }, 60000);
 }
 
-// Admin: စာပို့ (userId = null ဆိုရင် အားလုံးသို့)
 async function admSendMail(userId, say, btn) {
   const t = $('admMailTitle').value.trim(), b = $('admMailBody').value.trim();
   if (!t || !b) { say('ခေါင်းစဉ်နှင့် စာအကြောင်းအရာ ထည့်ပါ', false); return; }
@@ -1474,7 +1506,7 @@ $('admMailAll').addEventListener('click', () => {
 });
 
 
-// ---- User → Admin စာပို့ ----
+// ---------- User → Admin messages ----------
 $('fbSend').addEventListener('click', async () => {
   const ta = $('fbBody'), msg = $('fbMsg'), b = ta.value.trim();
   const say = (t, ok) => { msg.textContent = t; msg.className = 'msg ' + (ok ? 'ok' : 'err'); };
@@ -1487,7 +1519,7 @@ $('fbSend').addEventListener('click', async () => {
   say('✓ Admin ဆီ ပို့ပြီးပါပြီ', true);
 });
 
-// ---- Admin: User တွေဆီက စာများ ----
+// ---------- Admin: user messages ----------
 async function admFbLoad() {
   let res;
   try { res = await sb.rpc('admin_list_feedback'); } catch (e) { return; }
@@ -1532,7 +1564,7 @@ function admFbCard(f) {
   return c;
 }
 
-// ================= လက်ဆောင်ပုံး (Task 30 ပြီးတိုင်း Bonus) =================
+// ===== Gift box =====
 const giftCard = $('giftCard'), giftBtn = $('giftBtn');
 let giftReady = 0, giftReward = 50, giftBusy = false;
 async function refreshBonus() {
@@ -1581,8 +1613,7 @@ function authMsg(id, text, ok) {
   el.className = 'msg ' + (ok ? 'ok' : 'err');
 }
 
-// နာမည် → အတွင်း ID (Supabase Auth က email ပုံစံ ID ပဲ လက်ခံလို့)။ user မမြင်ရ။
-// ဒီ function ကို မပြောင်းပါနဲ့ — ပြောင်းရင် အကောင့်ဟောင်းတွေ ဝင်မရတော့ပါ
+// Do not change: existing accounts are keyed by this mapping.
 async function nameToEmail(name) {
   const key = name.trim().normalize('NFC').toLowerCase();
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(key));
@@ -1590,8 +1621,6 @@ async function nameToEmail(name) {
   return 'u' + hex.slice(0, 40) + '@gmail.com';
 }
 
-// စကားဝှက် စည်းမျဉ်း: အနည်းဆုံး ၆ လုံး + English စာလုံးကြီး၊ စာလုံးသေး၊ ဂဏန်း (ဥပမာ Abc234)
-// အကောင့်သစ်ဖွင့်တဲ့အခါပဲ စစ်သည် — login မှာ မစစ်လို့ စကားဝှက်အဟောင်းတွေ ဆက်ဝင်လို့ရသည်
 function passProblem(p) {
   if (p.length < 6) return 'စကားဝှက် အနည်းဆုံး ၆ လုံးထည့်ပါ';
   if (!/[a-z]/.test(p) || !/[A-Z]/.test(p) || !/[0-9]/.test(p))
@@ -1599,7 +1628,6 @@ function passProblem(p) {
   return '';
 }
 
-// နာမည် ရှိ/မရှိ — true / false / null (စစ်မရ၊ SQL function မရှိသေးတာ အပါအဝင်)
 async function nameExists(email) {
   try {
     const { data, error } = await sb.rpc('auth_email_exists', { p_email: email });
@@ -1608,7 +1636,6 @@ async function nameExists(email) {
   } catch (e) { return null; }
 }
 
-// user ကို စာရှင်းရှင်းပြ၊ နည်းပညာအချက်အလက်ကို console ထဲမှာပဲ မှတ်
 function fail(id, userMsg, detail) {
   if (detail) console.error('[auth]', detail);
   authMsg(id, userMsg, false);
@@ -1624,7 +1651,7 @@ function loadProfile(user) {
 async function enterApp(user) {
   enterErr = null;
   let { data, error } = await loadProfile(user);
-  if (!error && !data) {                       // profile မရှိသေးရင် ဖန်တီးပြီး ပြန်ယူ
+  if (!error && !data) {
     const r = await sb.rpc('ensure_profile');
     if (r.error) error = r.error;
     else ({ data, error } = await loadProfile(user));
@@ -1668,7 +1695,6 @@ $('loginBtn').addEventListener('click', async () => {
     const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
     if (error) {
       if (error.code === 'invalid_credentials' || /invalid login/i.test(error.message || '')) {
-        // နာမည်မရှိတာလား၊ စကားဝှက်မှားတာလား ခွဲပြရန်
         const exists = await nameExists(email);
         authMsg('loginMsg',
           exists === false ? 'ဒီနာမည်နဲ့ အကောင့် မရှိပါ'
@@ -1703,10 +1729,8 @@ $('regBtn').addEventListener('click', async () => {
     const TAKEN = 'ဒီနာမည်ကို အသုံးပြုပြီးသားပါ၊ တခြားနာမည် ရွေးပါ';
     const email = await nameToEmail(name);
 
-    // ၁) နာမည်တူ ကြိုစစ် (Confirm email ဖွင့်ထားရင်တောင် မှန်အောင်)
     if (await nameExists(email) === true) { authMsg('regMsg', TAKEN, false); return; }
 
-    // ၂) အကောင့်ဖွင့်
     const { data, error } = await sb.auth.signUp({
       email,
       password: pass,
@@ -1718,16 +1742,15 @@ $('regBtn').addEventListener('click', async () => {
       else if (c === 'weak_password') fail('regMsg', 'စကားဝှက် အားနည်းလွန်းပါသည်၊ ပိုရှည်/ခက်အောင် ပြောင်းပါ', error);
       else if (c === 'signup_disabled') fail('regMsg', 'အကောင့်သစ်ဖွင့်ခြင်းကို ယာယီပိတ်ထားပါသည်', error);
       else if (/rate.?limit/i.test(c || t)) fail('regMsg', 'ခဏစောင့်ပြီး ပြန်ကြိုးစားပါ', error);
-      else fail('regMsg', 'အကောင့်ဖွင့်မရပါ (' + (c || t) + ')', error);   // မသိတဲ့ error ဆိုရင်တော့ code ကို ပြထားမည်
+      else fail('regMsg', 'အကောင့်ဖွင့်မရပါ (' + (c || t) + ')', error);
       return;
     }
-    // Confirm email ဖွင့်ထားချိန် နာမည်တူရင် error မပေးဘဲ identities ဗလာနဲ့ ပြန်လာတတ်သည်
     if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
       authMsg('regMsg', TAKEN, false); return;
     }
     if (!data.session) {
       fail('regMsg', 'အကောင့်ဖွင့်မရပါ၊ ထပ်ကြိုးစားပါ',
-        'signUp က session မပြန်ပေးဘူး — Supabase → Authentication → Sign In / Providers → Email မှာ "Confirm email" ကို ပိတ်ပါ');
+        'signUp returned no session (email confirmation is enabled)');
       return;
     }
 
@@ -1765,7 +1788,7 @@ $('logoutBtn').addEventListener('click', async () => {
 });
 
 if (!sb) {
-  console.error('[auth]', !window.supabase ? 'Supabase library load မရပါ' : 'Supabase URL/Key ကို စစ်ပါ (APP_CONFIG)');
+  console.error('[auth]', !window.supabase ? 'Supabase library failed to load' : 'Check Supabase URL/key (APP_CONFIG)');
   const m = 'ချိတ်ဆက်မှု မအောင်မြင်ပါ၊ internet စစ်ပြီး page ကို refresh လုပ်ပါ';
   authMsg('loginMsg', m, false);
   authMsg('regMsg', m, false);
@@ -1781,7 +1804,6 @@ if (!sb) {
   })();
 }
 
-// chip / tile ရွေးထားမှု ကို screen reader သိအောင် aria-pressed ချိတ်
 (function () {
   const sync = () => document.querySelectorAll('.chip, .tile').forEach(b => b.setAttribute('aria-pressed', b.classList.contains('active') ? 'true' : 'false'));
   document.addEventListener('click', () => setTimeout(sync, 0));
