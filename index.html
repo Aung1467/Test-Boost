@@ -542,10 +542,12 @@ select.text {
   <div class="modal" id="mailModal" hidden role="dialog" aria-modal="true" aria-label="စာများ">
     <div class="modal-box">
       <div class="modal-head"><b>Mail Box</b><button type="button" id="mailClose">ပိတ်</button></div>
+      <div id="fbBox">
       <div class="field-label" style="margin-top:0">Admin ကို စာပို့ရန် (Error / အကြံပေးချက်)</div>
       <textarea class="text" id="fbBody" rows="3" maxlength="1000" placeholder="ဘာဖြစ်လဲ ရေးပါ" style="resize:vertical;font-family:inherit"></textarea>
       <button type="button" class="btn" id="fbSend" style="margin-top:8px">Admin ဆီ ပို့မည်</button>
       <div class="msg" id="fbMsg" role="status" style="margin:8px 0 4px"></div>
+      </div>
       <div class="field-label">ရရှိထားသော စာများ</div>
       <div id="mailList"></div>
     </div>
@@ -1412,6 +1414,7 @@ async function checkAdmin() {
   try {
     const { data } = await sb.rpc('is_admin');
     isAdm = !!data;
+    $('fbBox').hidden = isAdm;                 // Admin ကိုယ်တိုင်ကတော့ "Admin ကို စာပို့ရန်" form မလို
     $('adminTab').hidden = !data;
     if (data) admFbLoad();
     $('appTabs').style.gridTemplateColumns = data ? 'repeat(3, 1fr)' : '';
