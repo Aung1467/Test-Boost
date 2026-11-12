@@ -682,11 +682,11 @@ async function loadLikeTask() {
   }
   // ကြည့်ရန် / Like ပေးရန် နှစ်မျိုးလုံးမှာ မှာထားတဲ့ Video မရှိရင် Trending pool ထဲက random ယူ (Credit 2-3 random)
   if (error && /NO_VIDEO/.test(error.message || '')) {
-    let t = await sb.rpc('next_trending_task');
+    let t = await sb.rpc('next_trending_task', { p_kind: isLike ? 'like' : 'watch' });
     if (t.error && /NO_VIDEO/.test(t.error.message || '')) {
       lkStatus.textContent = 'Trending Video အသစ်ရှာနေသည်...';
       try { await sb.functions.invoke('fetch-trending'); } catch (e) {}
-      t = await sb.rpc('next_trending_task');
+      t = await sb.rpc('next_trending_task', { p_kind: isLike ? 'like' : 'watch' });
     }
     if (!t.error && t.data) { data = t.data; data.trending = true; error = null; }
   }
@@ -706,7 +706,7 @@ async function loadLikeTask() {
     let ok = false;
     try {
       const r = await sb.functions.invoke('verify-like', {
-        body: { action: 'start', task_id: mine.task_id, video_url: mine.video_url, trending: !!mine.trending }
+        body: { action: 'start', task_id: mine.task_id, trending: !!mine.trending }
       });
       ok = !r.error && r.data && r.data.ok;
     } catch (e) {}
@@ -802,7 +802,7 @@ async function claimNow() {
     if (earnKind === 'like') {                    // Like တကယ်ပေးမပေး Server မှာ စစ်ပြီးမှ Credit ထည့်
       lkStatus.textContent = 'Like စစ်ဆေးနေသည်...';
       const r = await sb.functions.invoke('verify-like', {
-        body: { action: 'claim', task_id: lk.task_id, video_url: lk.video_url, trending: !!lk.trending }
+        body: { action: 'claim', task_id: lk.task_id, trending: !!lk.trending }
       });
       const d = r.data;
       if (r.error || !d) { lkStatus.textContent = errText({ message: 'VERIFY_UNAVAILABLE' }); lkClaim.disabled = false; lkClaim.textContent = 'ထပ်စစ်မည်'; return; }
