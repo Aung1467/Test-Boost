@@ -262,6 +262,12 @@ select.text {
 .ord { margin-bottom: 10px; padding: 14px; background: var(--card); border: 1.5px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--sh-card); }
 .ord-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
 .ord-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; font-weight: 700; color: var(--ink); text-decoration: none; }
+.adm-head { width: 100%; min-height: 40px; padding: 0; background: none; border: 0; font: inherit; color: inherit; text-align: left; cursor: pointer; }
+.adm-head .ord-name { flex: 1; }
+.adm-chev { flex: none; width: 22px; text-align: center; color: var(--muted); transition: transform .2s; }
+.adm-open .adm-chev { transform: rotate(180deg); }
+.adm-body { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--line); }
+.adm-body[hidden] { display: none; }
 .badge { flex: none; padding: 2px 10px; border-radius: 99px; font-size: 12px; font-weight: 700; }
 .st-open { background: #DDF5EC; color: var(--ok); }
 .st-warn { background: #FFE9C4; color: #8A5A00; }
@@ -1345,15 +1351,23 @@ async function checkAdmin() {
 const admList = $('admList'), admMsg = $('admMsg'), admQ = $('admQ');
 function admSay(t, ok) { admMsg.textContent = t; admMsg.className = 'msg ' + (ok ? 'ok' : 'err'); }
 
+let admTok = 0;
+async function admSearchUsers() {
+  const my = ++admTok;
+  const { data, error } = await sb.rpc('admin_list_users', { p_search: admQ.value.trim() || null });
+  if (my !== admTok) return;                       // နောက်ဆုံးရိုက်တာကိုသာ ပြ
+  if (error) { admSay('ယူမရပါ (' + (error.message || '') + ')', false); return; }
+  admList.replaceChildren();
+  if (!data.length) { admSay('', true); admList.appendChild(el('div', 'ord-empty', 'User မတွေ့ပါ')); return; }
+  admSay('User ' + data.length + ' ဦး တွေ့ပါသည် — နာမည်ကို နှိပ်ပြီး ဖွင့်ပါ', true);
+  data.forEach(u => admList.appendChild(admCard(u)));
+  if (data.length === 1) admList.firstChild.admToggle(true);   // တစ်ယောက်တည်းဆို အလိုအလျောက် ဖွင့်
+}
 async function admLoad() {
   admSay('', true);
   admFbLoad();
   creditListLoad(true);
-  const { data, error } = await sb.rpc('admin_list_users', { p_search: admQ.value.trim() || null });
-  if (error) { admSay('ယူမရပါ (' + (error.message || '') + ')', false); return; }
-  admList.replaceChildren();
-  if (!data.length) { admList.appendChild(el('div', 'ord-empty', 'User မတွေ့ပါ')); return; }
-  data.forEach(u => admList.appendChild(admCard(u)));
+  await admSearchUsers();
 }
 const clList = $('clList'), clSum = $('clSum'), clMore = $('clMore');
 const CL_PAGE = 50;
@@ -1382,12 +1396,18 @@ async function creditListLoad(reset) {
 clMore.addEventListener('click', () => creditListLoad(false));
 $('admSearch').addEventListener('click', admLoad);
 admQ.addEventListener('keydown', e => { if (e.key === 'Enter') admLoad(); });
+let admTimer = null;
+admQ.addEventListener('input', () => { clearTimeout(admTimer); admTimer = setTimeout(admSearchUsers, 300); });   // ရိုက်ရင်း ရှာ
 
 function admCard(u) {
-  const card = el('div', 'ord');
-  const top = el('div', 'ord-top');
+  const card = el('div', 'ord adm-card');
+  const top = el('button', 'ord-top adm-head');
+  top.type = 'button'; top.setAttribute('aria-expanded', 'false');
   const badge = el('span', 'badge st-open', u.credit + ' Credit');
-  top.append(el('span', 'ord-name', u.username), badge);
+  top.append(el('span', 'ord-name', u.username), badge, el('span', 'adm-chev', '▾'));
+  const body = el('div', 'adm-body'); body.hidden = true;
+  const setOpen = (o) => { body.hidden = !o; card.classList.toggle('adm-open', o); top.setAttribute('aria-expanded', String(o)); };
+  card.admToggle = setOpen;
 
   const inp = el('input', 'text');
   inp.type = 'number'; inp.inputMode = 'numeric'; inp.placeholder = 'Credit ပမာဏ';
@@ -1432,7 +1452,13 @@ function admCard(u) {
 
   ml.addEventListener('click', () => admSendMail(u.id, say, ml));
 
-  card.append(top, inp, act, msg);
+  body.append(inp, act, msg);
+  card.append(top, body);
+  top.addEventListener('click', () => {
+    const open = body.hidden;
+    if (open) admList.querySelectorAll('.adm-card.adm-open').forEach(c => c.admToggle(false));   // တစ်ခုပဲ ဖွင့်
+    setOpen(open);
+  });
   return card;
 }
 
