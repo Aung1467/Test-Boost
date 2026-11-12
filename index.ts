@@ -1,5 +1,4 @@
-// Supabase Edge Function: fetch-trending  (deploy: supabase functions deploy fetch-trending)
-// ⚠️ တရားဝင် TikTok API မဟုတ်ပါ — tikwm.com ကို သုံးထားသည်၊ ရပ်သွား/ပြောင်းသွားနိုင်သည်
+
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const CORS = {
@@ -7,62 +6,95 @@ const CORS = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
-const json = (b: unknown, status = 200) =>
-  new Response(JSON.stringify(b), { status, headers: { ...CORS, "Content-Type": "application/json" } });
+const json = (b: unknown) =>
+  new Response(JSON.stringify(b), { status: 200, headers: { ...CORS, "Content-Type": "application/json" } });
 
-const REGIONS = ["US", "GB", "SG", "TH", "ID", "PH"];
-const COOLDOWN_MS = 10 * 60_000;      // ၁၀ မိနစ်အတွင်း ထပ်မဆွဲ
-const KEEP_MS = 3 * 86_400_000;       // ၃ ရက်ထက်ဟောင်းရင် ဖျက်
-const MAX_ROWS = 60;
+const URL_RE = /^https:\/\/www\.tiktok\.com\/@[\w.]+\/video\/\d{8,25}$/;
+const MAX_AGE_MS = 30 * 60_000;    
+const TRIES = 3;                  
+const GAP_MS = 2500;
 
-type Item = { video_id?: string; id?: string; author?: { unique_id?: string } };
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-async function pull(region: string): Promise<{ url: string; id: string }[]> {
-  const r = await fetch(`https://www.tikwm.com/api/feed/list?region=${region}&count=30`, {
-    headers: { "User-Agent": "Mozilla/5.0", "Accept": "application/json" },
-  });
-  if (!r.ok) return [];
-  const items = ((await r.json())?.data ?? []) as Item[];
-  return items.flatMap((it) => {
-    const id = String(it.video_id ?? it.id ?? "");
-    const user = it.author?.unique_id;
-    return /^\d{8,25}$/.test(id) && user && /^[\w.]+$/.test(user)
-      ? [{ id, url: `https://www.tiktok.com/@${user}/video/${id}` }]
-      : [];
-  });
+async function likeCount(url: string): Promise<number | null> {
+  try {
+    const r = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`, {
+      headers: { "User-Agent": "Mozilla/5.0", "Accept": "application/json" },
+    });
+    if (!r.ok) return null;
+    const n = (await r.json())?.data?.digg_count;
+    return typeof n === "number" ? n : null;
+  } catch (_e) {
+    return null;
+  }
 }
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
   try {
-    const db = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+    const auth = req.headers.get("Authorization") ?? "";
+    const url = Deno.env.get("SUPABASE_URL")!;
+    const userDb = createClient(url, Deno.env.get("SUPABASE_ANON_KEY")!, {
+      global: { headers: { Authorization: auth } },
+    });
+    const admin = createClient(url, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 
-    const { data: last } = await db.from("trending_videos")
-      .select("fetched_at").order("fetched_at", { ascending: false }).limit(1).maybeSingle();
-    if (last && Date.now() - new Date(last.fetched_at).getTime() < COOLDOWN_MS) {
-      return json({ added: 0, cached: true });
+    const { data: u } = await userDb.auth.getUser();
+    const uid = u?.user?.id;
+    if (!uid) return json({ ok: false, code: "JWT" });
+
+    const body = await req.json().catch(() => ({}));
+    const action = String(body.action ?? "");
+    const taskId = String(body.task_id ?? "");
+    const videoUrl = String(body.video_url ?? "");
+    const trending = !!body.trending;
+    if (!taskId || !URL_RE.test(videoUrl.split("?")[0])) return json({ ok: false, code: "NO_TASK" });
+    const cleanUrl = videoUrl.split("?")[0];
+
+    // ---- start: Like အရေအတွက် အစမှတ်ယူ ----
+    if (action === "start") {
+      let n = await likeCount(cleanUrl);
+      if (n === null) { await sleep(1200); n = await likeCount(cleanUrl); }   // tikwm: 1 req/sec
+      if (n === null) return json({ ok: false, code: "VERIFY_UNAVAILABLE" });
+      const { error } = await admin.from("like_checks").upsert(
+        { user_id: uid, task_id: taskId, video_url: cleanUrl, baseline: n, created_at: new Date().toISOString() },
+        { onConflict: "user_id,task_id" },
+      );
+      return json(error ? { ok: false, code: "VERIFY_UNAVAILABLE" } : { ok: true });
     }
 
-    const now = new Date().toISOString();
-    const seen = new Set<string>();
-    const rows: { video_url: string; video_id: string; active: boolean; fetched_at: string }[] = [];
-    for (const region of REGIONS) {
-      try {
-        for (const v of await pull(region)) {
-          if (seen.has(v.id)) continue;
-          seen.add(v.id);
-          rows.push({ video_url: v.url, video_id: v.id, active: true, fetched_at: now });
-        }
-      } catch (_e) { /* region တစ်ခု မရရင် ကျော် */ }
-      if (rows.length >= MAX_ROWS) break;
+    // ---- claim: Like တိုးမတိုးစစ်ပြီးမှ Credit ထည့် ----
+    if (action === "claim") {
+      const { data: row } = await admin.from("like_checks").select("*")
+        .eq("user_id", uid).eq("task_id", taskId).maybeSingle();
+      if (!row || row.video_url !== cleanUrl) return json({ ok: false, code: "NO_BASELINE" });
+      if (Date.now() - new Date(row.created_at).getTime() > MAX_AGE_MS) {
+        await admin.from("like_checks").delete().eq("user_id", uid).eq("task_id", taskId);
+        return json({ ok: false, code: "NO_BASELINE" });
+      }
+
+      let liked = false, reachable = false;
+      for (let i = 0; i < TRIES && !liked; i++) {
+        if (i) await sleep(GAP_MS);
+        const n = await likeCount(cleanUrl);
+        if (n === null) continue;
+        reachable = true;
+        if (n > row.baseline) liked = true;
+      }
+      if (!liked) return json({ ok: false, code: reachable ? "LIKE_NOT_FOUND" : "VERIFY_UNAVAILABLE" });
+
+      
+      const { data, error } = trending
+        ? await userDb.rpc("complete_trending_task", { p_task: taskId, p_duration: null })
+        : await userDb.rpc("complete_order_task", { p_task: taskId, p_watched: 3, p_dur: 3 });
+      if (error) return json({ ok: false, code: error.message ?? "FAILED" });
+
+      await admin.from("like_checks").delete().eq("user_id", uid).eq("task_id", taskId);
+      return json({ ok: true, credit: data });
     }
-    if (!rows.length) return json({ error: "SOURCE_UNAVAILABLE" }, 502);
 
-    await db.from("trending_videos").upsert(rows, { onConflict: "video_url" });
-    await db.from("trending_videos").delete().lt("fetched_at", new Date(Date.now() - KEEP_MS).toISOString());
-
-    return json({ added: rows.length });
+    return json({ ok: false, code: "NO_TASK" });
   } catch (_e) {
-    return json({ error: "FETCH_FAILED" }, 500);
+    return json({ ok: false, code: "VERIFY_UNAVAILABLE" });
   }
 });
