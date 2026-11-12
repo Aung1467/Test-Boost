@@ -326,6 +326,61 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--pink); outl
 
 .lk-time { font-size: 18px; font-weight: 800; color: var(--ink); font-family: var(--display); }
 .chip:disabled{opacity:.35;cursor:not-allowed;text-decoration:line-through}
+
+/* ---------- Mail Box + လက်ဆောင်ပုံး ---------- */
+.top-r { display: flex; align-items: center; gap: 8px; flex: none; }
+.mail { position: relative; display: grid; place-items: center; padding: 5px 11px; }
+.mail svg { width: 18px; height: 18px; fill: #fff; }
+.mail-badge {
+  position: absolute; top: -7px; right: -5px; min-width: 18px; height: 18px; padding: 0 4px;
+  border-radius: 99px; background: var(--pink); color: #fff;
+  font: 700 11px/18px var(--sans); text-align: center;
+}
+.modal {
+  position: fixed; inset: 0; z-index: 50; display: flex; align-items: flex-end; justify-content: center;
+  background: rgba(23, 20, 60, .6);
+}
+.modal-box {
+  width: 100%; max-width: 480px; max-height: 80vh; max-height: 80dvh; overflow-y: auto;
+  background: var(--sheet); border-radius: 24px 24px 0 0;
+  padding: 16px 16px calc(22px + env(safe-area-inset-bottom));
+  animation: pop .25s ease;
+}
+.modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 17px; }
+.modal-head button {
+  cursor: pointer; background: var(--soft); color: var(--ink); border: 0; border-radius: 99px;
+  padding: 4px 14px; font-size: 13px; font-weight: 600;
+}
+.mail-item { margin-bottom: 8px; padding: 10px 12px; background: #fff; border: 2px solid var(--line); border-radius: 14px; }
+.mail-item.unread { border-color: var(--pink); }
+.mail-item b { display: block; font-size: 14px; }
+.mail-item p { margin: 4px 0; font-size: 14px; white-space: pre-wrap; word-break: break-word; }
+.mail-item small { font-size: 11px; color: var(--muted); }
+
+.gift {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 14px; padding: 10px 14px;
+  background: #fff; border: 2px solid var(--line); border-radius: 18px;
+}
+.gift.ready { background: #FFF6D6; border-color: var(--gold); }
+.gift-box { flex: none; width: 54px; height: 54px; padding: 0; cursor: pointer; background: none; border: 0; }
+.gift-box svg { width: 100%; height: 100%; overflow: visible; }
+.gift.ready .gift-box { animation: giftwiggle 1.1s ease-in-out infinite; }
+.gift-lid { transform-box: fill-box; transform-origin: 10% 100%; transition: transform .45s ease; }
+.gift.opening .gift-lid { transform: translateY(-9px) rotate(-22deg); }
+.gift.opening .gift-box { animation: none; }
+.gift-info { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.gift-info b { font-size: 15px; }
+.gift-info small { font-size: 12px; line-height: 1.4; color: var(--muted); }
+.gift-bar { height: 6px; margin-top: 4px; background: var(--line); border-radius: 99px; overflow: hidden; }
+.gift-bar div { height: 100%; width: 0; background: var(--pink); transition: width .4s ease; }
+.gift-count { flex: none; font: 800 15px var(--display); }
+.gift-pop {
+  position: fixed; left: 50%; top: 40%; z-index: 60; pointer-events: none;
+  font: 800 46px var(--display); color: var(--pink); text-shadow: 0 3px 0 var(--ink);
+  animation: giftpop 1.3s ease forwards;
+}
+@keyframes giftwiggle { 0%, 100% { transform: rotate(0); } 20% { transform: rotate(-9deg); } 40% { transform: rotate(8deg); } 60% { transform: rotate(-5deg); } 80% { transform: rotate(4deg); } }
+@keyframes giftpop { 0% { opacity: 0; transform: translate(-50%, 20px) scale(.5); } 25% { opacity: 1; transform: translate(-50%, -10px) scale(1.15); } 100% { opacity: 0; transform: translate(-50%, -90px) scale(1); } }
 </style>
 </head>
 <body>
@@ -403,8 +458,26 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--pink); outl
 <div class="screen" id="appScreen" hidden>
   <header class="top">
     <div class="who"><span class="avatar" id="avatar">?</span><span id="who"></span></div>
-    <button type="button" class="ghost" id="logoutBtn">ထွက်ရန်</button>
+    <div class="top-r">
+      <button type="button" class="ghost mail" id="mailBtn" aria-label="စာများ">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zm9 7.2L4.6 7H4v.4l8 5.5 8-5.5V7h-.6L12 12.2z"/></svg>
+        <span class="mail-badge" id="mailBadge" hidden>0</span>
+      </button>
+      <button type="button" class="ghost" id="logoutBtn">ထွက်ရန်</button>
+    </div>
   </header>
+
+  <div class="modal" id="mailModal" hidden role="dialog" aria-modal="true" aria-label="စာများ">
+    <div class="modal-box">
+      <div class="modal-head"><b>Mail Box</b><button type="button" id="mailClose">ပိတ်</button></div>
+      <div class="field-label" style="margin-top:0">Admin ကို စာပို့ရန် (Error / အကြံပေးချက်)</div>
+      <textarea class="text" id="fbBody" rows="3" maxlength="1000" placeholder="ဘာဖြစ်လဲ ရေးပါ" style="resize:vertical;font-family:inherit"></textarea>
+      <button type="button" class="btn" id="fbSend" style="margin-top:8px">Admin ဆီ ပို့မည်</button>
+      <div class="msg" id="fbMsg" role="status" style="margin:8px 0 4px"></div>
+      <div class="field-label">ရရှိထားသော စာများ</div>
+      <div id="mailList"></div>
+    </div>
+  </div>
 
   <section class="wallet" aria-live="polite">
     <div class="coin" id="coin" aria-hidden="true">C</div>
@@ -423,6 +496,26 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--pink); outl
 
     <!-- Credit ယူရန် -->
     <div id="earnView">
+      <div class="gift" id="giftCard" hidden>
+        <button type="button" class="gift-box" id="giftBtn" aria-label="လက်ဆောင်ပုံး">
+          <svg viewBox="0 0 64 64" aria-hidden="true">
+            <rect x="10" y="28" width="44" height="30" rx="3" fill="#FE2C55"/>
+            <rect x="29" y="28" width="6" height="30" fill="#FFC933"/>
+            <g class="gift-lid">
+              <rect x="6" y="19" width="52" height="11" rx="3" fill="#D81F48"/>
+              <rect x="29" y="19" width="6" height="11" fill="#FFC933"/>
+              <path d="M32 19c-3-9-14-9-12-3s9 3 12 3zM32 19c3-9 14-9 12-3s-9 3-12 3z" fill="none" stroke="#FFC933" stroke-width="3.5" stroke-linejoin="round"/>
+            </g>
+          </svg>
+        </button>
+        <div class="gift-info">
+          <b>လက်ဆောင်ပုံး</b>
+          <small id="giftSub"></small>
+          <div class="gift-bar"><div id="giftFill"></div></div>
+        </div>
+        <span class="gift-count" id="giftCount">0/30</span>
+      </div>
+
       <div class="tiles" id="earnTiles">
         <button type="button" class="tile" data-v="watch">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.5C7 4.5 2.7 7.6 1 12c1.7 4.4 6 7.5 11 7.5s9.3-3.1 11-7.5c-1.7-4.4-6-7.5-11-7.5zM12 17a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/></svg>
@@ -454,6 +547,14 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--pink); outl
 
     <!-- Admin -->
     <div id="adminView" hidden>
+      <div class="field-label">စာပို့ရန် (Mail Box)</div>
+      <input class="text" type="text" id="admMailTitle" maxlength="100" placeholder="ခေါင်းစဉ်">
+      <textarea class="text" id="admMailBody" rows="3" maxlength="1000" placeholder="စာအကြောင်းအရာ" style="margin-top:8px;resize:vertical;font-family:inherit"></textarea>
+      <button type="button" class="btn" id="admMailAll" style="margin-top:8px">User အားလုံးသို့ ပို့မည်</button>
+      <div class="msg" id="admMailMsg" role="status"></div>
+      <p class="note">တစ်ယောက်တည်းကို ပို့ချင်ရင် အောက်မှာ User ရှာပြီး ၎င်းရဲ့ "စာပို့" ကိုနှိပ်ပါ</p>
+      <div class="field-label">User တွေဆီက စာများ <span id="admFbCount" style="color:var(--pink)"></span></div>
+      <div id="admFb"></div>
       <div class="field-label">User ရှာရန်</div>
       <div style="display:flex;gap:8px">
         <input class="text" type="text" id="admQ" placeholder="နာမည် (အလွတ်ထားရင် အကုန်)" autocapitalize="none">
@@ -558,7 +659,11 @@ const ERR = {
   TOO_EARLY:           'Video ကို အဆုံးထိ မကြည့်ရသေးပါ',
   LIKE_NOT_FOUND:      'Like မတွေ့ပါ ✗ Credit မရပါ၊ နောက်တစ်ပုဒ် ပြောင်းပေးမည်',
   NO_BASELINE:         'စစ်ဆေးမှု မစတင်ရသေးပါ၊ နောက်တစ်ပုဒ် ယူပါ',
-  VERIFY_UNAVAILABLE:  'Like စစ်ဆေးမရပါ၊ ခဏနေမှ ထပ်ကြိုးစားပါ'
+  VERIFY_UNAVAILABLE:  'Like စစ်ဆေးမရပါ၊ ခဏနေမှ ထပ်ကြိုးစားပါ',
+  NO_GIFT:             'လက်ဆောင်ပုံး မရှိသေးပါ',
+  NOT_ADMIN:           'Admin မဟုတ်ပါ',
+  EMPTY:               'စာအကြောင်းအရာ ထည့်ပါ',
+  TOO_MANY:            'ခဏနေမှ ထပ်ပို့ပါ (တစ်နာရီမှာ ၅ စောင်အထိသာ)'
 };
 function errText(e) {
   const m = (e && e.message) || '';
@@ -871,7 +976,7 @@ async function claimNow() {
         return;
       }
       if (d.credit < 0) { lkNextState('ဒီ Video အတွက် Credit မရတော့ပါ၊ နောက်တစ်ပုဒ် ယူပါ'); return; }
-      setCredit(d.credit, true);
+      setCredit(d.credit, true); refreshBonus();
       lkNextState('+' + (lk.trending ? (d.credit - credit0) : lk.reward) + ' Credit ရပါပြီ ✓ (Like မှန်ကန်ကြောင်း စစ်ပြီး)');
       lkFill.style.width = '0'; lkTime.textContent = '';
       return;
@@ -891,7 +996,7 @@ async function claimNow() {
       lkNextState('ဒီ Video အတွက် Credit မရတော့ပါ၊ နောက်တစ်ပုဒ် ယူပါ');
       return;
     }
-    setCredit(data, true);
+    setCredit(data, true); refreshBonus();
     lkNextState('+' + (lk.trending ? (data - credit0) : lk.reward) + ' Credit ရပါပြီ ✓');
     lkFill.style.width = '0'; lkTime.textContent = '';
   } catch (e) {
@@ -1218,11 +1323,13 @@ function buildEditForm(o) {
 }
 
 // ================= Admin (server ဘက်က Admin ဟုတ်မှ အလုပ်လုပ်) =================
-let myId = null;
+let myId = null, isAdm = false;
 async function checkAdmin() {
   try {
     const { data } = await sb.rpc('is_admin');
+    isAdm = !!data;
     $('adminTab').hidden = !data;
+    if (data) admFbLoad();
     $('appTabs').style.gridTemplateColumns = data ? 'repeat(3, 1fr)' : '';
   } catch (e) {}
 }
@@ -1231,6 +1338,7 @@ function admSay(t, ok) { admMsg.textContent = t; admMsg.className = 'msg ' + (ok
 
 async function admLoad() {
   admSay('', true);
+  admFbLoad();
   const { data, error } = await sb.rpc('admin_list_users', { p_search: admQ.value.trim() || null });
   if (error) { admSay('ယူမရပါ (' + (error.message || '') + ')', false); return; }
   admList.replaceChildren();
@@ -1254,8 +1362,9 @@ function admCard(u) {
   const add = el('button', '', 'ထည့်မည် (+)');
   const set = el('button', '', 'သတ်မှတ် (=)');
   const pw  = el('button', '', 'Password');
-  [add, set, pw].forEach(b => b.type = 'button');
-  act.append(add, set, pw);
+  const ml  = el('button', '', 'စာပို့');
+  [add, set, pw, ml].forEach(b => b.type = 'button');
+  act.append(add, set, pw, ml);
 
   const msg = el('div', 'msg'); msg.style.minHeight = '0'; msg.style.marginTop = '6px';
   const say = (t, ok) => { msg.textContent = t; msg.className = 'msg ' + (ok ? 'ok' : 'err'); };
@@ -1285,9 +1394,172 @@ function admCard(u) {
     error ? say('မအောင်မြင်ပါ (' + (error.message || '') + ')', false) : say('✓ စကားဝှက် ပြောင်းပြီးပါပြီ', true);
   });
 
+  ml.addEventListener('click', () => admSendMail(u.id, say, ml));
+
   card.append(top, inp, act, msg);
   return card;
 }
+
+// ================= Mail Box =================
+const mailBtn = $('mailBtn'), mailBadge = $('mailBadge'), mailModal = $('mailModal'), mailList = $('mailList');
+function fmtDate(str) {
+  const d = new Date(str);
+  if (isNaN(d)) return '';
+  return d.toLocaleDateString() + ' ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+}
+async function loadMail(show) {
+  let res;
+  try { res = await sb.rpc('my_inbox'); } catch (e) { res = { error: e }; }
+  const { data, error } = res;
+  if (error || !Array.isArray(data)) {
+    if (show) mailList.replaceChildren(el('div', 'ord-empty', 'စာများ မယူနိုင်ပါ'));
+    return false;
+  }
+  const unread = data.filter(m => !m.is_read).length;
+  mailBadge.hidden = unread === 0;
+  mailBadge.textContent = unread > 9 ? '9+' : String(unread);
+  if (show) {
+    mailList.replaceChildren();
+    if (!data.length) mailList.appendChild(el('div', 'ord-empty', 'စာ မရှိသေးပါ'));
+    data.forEach(m => {
+      const c = el('div', 'mail-item' + (m.is_read ? '' : ' unread'));
+      c.append(el('b', '', m.title), el('p', '', m.body), el('small', '', fmtDate(m.created_at)));
+      mailList.appendChild(c);
+    });
+  }
+  return true;
+}
+mailBtn.addEventListener('click', async () => {
+  mailModal.hidden = false;
+  mailList.replaceChildren(el('div', 'ord-empty', 'ယူနေသည်...'));
+  const ok = await loadMail(true);
+  if (ok) {
+    const { error } = await sb.rpc('mark_inbox_read');   // ဖွင့်ကြည့်ပြီးရင် ဖတ်ပြီးမှတ်
+    if (!error) mailBadge.hidden = true;
+  }
+});
+function closeMail() { mailModal.hidden = true; }
+$('mailClose').addEventListener('click', closeMail);
+mailModal.addEventListener('click', (e) => { if (e.target === mailModal) closeMail(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMail(); });
+let mailTimer = null;
+function startMailPolling() {
+  loadMail(false);
+  if (!mailTimer) mailTimer = setInterval(() => { if (!appScreen.hidden && mailModal.hidden) { loadMail(false); if (isAdm) admFbLoad(); } }, 60000);
+}
+
+// Admin: စာပို့ (userId = null ဆိုရင် အားလုံးသို့)
+async function admSendMail(userId, say, btn) {
+  const t = $('admMailTitle').value.trim(), b = $('admMailBody').value.trim();
+  if (!t || !b) { say('ခေါင်းစဉ်နှင့် စာအကြောင်းအရာ ထည့်ပါ', false); return; }
+  if (!userId && !confirm('User အားလုံးဆီ ပို့မလား?')) return;
+  if (btn) btn.disabled = true;
+  const { data, error } = await sb.rpc('admin_send_message', { p_user: userId, p_title: t, p_body: b });
+  if (btn) btn.disabled = false;
+  if (error) { say('မအောင်မြင်ပါ (' + errText(error) + ')', false); return; }
+  say('✓ စာပို့ပြီးပါပြီ (' + data + ' ဦး)', true);
+  if (!userId) { $('admMailTitle').value = ''; $('admMailBody').value = ''; }
+}
+$('admMailAll').addEventListener('click', () => {
+  const m = $('admMailMsg');
+  admSendMail(null, (t, ok) => { m.textContent = t; m.className = 'msg ' + (ok ? 'ok' : 'err'); }, $('admMailAll'));
+});
+
+
+// ---- User → Admin စာပို့ ----
+$('fbSend').addEventListener('click', async () => {
+  const ta = $('fbBody'), msg = $('fbMsg'), b = ta.value.trim();
+  const say = (t, ok) => { msg.textContent = t; msg.className = 'msg ' + (ok ? 'ok' : 'err'); };
+  if (!b) { say('စာရေးပါ', false); return; }
+  $('fbSend').disabled = true;
+  const { error } = await sb.rpc('send_feedback', { p_body: b });
+  $('fbSend').disabled = false;
+  if (error) { say(errText(error), false); return; }
+  ta.value = '';
+  say('✓ Admin ဆီ ပို့ပြီးပါပြီ', true);
+});
+
+// ---- Admin: User တွေဆီက စာများ ----
+async function admFbLoad() {
+  let res;
+  try { res = await sb.rpc('admin_list_feedback'); } catch (e) { return; }
+  const data = res.data;
+  if (res.error || !Array.isArray(data)) return;
+  const unread = data.filter(f => !f.is_read).length;
+  $('adminTab').textContent = unread ? 'Admin (' + unread + ')' : 'Admin';
+  $('admFbCount').textContent = unread ? '— မဖတ်ရသေး ' + unread : '';
+  const box = $('admFb');
+  box.replaceChildren();
+  if (!data.length) { box.appendChild(el('div', 'ord-empty', 'စာ မရှိသေးပါ')); return; }
+  data.forEach(f => box.appendChild(admFbCard(f)));
+}
+function admFbCard(f) {
+  const c = el('div', 'mail-item' + (f.is_read ? '' : ' unread'));
+  c.append(el('b', '', f.username || 'User'), el('p', '', f.body), el('small', '', fmtDate(f.created_at)));
+  const act = el('div', 'ord-act');
+  const rp = el('button', '', 'ပြန်စာ'), rd = el('button', '', 'ဖတ်ပြီး'), dl = el('button', 'del', 'ဖျက်');
+  [rp, rd, dl].forEach(b => b.type = 'button');
+  rd.hidden = !!f.is_read;
+  act.append(rp, rd, dl);
+  const msg = el('div', 'msg'); msg.style.minHeight = '0'; msg.style.marginTop = '6px';
+  const say = (t, ok) => { msg.textContent = t; msg.className = 'msg ' + (ok ? 'ok' : 'err'); };
+  rp.addEventListener('click', async () => {
+    const v = prompt((f.username || 'User') + ' ကို ပြန်စာ');
+    if (!v || !v.trim()) return;
+    const r = await sb.rpc('admin_send_message', { p_user: f.user_id, p_title: 'Admin ပြန်စာ', p_body: v });
+    if (r.error) { say('မအောင်မြင်ပါ (' + errText(r.error) + ')', false); return; }
+    await sb.rpc('admin_mark_feedback', { p_id: f.id });
+    admFbLoad();
+  });
+  rd.addEventListener('click', async () => {
+    const r = await sb.rpc('admin_mark_feedback', { p_id: f.id });
+    r.error ? say('မအောင်မြင်ပါ', false) : admFbLoad();
+  });
+  dl.addEventListener('click', async () => {
+    if (!confirm('ဒီစာကို ဖျက်မလား?')) return;
+    const r = await sb.rpc('admin_delete_feedback', { p_id: f.id });
+    r.error ? say('မအောင်မြင်ပါ', false) : admFbLoad();
+  });
+  c.append(act, msg);
+  return c;
+}
+
+// ================= လက်ဆောင်ပုံး (Task 30 ပြီးတိုင်း Bonus) =================
+const giftCard = $('giftCard'), giftBtn = $('giftBtn');
+let giftReady = 0, giftReward = 50, giftBusy = false;
+async function refreshBonus() {
+  let res;
+  try { res = await sb.rpc('my_bonus'); } catch (e) { return; }
+  const d = res.data;
+  if (res.error || !d) return;
+  const goal = d.goal || 30;
+  giftReward = d.reward || 50;
+  giftReady = d.ready || 0;
+  const prog = (d.done || 0) % goal;
+  giftCard.hidden = false;
+  giftCard.classList.toggle('ready', giftReady > 0);
+  $('giftCount').textContent = giftReady > 0 ? '×' + giftReady : prog + '/' + goal;
+  $('giftFill').style.width = (giftReady > 0 ? 100 : prog / goal * 100) + '%';
+  $('giftSub').textContent = giftReady > 0
+    ? 'နှိပ်ပြီး ဖွင့်ပါ၊ Credit ' + giftReward + ' ရမည်'
+    : 'Task ' + goal + ' ပြီးတိုင်း Bonus Credit ' + giftReward + ' (ကျန် ' + (goal - prog) + ')';
+}
+giftBtn.addEventListener('click', async () => {
+  if (giftBusy) return;
+  if (giftReady <= 0) { restart(giftBtn, 'pop'); return; }
+  giftBusy = true;
+  giftCard.classList.add('opening');
+  const { data, error } = await sb.rpc('open_gift');
+  await new Promise(r => setTimeout(r, 500));
+  giftCard.classList.remove('opening');
+  giftBusy = false;
+  if (error) { $('giftSub').textContent = errText(error); refreshBonus(); return; }
+  setCredit(data, true);
+  const pop = el('div', 'gift-pop', '+' + giftReward);
+  document.body.appendChild(pop);
+  setTimeout(() => pop.remove(), 1400);
+  refreshBonus();
+});
 
 // ================= Login / Register =================
 const authScreen = $('authScreen');
@@ -1358,6 +1630,7 @@ async function enterApp(user) {
   $('avatar').textContent = (Array.from(data.username)[0] || '?').toUpperCase();
   setCredit(data.credit);
   myId = user.id; checkAdmin();
+  startMailPolling(); refreshBonus();
   authScreen.hidden = true;
   appScreen.hidden = false;
   window.scrollTo(0, 0);
