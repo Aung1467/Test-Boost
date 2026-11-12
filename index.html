@@ -556,7 +556,7 @@ const ERR = {
   NO_VIDEO:            'ယခု Like ပေးစရာ Video မရှိသေးပါ၊ နောက်မှ ပြန်စစ်ပါ',
   ORDER_FULL:          'ဒီ Video အတွက် Like ပြည့်သွားပါပြီ',
   TOO_EARLY:           'Video ကို အဆုံးထိ မကြည့်ရသေးပါ',
-  LIKE_NOT_FOUND:      'Like မတွေ့ပါ ✗ Credit မရပါ — TikTok မှာ Like ပေးပြီးမှ ထပ်နှိပ်ပါ',
+  LIKE_NOT_FOUND:      'Like မတွေ့ပါ ✗ Credit မရပါ၊ နောက်တစ်ပုဒ် ပြောင်းပေးမည်',
   NO_BASELINE:         'စစ်ဆေးမှု မစတင်ရသေးပါ၊ နောက်တစ်ပုဒ် ယူပါ',
   VERIFY_UNAVAILABLE:  'Like စစ်ဆေးမရပါ၊ ခဏနေမှ ထပ်ကြိုးစားပါ'
 };
@@ -674,6 +674,43 @@ function lkNextState(msg) {
   lkWrap.hidden = true; lkStop();
 }
 
+// ---------- Like မပေးဘဲ တမင်လုပ်ရင် ၃ မိနစ် ပိတ်ထား ----------
+let likeLockUntil = 0, likeLockTimer = null;
+try { likeLockUntil = Number(localStorage.getItem('likeLockUntil')) || 0; } catch (e) {}
+function setLikeLock(sec) {
+  likeLockUntil = Date.now() + sec * 1000;
+  try { localStorage.setItem('likeLockUntil', String(likeLockUntil)); } catch (e) {}
+}
+function likeLockLeft() { return Math.max(0, Math.ceil((likeLockUntil - Date.now()) / 1000)); }
+function showLikeLock() {
+  clearInterval(likeLockTimer);
+  lk = null;
+  lkWrap.hidden = true; lkStop();
+  lkClaim.classList.remove('next');
+  lkClaim.disabled = true;
+  lkActions.classList.add('one');
+  const tick = () => {
+    const left = likeLockLeft();
+    if (left <= 0) {
+      clearInterval(likeLockTimer);
+      if (earnKind === 'like') loadLikeTask();
+      return;
+    }
+    lkStatus.textContent = 'Like မပေးဘဲ ထပ်ခါထပ်ခါ လုပ်လို့ ခဏပိတ်ထားသည်၊ ' + fmtT(left) + ' အကြာမှ ပြန်ယူနိုင်မည်';
+    lkClaim.textContent = 'ခဏစောင့်ပါ ' + fmtT(left);
+  };
+  tick();
+  likeLockTimer = setInterval(tick, 1000);
+}
+// Like မတွေ့ရင် Credit မပေး၊ ပြန်မစစ်ခိုင်း၊ နောက်တစ်ပုဒ် အလိုအလျောက်ပြ (Server က ကြိမ်ရေများရင် lock ပေး)
+function likeFailed(lockSec) {
+  if (lockSec > 0) { setLikeLock(lockSec); showLikeLock(); return; }
+  const mine = lk;
+  lkStatus.textContent = errText({ message: 'LIKE_NOT_FOUND' });
+  lkClaim.disabled = true;
+  setTimeout(() => { if (lk === mine && earnKind === 'like') loadLikeTask(); }, 1800);
+}
+
 async function loadLikeTask() {
   lkWatched = 0; lkLast = null; lkDur = 0; lkFinished = false; lkOpened = false;
   const isWatch = earnKind === 'watch';
@@ -686,6 +723,8 @@ async function loadLikeTask() {
   lkStatus.textContent = 'Video ရှာနေသည်...';
   lkTime.textContent = '';
   lkUI();
+  clearInterval(likeLockTimer);
+  if (isLike && likeLockLeft() > 0) { showLikeLock(); return; }
   let data = null, error = null;
   {                                                  // ကိုယ့်အမျိုးအစား order သာ (ကြည့်ရန်=view / Like=like)၊ Credit နှုန်းမြင့်ကို အရင်
     const r = await sb.rpc('next_order_task', { p_kind: earnKind === 'watch' ? 'view' : 'like' });
@@ -714,17 +753,19 @@ async function loadLikeTask() {
     lkClaim.textContent = 'စစ်ဆေးရန် ပြင်ဆင်နေသည်...';
     lkStatus.textContent = '';
     lkFinished = false; lkUI();
-    let ok = false;
+    let ok = false, locked = 0;
     try {
       const r = await sb.functions.invoke('verify-like', {
         body: { action: 'start', task_id: mine.task_id, trending: !!mine.trending }
       });
       ok = !r.error && r.data && r.data.ok;
+      if (r.data && r.data.code === 'LOCKED') locked = r.data.wait || 180;
     } catch (e) {}
     if (lk !== mine) return;                      // နောက်ထပ် task ပြောင်းသွားပြီ
+    if (locked) { setLikeLock(locked); showLikeLock(); return; }
     if (!ok) { lkNextState('Like စစ်ဆေးရန် ပြင်ဆင်မရပါ၊ နောက်တစ်ပုဒ် ယူပါ'); return; }
     lkFinished = true;
-    lkClaim.textContent = 'Like ပေးရန် (TikTok ဖွင့်မည်)';
+    lkClaim.textContent = 'Like ပေးရန်';
     lkStatus.textContent = 'နှိပ်ပြီး TikTok မှာ Like ပေးပါ၊ Like တကယ်ပေးမှ Credit ရမည်';
     lkUI();
     return;
@@ -821,6 +862,8 @@ async function claimNow() {
       const d = r.data;
       if (r.error || !d) { lkStatus.textContent = errText({ message: 'VERIFY_UNAVAILABLE' }); lkClaim.disabled = false; lkClaim.textContent = 'ထပ်စစ်မည်'; return; }
       if (!d.ok) {
+        if (d.code === 'LIKE_NOT_FOUND') { likeFailed(d.lock || 0); return; }   // Like မပေးထား: Credit မရ၊ ပြန်မစစ်၊ နောက်တစ်ပုဒ်
+        if (d.code === 'LOCKED') { setLikeLock(d.wait || 180); showLikeLock(); return; }
         const gone = /NO_TASK|ORDER_FULL|NO_BASELINE/.test(d.code || '');
         if (gone) { lkNextState(errText({ message: d.code })); return; }
         lkStatus.textContent = errText({ message: d.code });

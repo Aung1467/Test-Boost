@@ -19,6 +19,35 @@ const MAX_AGE_MS = 30 * 60_000;     // စတင်ပြီး မိနစ် 
 const TRIES = 3;                    // TikTok count update နောက်ကျတတ်လို့ ၃ ကြိမ်စစ်
 const GAP_MS = 2500;
 
+const LOCK_AFTER = 3;               // Like မပေးဘဲ claim လုပ်တာ ၃ ကြိမ်ဆက်တိုက်ဖြစ်ရင်
+const LOCK_SEC = 180;               // ၃ မိနစ် ပိတ်ထား
+
+// deno-lint-ignore no-explicit-any
+async function lockLeft(admin: any, uid: string): Promise<number> {
+  const { data } = await admin.from("like_strikes").select("locked_until").eq("user_id", uid).maybeSingle();
+  if (!data?.locked_until) return 0;
+  const left = new Date(data.locked_until).getTime() - Date.now();
+  return left > 0 ? Math.ceil(left / 1000) : 0;
+}
+// deno-lint-ignore no-explicit-any
+async function addStrike(admin: any, uid: string): Promise<number> {   // lock ကျသွားရင် စက္ကန့်ပြန်
+  const { data } = await admin.from("like_strikes").select("strikes").eq("user_id", uid).maybeSingle();
+  const n = (data?.strikes ?? 0) + 1;
+  if (n >= LOCK_AFTER) {
+    await admin.from("like_strikes").upsert(
+      { user_id: uid, strikes: 0, locked_until: new Date(Date.now() + LOCK_SEC * 1000).toISOString() },
+      { onConflict: "user_id" },
+    );
+    return LOCK_SEC;
+  }
+  await admin.from("like_strikes").upsert({ user_id: uid, strikes: n, locked_until: null }, { onConflict: "user_id" });
+  return 0;
+}
+// deno-lint-ignore no-explicit-any
+async function clearStrikes(admin: any, uid: string) {
+  await admin.from("like_strikes").upsert({ user_id: uid, strikes: 0, locked_until: null }, { onConflict: "user_id" });
+}
+
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 async function tikData(url: string): Promise<Record<string, unknown> | null> {
@@ -86,6 +115,12 @@ Deno.serve(async (req) => {
       return json(d === null ? { ok: false, code: "VERIFY_UNAVAILABLE" } : { ok: true, duration: Math.round(d) });
     }
 
+    // ---- lock ကျနေရင် start / claim မရ ----
+    if (action === "start" || action === "claim") {
+      const left = await lockLeft(admin, uid);
+      if (left > 0) return json({ ok: false, code: "LOCKED", wait: left });
+    }
+
     const taskId = String(body.task_id ?? "");
     const trending = !!body.trending;
     if (!UUID_RE.test(taskId)) return json({ ok: false, code: "NO_TASK" });
@@ -125,7 +160,13 @@ Deno.serve(async (req) => {
           reachable = true;
           if (n > row.baseline) liked = true;
         }
-        if (!liked) return json({ ok: false, code: reachable ? "LIKE_NOT_FOUND" : "VERIFY_UNAVAILABLE" });
+        if (!liked) {
+          if (!reachable) return json({ ok: false, code: "VERIFY_UNAVAILABLE" });
+          // Like မတွေ့: ဒီ task ကို ပြန်မစစ်စေ (baseline ဖျက်)၊ ကြိမ်ရေတိုး၊ များရင် lock
+          await admin.from("like_checks").delete().eq("user_id", uid).eq("task_id", taskId);
+          const lock = await addStrike(admin, uid);
+          return json({ ok: false, code: "LIKE_NOT_FOUND", lock });
+        }
         await admin.from("like_checks").update({ verified_at: new Date().toISOString() })
           .eq("user_id", uid).eq("task_id", taskId);
       }
@@ -135,6 +176,7 @@ Deno.serve(async (req) => {
         ? await userDb.rpc("complete_trending_task", { p_task: taskId, p_duration: null })
         : await userDb.rpc("complete_order_task", { p_task: taskId });
       if (error) return json({ ok: false, code: error.message ?? "FAILED" });
+      await clearStrikes(admin, uid);          // Like မှန်ရင် ကြိမ်ရေ ပြန်သုညထား
       return json({ ok: true, credit: data });
     }
 
