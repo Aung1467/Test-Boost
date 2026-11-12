@@ -372,10 +372,11 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--pink); outl
         <span>စကားဝှက်</span>
         <div class="input-box">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 9V7a5 5 0 0 0-10 0v2H5v12h14V9h-2zm-8-2a3 3 0 0 1 6 0v2H9V7z"/></svg>
-          <input type="password" id="regPass" autocomplete="new-password" placeholder="အနည်းဆုံး ၆ လုံး">
+          <input type="password" id="regPass" autocomplete="new-password" placeholder="ဥပမာ Abc234">
           <button type="button" class="eye" data-for="regPass" aria-label="စကားဝှက်ပြရန်"></button>
         </div>
       </label>
+      <p class="note" style="margin:-6px 2px 14px">အနည်းဆုံး ၆ လုံး — English စာလုံးကြီး (A-Z)၊ စာလုံးသေး (a-z)၊ ဂဏန်း (0-9) ပါရမည်</p>
       <label class="field">
         <span>စကားဝှက်ကို ပြန်ရိုက်ပါ</span>
         <div class="input-box">
@@ -1162,6 +1163,15 @@ async function nameToEmail(name) {
   return 'u' + hex.slice(0, 40) + '@gmail.com';
 }
 
+// စကားဝှက် စည်းမျဉ်း: အနည်းဆုံး ၆ လုံး + English စာလုံးကြီး၊ စာလုံးသေး၊ ဂဏန်း (ဥပမာ Abc234)
+// အကောင့်သစ်ဖွင့်တဲ့အခါပဲ စစ်သည် — login မှာ မစစ်လို့ စကားဝှက်အဟောင်းတွေ ဆက်ဝင်လို့ရသည်
+function passProblem(p) {
+  if (p.length < 6) return 'စကားဝှက် အနည်းဆုံး ၆ လုံးထည့်ပါ';
+  if (!/[a-z]/.test(p) || !/[A-Z]/.test(p) || !/[0-9]/.test(p))
+    return 'စကားဝှက်မှာ English စာလုံးကြီး (A-Z)၊ စာလုံးသေး (a-z)၊ ဂဏန်း (0-9) ပါရပါမယ် — ဥပမာ Abc234';
+  return '';
+}
+
 // နာမည် ရှိ/မရှိ — true / false / null (စစ်မရ၊ SQL function မရှိသေးတာ အပါအဝင်)
 async function nameExists(email) {
   try {
@@ -1256,8 +1266,9 @@ $('regBtn').addEventListener('click', async () => {
 
   if (name.length < 3)  { authMsg('regMsg', 'နာမည် အနည်းဆုံး ၃ လုံးထည့်ပါ', false); return; }
   if (name.length > 20) { authMsg('regMsg', 'နာမည် အများဆုံး ၂၀ လုံးသာ ထည့်နိုင်ပါသည်', false); return; }
-  if (pass.length < 6)  { authMsg('regMsg', 'စကားဝှက် အနည်းဆုံး ၆ လုံးထည့်ပါ', false); return; }
-  if (pass !== pass2)   { authMsg('regMsg', 'စကားဝှက် နှစ်ခု မတူပါ', false); return; }
+  const pp = passProblem(pass);
+  if (pp)               { authMsg('regMsg', pp, false); return; }
+  if (pass !== pass2)  { authMsg('regMsg', 'စကားဝှက် နှစ်ခု မတူပါ', false); return; }
 
   btn.disabled = true;
   try {
