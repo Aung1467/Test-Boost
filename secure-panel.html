@@ -668,14 +668,16 @@ body {
 #authScreen .input-box { min-height: 48px; }
 #authScreen .btn-primary { min-height: 50px; margin-top: 8px; }
 
-/* ---------- square avatar cropper ---------- */
-.crop-box { align-self: center; margin: auto; width: min(100% - 24px, 430px); border-radius: 24px; padding-top: 28px; }
-.crop-stage { position: relative; width: min(78vw, 320px); aspect-ratio: 1; margin: 12px auto; overflow: hidden; border-radius: 18px; background: #111; border: 2px solid var(--gold); box-shadow: 0 0 0 4px rgba(255,201,51,.16); touch-action: none; }
-.crop-stage::after { content: ""; position: absolute; inset: 0; border: 1px solid rgba(255,255,255,.65); pointer-events: none; }
-.crop-stage img { position: absolute; max-width: none; max-height: none; user-select: none; -webkit-user-drag: none; transform-origin: center; cursor: grab; }
-.crop-zoom { width: 100%; accent-color: #B77912; }
-.crop-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
-.crop-actions .btn { white-space: normal; }
+/* ---------- minimal square avatar cropper ---------- */
+.crop-box { position:relative; align-self:center; margin:auto; width:min(calc(100vw - 32px),390px); padding:48px 18px 18px; border-radius:26px; display:flex; flex-direction:column; align-items:center; gap:12px; }
+.crop-close { position:absolute; top:10px; right:12px; width:38px; height:38px; border:0; border-radius:50%; background:#eeeaf9; color:#201947; font-size:27px; line-height:1; }
+.crop-stage { position:relative; width:min(76vw,320px); aspect-ratio:1/1; flex:none; margin:0 auto; overflow:hidden; border-radius:20px; background:#111; border:2px solid var(--gold); box-shadow:0 0 0 4px rgba(255,201,51,.14); touch-action:none; }
+.crop-stage img { position:absolute; display:block; max-width:none; max-height:none; user-select:none; -webkit-user-drag:none; pointer-events:none; }
+.crop-zoom { display:block; width:min(76vw,320px); margin:2px auto; accent-color:#B77912; }
+.crop-actions { width:min(76vw,320px); display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:2px; }
+.crop-icon-btn { height:48px; border:0; border-radius:15px; font-size:26px; font-weight:800; }
+.crop-icon-btn.cancel { background:#eeeaf9; color:#211947; }
+.crop-icon-btn.apply { background:linear-gradient(135deg,#25dce4,#25aebd); color:#10243b; box-shadow:0 8px 18px rgba(37,220,228,.22); }
 /* ---------- postman + popup bubble ---------- */
 .postman { position: fixed; z-index: 70; right: max(10px, env(safe-area-inset-right)); top: calc(env(safe-area-inset-top) + 64px); touch-action: none; cursor: grab; width: 52px; height: 52px; padding: 0; cursor: pointer; border: 2px solid var(--ink); border-radius: 50%; background: var(--cyan); box-shadow: 0 6px 16px -4px rgba(8,6,36,.55); display: grid; place-items: center; }
 .postman svg { width: 38px; height: 38px; }
@@ -888,14 +890,15 @@ body.modal-open .pm-float{display:none!important;}
     </div>
   </div>
 
-  <!-- Square avatar cropper -->
-  <div class="modal" id="cropModal" hidden role="dialog" aria-modal="true" aria-label="ပုံဖြတ်ရန်">
+  <div class="modal crop-modal" id="cropModal" hidden role="dialog" aria-modal="true" aria-label="Profile photo">
     <div class="modal-box crop-box">
-      <div class="modal-head"><b>ပုံကို 1:1 ဖြတ်ရန်</b><button type="button" id="cropCancel">ပိတ်</button></div>
-      <div class="crop-stage" id="cropStage"><img id="cropImage" alt="Crop preview"></div>
-      <p class="note">ပုံကို လက်နဲ့ဆွဲရွှေ့ပြီး Zoom ကို ချိန်ကာ စိတ်ကြိုက်ဖြတ်နိုင်ပါတယ်။</p>
-      <label class="field-label" for="cropZoom">Zoom</label><input id="cropZoom" type="range" min="1" max="3" step="0.01" value="1" class="crop-zoom">
-      <div class="crop-actions"><button type="button" class="btn alt" id="cropCancel2">မလုပ်တော့ပါ</button><button type="button" class="btn-gold" id="cropApply">ဖြတ်ပြီး အသုံးပြုမည်</button></div>
+      <button type="button" class="crop-close" id="cropCancel" aria-label="Close">×</button>
+      <div class="crop-stage" id="cropStage"><img id="cropImage" alt=""></div>
+      <input id="cropZoom" type="range" min="1" max="3" step="0.01" value="1" class="crop-zoom" aria-label="Zoom">
+      <div class="crop-actions">
+        <button type="button" class="crop-icon-btn cancel" id="cropCancel2" aria-label="Cancel">×</button>
+        <button type="button" class="crop-icon-btn apply" id="cropApply" aria-label="Apply">✓</button>
+      </div>
     </div>
   </div>
 
@@ -2747,30 +2750,115 @@ $('whoBtn').addEventListener('click', openProfile);
 $('pfClose').addEventListener('click', closePf);
 pfModal.addEventListener('click', (e) => { if (e.target === pfModal) closePf(); });
 $('pfPick').addEventListener('click', () => $('pfFile').click());
-let cropSource = null, cropScale = 1, cropX = 0, cropY = 0, cropBase = 1, cropPointer = null, cropStart = null;
+let cropSource = null, cropUrl = null, cropScale = 1, cropX = 0, cropY = 0, cropBase = 1, cropPointer = null, cropStart = null;
 const cropModal = $('cropModal'), cropStage = $('cropStage'), cropImage = $('cropImage'), cropZoom = $('cropZoom');
-function cropLayout() {
-  if (!cropSource) return;
-  const box = cropStage.clientWidth, w = cropSource.naturalWidth, h = cropSource.naturalHeight;
-  cropBase = Math.max(box / w, box / h); cropScale = cropBase * Number(cropZoom.value || 1);
-  cropX = Math.max(box - w * cropScale, Math.min(0, cropX)); cropY = Math.max(box - h * cropScale, Math.min(0, cropY));
-  cropImage.style.width = (w * cropScale) + 'px'; cropImage.style.height = (h * cropScale) + 'px';
-  cropImage.style.left = (cropX) + 'px'; cropImage.style.top = (cropY) + 'px';
+function cropLayout(preserveCenter = false) {
+  if (!cropSource || !cropSource.naturalWidth || !cropSource.naturalHeight) return;
+  const box = cropStage.getBoundingClientRect().width || cropStage.clientWidth || 280;
+  const w = cropSource.naturalWidth, h = cropSource.naturalHeight;
+  const oldScale = cropScale || 1;
+  const centerX = preserveCenter ? (box / 2 - cropX) / oldScale : w / 2;
+  const centerY = preserveCenter ? (box / 2 - cropY) / oldScale : h / 2;
+  cropBase = Math.max(box / w, box / h);
+  cropScale = cropBase * Math.max(1, Number(cropZoom.value || 1));
+  cropX = box / 2 - centerX * cropScale;
+  cropY = box / 2 - centerY * cropScale;
+  cropX = Math.max(box - w * cropScale, Math.min(0, cropX));
+  cropY = Math.max(box - h * cropScale, Math.min(0, cropY));
+  cropImage.style.width = (w * cropScale) + 'px';
+  cropImage.style.height = (h * cropScale) + 'px';
+  cropImage.style.left = cropX + 'px';
+  cropImage.style.top = cropY + 'px';
+}
+function cropRelease() {
+  cropSource = null;
+  cropPointer = null;
+  cropStart = null;
+  cropScale = 1; cropX = 0; cropY = 0;
+  cropImage.onload = null; cropImage.onerror = null;
+  cropImage.removeAttribute('src');
+  cropImage.removeAttribute('style');
+  if (cropUrl) URL.revokeObjectURL(cropUrl);
+  cropUrl = null;
 }
 function cropOpen(file) {
-  const url = URL.createObjectURL(file), im = new Image();
-  im.onload = () => { cropSource = im; cropImage.src = url; cropZoom.value = '1'; cropX = (cropStage.clientWidth - im.width * Math.max(cropStage.clientWidth/im.width,cropStage.clientWidth/im.height))/2; cropY = (cropStage.clientHeight - im.height * Math.max(cropStage.clientHeight/im.width,cropStage.clientHeight/im.height))/2; cropLayout(); showModal(cropModal); };
-  im.onerror = () => { URL.revokeObjectURL(url); pfSay(errText({message:'BAD_IMAGE'}), false); };
-  im.src = url;
+  const maxBytes = 20 * 1024 * 1024;
+  if (!file || !(file.type || '').toLowerCase().startsWith('image/') || file.size <= 0 || file.size > maxBytes) {
+    pfSay('ပုံဖိုင်ကို ဖွင့်မရပါ', false); return;
+  }
+  cropRelease();
+  cropUrl = URL.createObjectURL(file);
+  cropZoom.value = '1';
+  cropImage.onload = () => {
+    if (!cropImage.naturalWidth || !cropImage.naturalHeight) {
+      pfSay('ပုံကို ဖွင့်မရပါ', false); cropClose(); return;
+    }
+    cropSource = cropImage;
+    showModal(cropModal);
+    // Wait until the modal is visible and the square crop area has a real size.
+    let tries = 0;
+    const layoutWhenReady = () => {
+      if (!cropSource) return;
+      if (cropStage.getBoundingClientRect().width > 0) cropLayout(false);
+      else if (++tries < 20) requestAnimationFrame(layoutWhenReady);
+      else { pfSay('ပုံဖြတ်ရန် မရပါ', false); cropClose(); }
+    };
+    requestAnimationFrame(() => requestAnimationFrame(layoutWhenReady));
+  };
+  cropImage.onerror = () => {
+    pfSay('ဒီပုံအမျိုးအစားကို ဖွင့်မရပါ', false);
+    cropClose();
+  };
+  cropImage.src = cropUrl;
 }
-function cropClose() { hideModal(cropModal); if (cropImage.src.startsWith('blob:')) URL.revokeObjectURL(cropImage.src); cropImage.removeAttribute('src'); cropSource = null; }
-$('cropCancel').addEventListener('click', cropClose); $('cropCancel2').addEventListener('click', cropClose);
-cropZoom.addEventListener('input', cropLayout);
-cropStage.addEventListener('pointerdown', e => { if (!cropSource) return; cropPointer = e.pointerId; cropStart = {x:e.clientX,y:e.clientY,left:cropX,top:cropY}; cropStage.setPointerCapture(e.pointerId); });
-cropStage.addEventListener('pointermove', e => { if (cropPointer !== e.pointerId || !cropStart) return; const box=cropStage.clientWidth, w=cropSource.naturalWidth*cropScale, h=cropSource.naturalHeight*cropScale; cropX=Math.max(box-w,Math.min(0,cropStart.left+e.clientX-cropStart.x)); cropY=Math.max(box-h,Math.min(0,cropStart.top+e.clientY-cropStart.y)); cropImage.style.left=cropX+'px'; cropImage.style.top=cropY+'px'; });
-['pointerup','pointercancel'].forEach(ev => cropStage.addEventListener(ev, () => { cropPointer=null; cropStart=null; }));
-$('cropApply').addEventListener('click', () => { if (!cropSource) return; const S=256, box=cropStage.clientWidth, c=document.createElement('canvas'); c.width=c.height=S; const g=c.getContext('2d'); g.drawImage(cropSource, -cropX/cropScale, -cropY/cropScale, box/cropScale, box/cropScale, 0, 0, S, S); let q=.86, out=c.toDataURL('image/jpeg',q); while(out.length>69000 && q>.3){q-=.08;out=c.toDataURL('image/jpeg',q);} if(out.length>69000){pfSay('ပုံအရွယ်အစား ကြီးလွန်းနေပါတယ်',false);return;} draft.avatar=out; draft.clear=false; cropClose(); pfSay('',true); pfBuild(); pfRefresh(); });
-$('pfFile').addEventListener('change', e => { const f=e.target.files&&e.target.files[0]; e.target.value=''; if(!f)return; if(!/^image\//.test(f.type)){pfSay(errText({message:'BAD_IMAGE'}),false);return;} cropOpen(f); });
+function cropClose() {
+  hideModal(cropModal);
+  cropRelease();
+}
+$('cropCancel').addEventListener('click', cropClose);
+$('cropCancel2').addEventListener('click', cropClose);
+cropZoom.addEventListener('input', () => cropLayout(true));
+cropStage.addEventListener('pointerdown', e => {
+  if (!cropSource) return;
+  e.preventDefault(); cropPointer = e.pointerId;
+  cropStart = { x:e.clientX, y:e.clientY, left:cropX, top:cropY };
+  try { cropStage.setPointerCapture(e.pointerId); } catch (_) {}
+});
+cropStage.addEventListener('pointermove', e => {
+  if (cropPointer !== e.pointerId || !cropStart || !cropSource) return;
+  const box = cropStage.getBoundingClientRect().width || cropStage.clientWidth;
+  const w = cropSource.naturalWidth * cropScale, h = cropSource.naturalHeight * cropScale;
+  cropX = Math.max(box-w, Math.min(0, cropStart.left + e.clientX-cropStart.x));
+  cropY = Math.max(box-h, Math.min(0, cropStart.top + e.clientY-cropStart.y));
+  cropImage.style.left = cropX + 'px'; cropImage.style.top = cropY + 'px';
+});
+['pointerup','pointercancel','lostpointercapture'].forEach(ev => cropStage.addEventListener(ev, () => { cropPointer=null; cropStart=null; }));
+$('cropApply').addEventListener('click', () => {
+  if (!cropSource || !cropSource.naturalWidth || !cropStage.clientWidth || !cropScale) return;
+  try {
+    const S = 256, box = cropStage.getBoundingClientRect().width || cropStage.clientWidth;
+    const c = document.createElement('canvas'); c.width = S; c.height = S;
+    const g = c.getContext('2d', { alpha:false });
+    if (!g) throw new Error('canvas');
+    g.fillStyle = '#fff'; g.fillRect(0, 0, S, S);
+    g.drawImage(cropSource, -cropX/cropScale, -cropY/cropScale, box/cropScale, box/cropScale, 0, 0, S, S);
+    let q = .84, out = c.toDataURL('image/jpeg', q);
+    while (out.length > 69000 && q > .32) { q -= .08; out = c.toDataURL('image/jpeg', q); }
+    if (!out || out.length > 69000) throw new Error('size');
+    draft.avatar = out; draft.clear = false;
+    cropClose(); pfSay('', true); pfBuild(); pfRefresh();
+  } catch (err) {
+    console.error('profile crop failed:', err);
+    pfSay('ပုံကို ပြင်ဆင်မရပါ၊ တခြားပုံရွေးပါ', false);
+  }
+});
+$('pfFile').addEventListener('change', e => {
+  const f = e.target.files && e.target.files[0];
+  e.target.value = '';
+  if (!f) return;
+  if (!(f.type || '').toLowerCase().startsWith('image/')) { pfSay('ပုံဖိုင်သာ ရွေးပါ', false); return; }
+  cropOpen(f);
+});
 $('pfRemove').addEventListener('click', () => { draft.avatar = null; draft.clear = true; pfBuild(); pfRefresh(); });
 $('pfVipBtn').addEventListener('click', openVip);
 $('pfSave').addEventListener('click', async () => {
