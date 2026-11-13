@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#1E1A4D">
+<meta name="theme-color" content="#120F33">
 <title>TikTok Boost — Like တစ်ခုအတွက် Like တစ်ခု၊ ကြည့်ရှုမှုတစ်ခုအတွက် ကြည့်ရှုမှု</title>
 <meta name="description" content="TikTok Boost — တခြားသူ့ Video ကို Like ပေး/ကြည့်ပြီး Credit ရယူကာ ကိုယ့် Video အတွက် Like နှင့် ကြည့်ရှုမှု လဲလှယ်နိုင်သော Myanmar app။">
 <link rel="canonical" href="https://tiktok-boost-lemon.vercel.app/">
@@ -490,6 +490,119 @@ select.text {
   .modal-box { border-radius: var(--r-xl); padding-bottom: 24px; box-shadow: var(--sh-float); }
   .modal-box::before { display: none; }
 }
+
+/* =====================================================================
+   v4 refresh — layered on top of v3 (JS / HTML untouched)
+   Glow backdrop · glass wallet · soft depth instead of hard offsets
+   ===================================================================== */
+:root {
+  --ground: #120F33;
+  --sheet: #F6F4FF;
+  --grad-pink: linear-gradient(135deg, #FF4D73 0%, #FE2C55 45%, #D1135F 100%);
+  --grad-cyan: linear-gradient(160deg, #25F4EE 0%, #9BFBF7 100%);
+  --grad-gold: linear-gradient(135deg, #FFE27A 0%, #FFC933 100%);
+  --sh-card: 0 1px 0 rgba(255,255,255,.9) inset, 0 14px 30px -16px rgba(23,20,60,.30);
+  --r-xl: 32px;
+}
+html { background: #120F33; }
+body {
+  background:
+    radial-gradient(560px 420px at 100% -6%, rgba(254,44,85,.42), transparent 70%),
+    radial-gradient(560px 460px at -10% 14%, rgba(37,244,238,.30), transparent 70%),
+    #120F33;
+  background-attachment: fixed;
+}
+
+/* logo + hero */
+.logo { width: 92px; height: 92px; border-radius: 28px; box-shadow: -6px -6px 0 var(--cyan), 6px 6px 0 var(--pink), 0 24px 50px -10px rgba(254,44,85,.55); }
+.logo svg { width: 48px; height: 48px; }
+.auth-top h1 { font-size: 48px; letter-spacing: -.035em; text-shadow: 0 6px 30px rgba(37,244,238,.25); }
+.tag { color: #D8D4FA; }
+
+/* sheet */
+.sheet {
+  background: linear-gradient(180deg, #FFFFFF 0, var(--sheet) 90px);
+  border-top: 1px solid rgba(255,255,255,.7);
+  padding-top: 22px;
+  box-shadow: 0 -20px 60px rgba(0,0,0,.35);
+}
+
+/* tabs */
+.tabs { padding: 5px; background: #E6E2FA; border-radius: 18px; box-shadow: inset 0 1px 3px rgba(23,20,60,.10); }
+.tab { border-radius: 14px; }
+.tab.active { background: var(--grad-pink); color: #fff; box-shadow: 0 8px 18px -8px rgba(254,44,85,.8); }
+
+/* inputs */
+.input-box, .text { border-radius: 16px; border-color: #DAD6F2; background: #fff; }
+.input-box:focus-within, .text:focus { border-color: var(--pink); box-shadow: 0 0 0 4px rgba(254,44,85,.16); }
+
+/* buttons */
+.btn-primary {
+  background: var(--grad-pink); border-radius: 16px; min-height: 54px;
+  box-shadow: 0 14px 26px -12px rgba(254,44,85,.85), inset 0 1px 0 rgba(255,255,255,.35);
+}
+.btn-primary:active, .btn-primary:not(:disabled):active { transform: translateY(1px) scale(.99); box-shadow: 0 6px 12px -8px rgba(254,44,85,.8); }
+.btn-primary:not(:disabled):hover { transform: translateY(-1px); box-shadow: 0 18px 30px -12px rgba(254,44,85,.9), inset 0 1px 0 rgba(255,255,255,.35); }
+.btn { background: linear-gradient(135deg, #2A2566, var(--ink)); }
+.btn.claim { background: var(--grad-gold); box-shadow: 0 10px 22px -10px rgba(255,201,51,.9); }
+.btn.next { background: var(--grad-cyan); }
+.btn-gold { background: var(--grad-gold); border-radius: 16px; box-shadow: 0 12px 24px -12px rgba(255,170,0,.9), inset 0 1px 0 rgba(255,255,255,.6); }
+.btn-gold:active { transform: translateY(1px); box-shadow: 0 5px 10px -6px rgba(255,170,0,.8); }
+
+/* top bar + wallet (glass card) */
+.avatar { box-shadow: 0 0 0 3px rgba(37,244,238,.25), 0 0 18px rgba(37,244,238,.45); }
+.ghost { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.22); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.wallet {
+  justify-content: flex-start; gap: 18px;
+  margin: 8px max(18px, env(safe-area-inset-right)) 28px max(18px, env(safe-area-inset-left));
+  padding: 18px 22px;
+  background: linear-gradient(135deg, rgba(255,255,255,.14), rgba(255,255,255,.04));
+  border: 1px solid rgba(255,255,255,.18); border-radius: 26px;
+  box-shadow: 0 24px 50px -24px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.2);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+}
+.coin { width: 56px; height: 56px; background: radial-gradient(circle at 30% 28%, #FFF2B0, #FFC933 62%, #F0A800); box-shadow: -3px -3px 0 var(--cyan), 3px 3px 0 var(--pink), 0 10px 24px -6px rgba(255,201,51,.7); }
+.bal { font-size: 46px; }
+
+/* choice tiles */
+.tile { border-radius: 22px; border-color: transparent; }
+.tile svg { border-radius: 14px; }
+.tile.active { background: var(--grad-cyan); border-color: transparent; transform: translateY(-2px); box-shadow: 0 18px 32px -16px rgba(37,244,238,.95); }
+.tile.active svg { background: rgba(255,255,255,.7); }
+
+/* earn task + spend panel */
+.task { border: 1px solid var(--line); border-radius: 26px; box-shadow: 0 26px 50px -26px rgba(254,44,85,.55), 0 1px 0 #fff inset; }
+.lk-head { background: linear-gradient(135deg, #F0EDFF, #FFF0F4); }
+.lk-bar { height: 10px; }
+.lk-bar div { background: var(--grad-pink); }
+.player-wrap { border-radius: 22px; box-shadow: 0 22px 40px -16px rgba(23,20,60,.5); }
+.use-panel { border-color: transparent; border-radius: 26px; }
+.chip { border-radius: 14px; border-color: #DAD6F2; }
+.chip.active { background: var(--ink); color: #fff; border-color: var(--ink); box-shadow: 0 8px 16px -8px rgba(23,20,60,.65); }
+.cost { background: linear-gradient(135deg, #F0EDFF, #FFF0F4); border-radius: 16px; }
+.cost b { color: var(--pink); }
+
+/* lists */
+.ord, .adm-stat, .perk { border-color: transparent; border-radius: 20px; }
+.vip-hero { border-radius: 24px; box-shadow: 0 24px 44px -22px rgba(255,201,51,.5); }
+
+/* desktop: add breathing room */
+@media (min-width: 640px) {
+  .screen { max-width: 520px; }
+  .sheet { box-shadow: 0 40px 80px -30px rgba(0,0,0,.7); }
+}
+
+/* ---------- login: compact centered card ---------- */
+#authScreen { justify-content: center; max-width: 380px; padding: 0 16px; }
+#authScreen .auth-top { padding: calc(28px + env(safe-area-inset-top)) 0 22px; }
+#authScreen .logo { width: 68px; height: 68px; border-radius: 22px; box-shadow: -4px -4px 0 var(--cyan), 4px 4px 0 var(--pink), 0 18px 36px -10px rgba(254,44,85,.55); }
+#authScreen .logo svg { width: 36px; height: 36px; }
+#authScreen .auth-top h1 { margin-top: 20px; font-size: 34px; }
+#authScreen .tag { margin-top: 8px; font-size: 13px; line-height: 1.8; }
+#authScreen .sheet { flex: none; padding: 16px 16px 20px; border-radius: 28px; margin-bottom: calc(28px + env(safe-area-inset-bottom)); box-shadow: 0 40px 80px -30px rgba(0,0,0,.75); }
+#authScreen .tab { min-height: 40px; font-size: 13px; }
+#authScreen .input-box { min-height: 48px; }
+#authScreen .btn-primary { min-height: 50px; margin-top: 8px; }
 </style>
 </head>
 <body>
@@ -859,7 +972,7 @@ select.text {
   window.addEventListener('unhandledrejection', function (e) { show('PROMISE: ' + ((e.reason && e.reason.message) || e.reason)); });
   document.addEventListener('DOMContentLoaded', function () {
     var s = document.createElement('div');
-    s.textContent = 'build vip-6';
+    s.textContent = 'build version 1.0.0';
     s.style.cssText = 'position:fixed;left:6px;bottom:4px;z-index:99998;font:10px monospace;color:#999;opacity:.6;pointer-events:none;';
     document.body.appendChild(s);
   });
