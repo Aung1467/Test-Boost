@@ -426,19 +426,52 @@ select.text {
 .adm-vip-badge.act { background: linear-gradient(135deg, #FFF1B8, #FFC933); }
 
 /* ---------- admin: tidy layout ---------- */
-.adm-tabs { grid-template-columns: repeat(5, 1fr); }
-.adm-tabs .tab { padding: 8px 2px; font-size: 13px; }
-@media (max-width: 400px) { .adm-tabs .tab { font-size: 12px; } .adm-dot { min-width: 16px; margin-left: 2px; padding: 0 4px; } }
-.adm-dot { display: inline-block; min-width: 18px; margin-left: 4px; padding: 0 5px; border-radius: 99px; background: var(--pink); color: #fff; font-size: 11px; line-height: 18px; vertical-align: 1px; }
-.adm-search { display: flex; gap: 8px; }
-.adm-status { margin-top: 10px; min-height: 0; font-size: 13px; color: var(--muted); }
+/* sub-tabs: 5 equal columns; badge floats on the corner so it never squeezes the label */
+.adm-tabs { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.adm-tabs .tab { position: relative; overflow: visible; text-overflow: clip; padding: 8px 2px; font-size: 13px; }
+.adm-dot { position: absolute; top: -5px; right: -1px; min-width: 18px; padding: 0 5px; border-radius: 99px; background: var(--pink); color: #fff; font-size: 11px; font-weight: 700; line-height: 18px; text-align: center; box-shadow: 0 0 0 2px #E6E2FA; pointer-events: none; }
+.adm-tabs .tab.active .adm-dot { background: #fff; color: var(--pink); box-shadow: 0 0 0 2px var(--pink); }
+@media (max-width: 400px) { .adm-tabs .tab { font-size: 12px; } .adm-dot { min-width: 16px; font-size: 10px; line-height: 16px; padding: 0 4px; } }
+
+.adm-pane > .field-label:first-child, .adm-pane > .note:first-child { margin-top: 0; }
+.adm-search { display: flex; align-items: stretch; gap: 8px; }
+.adm-search .text { flex: 1; min-width: 0; -webkit-appearance: none; appearance: none; }
+.adm-search .btn { flex: none; }
+.adm-status { margin-top: 10px; min-height: 0; font-size: 13px; text-align: left; color: var(--muted); }
+.adm-status:empty { display: none; }
 .adm-status.err { color: var(--err); }
-.adm-more { display: block; width: 100%; margin-top: 10px; background: var(--soft); color: var(--ink); }
-.adm-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-.adm-stat { padding: 12px 14px; background: var(--card); border: 1.5px solid var(--line); border-radius: var(--r-md); box-shadow: var(--sh-card); }
+.adm-pane .adm-status.ok { color: var(--ok); }
+.btn.adm-more { display: block; width: 100%; margin-top: 10px; background: var(--soft); color: var(--ink); }
+.adm-pane > .btn-primary { margin-top: 12px; }
+
+/* user cards */
+.adm-card { padding: 4px 14px; transition: border-color .15s; }
+.adm-card.adm-open { padding-bottom: 14px; border-color: var(--ink); }
+.adm-head { min-height: 48px; gap: 10px; }
+.adm-head .badge { font-variant-numeric: tabular-nums; }
+.adm-body { margin-top: 4px; }
+.adm-amt { display: block; margin: 0 0 10px; }
+.adm-body .msg, .mail-item .msg { margin: 8px 0 0; min-height: 0; font-size: 13px; text-align: left; }
+.adm-act { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 0; }
+.adm-act button { min-width: 0; padding: 7px 8px; line-height: 1.5; }
+.adm-act .wide { grid-column: 1 / -1; }
+.adm-act .pri, .adm-act .pri:hover { color: #fff; background: var(--ink); border-color: var(--ink); }
+.adm-act .vip, .adm-act .vip:hover { background: linear-gradient(135deg, #FFF1B8, #FFC933); border-color: var(--gold); font-weight: 700; }
+.ord-act button:disabled { opacity: .5; cursor: not-allowed; }
+
+/* mail / feedback / vip lists share the mail-item card */
+.adm-mi-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.adm-mi-head b { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.adm-mi-head small, .adm-mi-head .adm-vip-badge { flex: none; margin: 0; }
+.mail-item .ord-act { margin-top: 10px; }
+.adm-ta { margin-top: 8px; min-height: 110px; resize: vertical; font-family: inherit; line-height: 1.7; }
+
+/* credit pane */
+.adm-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 12px; }
+.adm-stat { min-width: 0; padding: 12px 14px; background: var(--card); border: 1.5px solid var(--line); border-radius: var(--r-md); box-shadow: var(--sh-card); }
 .adm-stat small { display: block; font-size: 12px; color: var(--muted); }
-.adm-stat b { display: block; margin-top: 2px; font: 800 20px var(--display); font-variant-numeric: tabular-nums; }
-#clList { max-height: 58vh; overflow-y: auto; overscroll-behavior: contain; }
+.adm-stat b { display: block; margin-top: 2px; font: 800 20px var(--display); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+#clList { max-height: min(58vh, 520px); max-height: min(58dvh, 520px); overflow-y: auto; overscroll-behavior: contain; }
 .cl-go { cursor: pointer; }
 .cl-go:active { background: var(--soft); }
 .cl-row:nth-child(-n+3) .cl-rank { color: var(--pink); }
@@ -861,10 +894,10 @@ body {
 
       <!-- စာပို့ -->
       <div class="adm-pane" id="admPane-mail" hidden>
-        <div class="field-label" style="margin-top:0">User အားလုံးသို့ စာပို့ရန်</div>
+        <div class="field-label">User အားလုံးသို့ စာပို့ရန်</div>
         <input class="text" type="text" id="admMailTitle" maxlength="100" placeholder="ခေါင်းစဉ်">
-        <textarea class="text" id="admMailBody" rows="4" maxlength="1000" placeholder="စာအကြောင်းအရာ" style="margin-top:8px;resize:vertical;font-family:inherit"></textarea>
-        <button type="button" class="btn adm-more" id="admMailAll">User အားလုံးသို့ ပို့မည်</button>
+        <textarea class="text adm-ta" id="admMailBody" rows="4" maxlength="1000" placeholder="စာအကြောင်းအရာ"></textarea>
+        <button type="button" class="btn-primary" id="admMailAll">User အားလုံးသို့ ပို့မည်</button>
         <div class="msg" id="admMailMsg" role="status"></div>
         <p class="note">တစ်ယောက်တည်းကို ပို့ချင်ရင် User tab မှာ ရှာပြီး ၎င်းရဲ့ "စာပို့" ကိုနှိပ်ပါ (ဒီမှာ ရေးထားတဲ့ စာကို သုံးမည်)</p>
       </div>
@@ -876,7 +909,7 @@ body {
 
       <!-- VIP: လျောက်ထားသူ + VIP Member များ -->
       <div class="adm-pane" id="admPane-vip" hidden>
-        <p class="note" style="margin-top:0">"VIP ဖွင့်ပေးမည်" ကိုနှိပ်ရင် User ရဲ့ Mail Box ထဲကို "VIP လက်ဆောင်ရယူရန်" (Credit 1,000 + 300 နှင့် VIP Border) ရောက်သွားမည်</p>
+        <p class="note">"VIP ဖွင့်ပေးမည်" ကိုနှိပ်ရင် User ရဲ့ Mail Box ထဲကို "VIP လက်ဆောင်ရယူရန်" (Credit 1,000 + 300 နှင့် VIP Border) ရောက်သွားမည်</p>
         <div class="msg adm-status" id="admVipMsg" role="status"></div>
         <div id="admVipList"></div>
       </div>
@@ -1698,7 +1731,7 @@ async function checkAdmin() {
   } catch (e) {}
 }
 const admList = $('admList'), admMsg = $('admMsg'), admQ = $('admQ');
-function admSay(t, ok) { admMsg.textContent = t; admMsg.className = 'msg ' + (ok ? 'ok' : 'err'); }
+function admSay(t, ok) { admMsg.textContent = t; admMsg.className = 'msg adm-status ' + (ok ? 'ok' : 'err'); }
 
 let admTok = 0, admRows = [], admShown = 0;
 const ADM_PAGE = 20;
@@ -1785,18 +1818,19 @@ function admCard(u) {
 
   const inp = el('input', 'text');
   inp.type = 'number'; inp.inputMode = 'numeric'; inp.placeholder = 'Credit ပမာဏ';
-  inp.style.margin = '8px 0';
+  inp.classList.add('adm-amt'); inp.setAttribute('aria-label', 'Credit ပမာဏ');
 
-  const act = el('div', 'ord-act');
+  const act = el('div', 'ord-act adm-act');
   const add = el('button', '', 'ထည့်မည် (+)');
   const set = el('button', '', 'သတ်မှတ် (=)');
   const pw  = el('button', '', 'Password');
   const ml  = el('button', '', 'စာပို့');
   const vp  = el('button', '', '👑 VIP ဖွင့်ပေးမည်');
   [add, set, pw, ml, vp].forEach(b => b.type = 'button');
+  add.classList.add('pri'); set.classList.add('pri'); vp.classList.add('vip', 'wide');
   act.append(add, set, pw, ml, vp);
 
-  const msg = el('div', 'msg'); msg.style.minHeight = '0'; msg.style.marginTop = '6px';
+  const msg = el('div', 'msg');
   const say = (t, ok) => { msg.textContent = t; msg.className = 'msg ' + (ok ? 'ok' : 'err'); };
   const done = (v) => {
     badge.textContent = v + ' Credit'; u.credit = v; inp.value = '';
@@ -1964,13 +1998,15 @@ async function admFbLoad() {
 }
 function admFbCard(f) {
   const c = el('div', 'mail-item' + (f.is_read ? '' : ' unread'));
-  c.append(el('b', '', f.username || 'User'), el('p', '', f.body), el('small', '', fmtDate(f.created_at)));
+  const head = el('div', 'adm-mi-head');
+  head.append(el('b', '', f.username || 'User'), el('small', '', fmtDate(f.created_at)));
+  c.append(head, el('p', '', f.body));
   const act = el('div', 'ord-act');
   const rp = el('button', '', 'ပြန်စာ'), rd = el('button', '', 'ဖတ်ပြီး'), dl = el('button', 'del', 'ဖျက်');
   [rp, rd, dl].forEach(b => b.type = 'button');
   rd.hidden = !!f.is_read;
   act.append(rp, rd, dl);
-  const msg = el('div', 'msg'); msg.style.minHeight = '0'; msg.style.marginTop = '6px';
+  const msg = el('div', 'msg');
   const say = (t, ok) => { msg.textContent = t; msg.className = 'msg ' + (ok ? 'ok' : 'err'); };
   rp.addEventListener('click', async () => {
     const v = prompt((f.username || 'User') + ' ကို ပြန်စာ');
@@ -2458,7 +2494,8 @@ async function admVipLoad() {
     const c = el('div', 'mail-item' + (r.kind === 'request' ? ' unread' : ''));
     const badge = el('span', 'adm-vip-badge' + (r.kind === 'active' ? ' act' : ''),
       LABEL[r.kind] + (r.kind === 'active' ? ' · ကျန် ' + r.days_left + ' ရက်' : ''));
-    const head = el('b', '', r.username || 'User'); head.appendChild(badge);
+    const head = el('div', 'adm-mi-head');
+    head.append(el('b', '', r.username || 'User'), badge);
     c.appendChild(head);
     if (r.note) c.appendChild(el('p', '', r.note));
     const act = el('div', 'ord-act');
