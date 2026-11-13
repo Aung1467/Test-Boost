@@ -1706,6 +1706,190 @@ function admCard(u) {
   return card;
 }
 
+// ================= Mail Box =================
+const mailBtn = $('mailBtn'), mailBadge = $('mailBadge'), mailModal = $('mailModal'), mailList = $('mailList');
+function fmtDate(str) {
+  const d = new Date(str);
+  if (isNaN(d)) return '';
+  return d.toLocaleDateString() + ' ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+}
+let giftPending = 0;
+function setMailBadge(n) { n += giftPending; mailBadge.hidden = n === 0; mailBadge.textContent = n > 9 ? '9+' : String(n); }
+async function loadMail(show) {
+  let res, gres;
+  try {
+    [res, gres] = await Promise.all([sb.rpc('my_inbox'), sb.rpc('my_vip_gifts').then(r => r, e => ({ error: e }))]);
+  } catch (e) { res = { error: e }; }
+  const { data, error } = res;
+  if (error || !Array.isArray(data)) {
+    if (show) mailList.replaceChildren(el('div', 'ord-empty', 'စာများ မယူနိုင်ပါ'));
+    return false;
+  }
+  const gifts = (gres && Array.isArray(gres.data)) ? gres.data : [];
+  giftPending = gifts.filter(g => !g.claimed_at).length;
+  setMailBadge(data.filter(m => !m.is_read).length);
+  if (show) {
+    mailList.replaceChildren();
+    if (!data.length && !gifts.length) mailList.appendChild(el('div', 'ord-empty', 'စာ မရှိသေးပါ'));
+    gifts.forEach(g => {
+      const c = el('div', 'mail-item vip-gift' + (g.claimed_at ? '' : ' unread'));
+      c.append(el('b', '', '👑 VIP လက်ဆောင်ရယူရန်'),
+        el('p', '', g.claimed_at ? 'ရယူပြီးပါပြီ ✓' : 'Credit 1,000 + 300 နှင့် VIP Border ကို ရယူပါ'),
+        el('small', '', fmtDate(g.created_at)));
+      if (!g.claimed_at) {
+        const gb = el('button', 'btn-gold', '🎁 VIP လက်ဆောင် ယူမည်'); gb.type = 'button';
+        gb.addEventListener('click', () => claimVipGift(gb));
+        c.appendChild(gb);
+      }
+      mailList.appendChild(c);
+    });
+    data.forEach(m => {
+      const c = el('div', 'mail-item' + (m.is_read ? '' : ' unread'));
+      c.append(el('b', '', m.title), el('p', '', m.body), el('small', '', fmtDate(m.created_at)));
+      mailList.appendChild(c);
+    });
+  }
+  return true;
+}
+mailBtn.addEventListener('click', async () => {
+  mailModal.hidden = false;
+  document.body.classList.add('modal-open');
+  $('mailClose').focus();
+  mailList.replaceChildren(el('div', 'ord-empty', 'ယူနေသည်...'));
+  await loadMe();
+  const ok = await loadMail(true);
+  if (ok) {
+    const { error } = await sb.rpc('mark_inbox_read');
+    if (!error) setMailBadge(0);
+  }
+});
+function closeMail() {
+  if (mailModal.hidden) return;
+  mailModal.hidden = true;
+  document.body.classList.remove('modal-open');
+  mailBtn.focus();
+}
+$('mailClose').addEventListener('click', closeMail);
+mailModal.addEventListener('click', (e) => { if (e.target === mailModal) closeMail(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMail(); });
+let mailTimer = null;
+function startMailPolling() {
+  loadMail(false);
+  if (!mailTimer) mailTimer = setInterval(() => { if (!appScreen.hidden && mailModal.hidden) { loadMail(false); loadMe(); if (isAdm) { admFbLoad(); admVipLoad(); } } }, 60000);
+}
+
+async function admSendMail(userId, say, btn) {
+  const t = $('admMailTitle').value.trim(), b = $('admMailBody').value.trim();
+  if (!t || !b) { say('ခေါင်းစဉ်နှင့် စာအကြောင်းအရာ ထည့်ပါ', false); return; }
+  if (!userId && !confirm('User အားလုံးဆီ ပို့မလား?')) return;
+  if (btn) btn.disabled = true;
+  const { data, error } = await sb.rpc('admin_send_message', { p_user: userId, p_title: t, p_body: b });
+  if (btn) btn.disabled = false;
+  if (error) { say('မအောင်မြင်ပါ (' + errText(error) + ')', false); return; }
+  say('✓ စာပို့ပြီးပါပြီ (' + data + ' ဦး)', true);
+  if (!userId) { $('admMailTitle').value = ''; $('admMailBody').value = ''; }
+}
+$('admMailAll').addEventListener('click', () => {
+  const m = $('admMailMsg');
+  admSendMail(null, (t, ok) => { m.textContent = t; m.className = 'msg ' + (ok ? 'ok' : 'err'); }, $('admMailAll'));
+});
+
+
+// ---------- User → Admin messages ----------
+$('fbSend').addEventListener('click', async () => {
+  const ta = $('fbBody'), msg = $('fbMsg'), b = ta.value.trim();
+  const say = (t, ok) => { msg.textContent = t; msg.className = 'msg ' + (ok ? 'ok' : 'err'); };
+  if (!b) { say('စာရေးပါ', false); return; }
+  $('fbSend').disabled = true;
+  const { error } = await sb.rpc('send_feedback', { p_body: b });
+  $('fbSend').disabled = false;
+  if (error) { say(errText(error), false); return; }
+  ta.value = '';
+  say('✓ Admin ဆီ ပို့ပြီးပါပြီ', true);
+});
+
+// ---------- Admin: user messages ----------
+async function admFbLoad() {
+  let res;
+  try { res = await sb.rpc('admin_list_feedback'); } catch (e) { return; }
+  const data = res.data;
+  if (res.error || !Array.isArray(data)) return;
+  const unread = data.filter(f => !f.is_read).length;
+  $('adminTab').textContent = unread ? 'Admin (' + unread + ')' : 'Admin';
+  $('admFbCount').textContent = unread > 9 ? '9+' : String(unread); $('admFbCount').hidden = !unread;
+  const box = $('admFb');
+  box.replaceChildren();
+  if (!data.length) { box.appendChild(el('div', 'ord-empty', 'စာ မရှိသေးပါ')); return; }
+  data.forEach(f => box.appendChild(admFbCard(f)));
+}
+function admFbCard(f) {
+  const c = el('div', 'mail-item' + (f.is_read ? '' : ' unread'));
+  c.append(el('b', '', f.username || 'User'), el('p', '', f.body), el('small', '', fmtDate(f.created_at)));
+  const act = el('div', 'ord-act');
+  const rp = el('button', '', 'ပြန်စာ'), rd = el('button', '', 'ဖတ်ပြီး'), dl = el('button', 'del', 'ဖျက်');
+  [rp, rd, dl].forEach(b => b.type = 'button');
+  rd.hidden = !!f.is_read;
+  act.append(rp, rd, dl);
+  const msg = el('div', 'msg'); msg.style.minHeight = '0'; msg.style.marginTop = '6px';
+  const say = (t, ok) => { msg.textContent = t; msg.className = 'msg ' + (ok ? 'ok' : 'err'); };
+  rp.addEventListener('click', async () => {
+    const v = prompt((f.username || 'User') + ' ကို ပြန်စာ');
+    if (!v || !v.trim()) return;
+    const r = await sb.rpc('admin_send_message', { p_user: f.user_id, p_title: 'Admin ပြန်စာ', p_body: v });
+    if (r.error) { say('မအောင်မြင်ပါ (' + errText(r.error) + ')', false); return; }
+    await sb.rpc('admin_mark_feedback', { p_id: f.id });
+    admFbLoad();
+  });
+  rd.addEventListener('click', async () => {
+    const r = await sb.rpc('admin_mark_feedback', { p_id: f.id });
+    r.error ? say('မအောင်မြင်ပါ', false) : admFbLoad();
+  });
+  dl.addEventListener('click', async () => {
+    if (!confirm('ဒီစာကို ဖျက်မလား?')) return;
+    const r = await sb.rpc('admin_delete_feedback', { p_id: f.id });
+    r.error ? say('မအောင်မြင်ပါ', false) : admFbLoad();
+  });
+  c.append(act, msg);
+  return c;
+}
+
+// ===== Gift box =====
+const giftCard = $('giftCard'), giftBtn = $('giftBtn');
+let giftReady = 0, giftReward = 50, giftBusy = false;
+async function refreshBonus() {
+  let res;
+  try { res = await sb.rpc('my_bonus'); } catch (e) { return; }
+  const d = res.data;
+  if (res.error || !d) return;
+  const goal = d.goal || 30;
+  giftReward = d.reward || 50;
+  giftReady = d.ready || 0;
+  const prog = (d.done || 0) % goal;
+  giftCard.hidden = false;
+  giftCard.classList.toggle('ready', giftReady > 0);
+  $('giftCount').textContent = giftReady > 0 ? '×' + giftReady : prog + '/' + goal;
+  $('giftFill').style.width = (giftReady > 0 ? 100 : prog / goal * 100) + '%';
+  $('giftSub').textContent = giftReady > 0
+    ? 'နှိပ်ပြီး ဖွင့်ပါ၊ Credit ' + giftReward + ' ရမည်'
+    : 'Task ' + goal + ' ပြီးတိုင်း Bonus Credit ' + giftReward + ' (ကျန် ' + (goal - prog) + ')';
+}
+giftBtn.addEventListener('click', async () => {
+  if (giftBusy) return;
+  if (giftReady <= 0) { restart(giftBtn, 'pop'); return; }
+  giftBusy = true;
+  giftCard.classList.add('opening');
+  const { data, error } = await sb.rpc('open_gift');
+  await new Promise(r => setTimeout(r, 500));
+  giftCard.classList.remove('opening');
+  giftBusy = false;
+  if (error) { $('giftSub').textContent = errText(error); refreshBonus(); return; }
+  setCredit(data, true);
+  const pop = el('div', 'gift-pop', '+' + giftReward);
+  document.body.appendChild(pop);
+  setTimeout(() => pop.remove(), 1400);
+  refreshBonus();
+});
+
 // ================= Profile + VIP =================
 const CROWN_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#FFC933" stroke="#8A5A00" stroke-width="1.1" stroke-linejoin="round" d="M3 8l4.5 6.5L12 5l4.5 9.5L21 8l-2 10H5L3 8z"/><rect x="5" y="18" width="14" height="2.6" rx="1.2" fill="#FFB400" stroke="#8A5A00" stroke-width="1"/><circle cx="12" cy="13" r="1.3" fill="#FE2C55"/><circle cx="7.6" cy="14" r="1" fill="#25F4EE"/><circle cx="16.4" cy="14" r="1" fill="#25F4EE"/></svg>';
 const SOLID_COLORS = ['#25F4EE', '#FE2C55', '#FFC933', '#8B5CF6', '#22C55E', '#FF6A00', '#38BDF8', '#FFFFFF'];
@@ -1728,156 +1912,4 @@ function pfpRender(host, o) {
 
 function paintMe() {
   const vip = !!(me && me.vip_active);
-  pfpRender($('avatar'), { name: myName, avatar: me && me.avatar, border: effBorder(me && me.border, vip) });
-  $('whoVip').hidden = !vip;
-  const ban = $('vipBanner');
-  ban.classList.remove('ready');
-  if (me && me.gift_pending > 0) { $('vbnTitle').textContent = 'VIP လက်ဆောင်ရယူရန်'; $('vbnSub').textContent = 'Credit 1,000 + 300 နှင့် VIP Border — Mail Box မှာ ယူပါ'; ban.classList.add('ready'); }
-  else if (vip && me.daily_ready) { $('vbnTitle').textContent = 'နေ့စဉ် Credit 300 ယူရန်'; $('vbnSub').textContent = 'VIP ကျန် ' + me.days_left + ' ရက်'; ban.classList.add('ready'); }
-  else if (vip) { $('vbnTitle').textContent = 'VIP Member'; $('vbnSub').textContent = 'ကျန် ' + me.days_left + ' ရက် · ဒီနေ့ Credit ယူပြီး'; }
-  else if (me && me.requested) { $('vbnTitle').textContent = 'VIP လျောက်ထားပြီး'; $('vbnSub').textContent = 'Admin ခွင့်ပြုချက် စောင့်နေသည်'; }
-  else { $('vbnTitle').textContent = 'VIP ဝင်ရန်'; $('vbnSub').textContent = 'ဝင်ဝင်ချင်း Credit 1,000 + နေ့စဉ် 300'; }
-  if (!$('vipModal').hidden) renderVipAction();
-}
-async function loadMe() {
-  let res;
-  try { res = await sb.rpc('my_profile_ext'); } catch (e) { return; }
-  if (res.error || !res.data) return;
-  me = res.data;
-  paintMe();
-  if (me.gift_pending > 0) loadMail(false);
-}
-
-// ----- modal helpers -----
-function showModal(m) { m.hidden = false; document.body.classList.add('modal-open'); }
-function hideModal(m) { m.hidden = true; if ($('pfModal').hidden && $('vipModal').hidden && $('mailModal').hidden) document.body.classList.remove('modal-open'); }
-
-// ----- Profile editor -----
-let draft = null;
-const pfModal = $('pfModal');
-function pfSay(t, ok) { $('pfMsg').textContent = t; $('pfMsg').className = 'msg ' + (ok ? 'ok' : 'err'); }
-function pfRefresh() {
-  const vip = !!(me && me.vip_active);
-  pfpRender($('pfPreview'), { name: myName, avatar: draft.clear ? null : (draft.avatar !== undefined ? draft.avatar : me && me.avatar), border: draft.border });
-  $('pfName').textContent = myName;
-  $('pfTag').textContent = vip ? '👑 VIP Member' : 'Member';
-  $('pfSwatches').querySelectorAll('.swatch').forEach(s => s.setAttribute('aria-checked', String(s.dataset.v === draft.border)));
-  $('pfVipGrid').querySelectorAll('.vbt').forEach(s => s.setAttribute('aria-checked', String(s.dataset.v === draft.border)));
-  $('pfLockNote').textContent = vip ? 'ရွေးလို့ရပါပြီ' : 'VIP ဝင်မှ သုံးလို့ရမည်';
-  $('pfVipBtn').hidden = vip;
-}
-function pfBuild() {
-  const vip = !!(me && me.vip_active);
-  const sw = $('pfSwatches'); sw.replaceChildren();
-  SOLID_COLORS.forEach(c => {
-    const b = el('button', 'swatch'); b.type = 'button'; b.setAttribute('role', 'radio');
-    b.dataset.v = 'solid:' + c; b.style.background = c; b.setAttribute('aria-label', c);
-    b.addEventListener('click', () => { draft.border = b.dataset.v; pfRefresh(); });
-    sw.appendChild(b);
-  });
-  const cu = el('label', 'swatch custom'); cu.setAttribute('aria-label', 'စိတ်ကြိုက်အရောင်');
-  const inp = el('input'); inp.type = 'color'; inp.value = '#25F4EE';
-  inp.addEventListener('input', () => { draft.border = 'solid:' + inp.value.toUpperCase(); pfRefresh(); });
-  cu.appendChild(inp); sw.appendChild(cu);
-  const g = $('pfVipGrid'); g.replaceChildren();
-  VIP_BORDERS.forEach(([k, label]) => {
-    const b = el('button', 'vbt' + (vip ? '' : ' locked')); b.type = 'button'; b.setAttribute('role', 'radio'); b.dataset.v = 'vip:' + k;
-    const p = el('span', 'pfp pfp-sm'); pfpRender(p, { name: myName, avatar: draft.avatar !== undefined ? draft.avatar : me && me.avatar, border: 'vip:' + k });
-    b.append(p, el('span', '', label));
-    b.addEventListener('click', () => {
-      if (!(me && me.vip_active)) { pfSay('VIP သီးသန့် ဘောင်ဖြစ်ပါသည် — VIP ဝင်မှ သုံးလို့ရပါမည်', false); return; }
-      pfSay('', true); draft.border = b.dataset.v; pfRefresh();
-    });
-    g.appendChild(b);
-  });
-}
-function openProfile() {
-  const vip = !!(me && me.vip_active);
-  draft = { border: effBorder(me && me.border, vip), avatar: undefined, clear: false };
-  pfSay('', true);
-  pfBuild(); pfRefresh();
-  showModal(pfModal);
-  $('pfClose').focus();
-}
-function closePf() { if (pfModal.hidden) return; hideModal(pfModal); $('whoBtn').focus(); }
-function fileToAvatar(file) {
-  return new Promise((res, rej) => {
-    const url = URL.createObjectURL(file), img = new Image();
-    img.onload = () => {
-      URL.revokeObjectURL(url);
-      const S = 192, c = document.createElement('canvas'); c.width = c.height = S;
-      const g = c.getContext('2d'), m = Math.min(img.width, img.height);
-      g.fillStyle = '#fff'; g.fillRect(0, 0, S, S);
-      g.drawImage(img, (img.width - m) / 2, (img.height - m) / 2, m, m, 0, 0, S, S);
-      let q = .85, out = c.toDataURL('image/jpeg', q);
-      while (out.length > 69000 && q > .3) { q -= .1; out = c.toDataURL('image/jpeg', q); }
-      out.length <= 69000 ? res(out) : rej(new Error('BAD_IMAGE'));
-    };
-    img.onerror = () => { URL.revokeObjectURL(url); rej(new Error('BAD_IMAGE')); };
-    img.src = url;
-  });
-}
-$('whoBtn').addEventListener('click', openProfile);
-$('pfClose').addEventListener('click', closePf);
-pfModal.addEventListener('click', (e) => { if (e.target === pfModal) closePf(); });
-$('pfPick').addEventListener('click', () => $('pfFile').click());
-$('pfFile').addEventListener('change', async (e) => {
-  const f = e.target.files && e.target.files[0]; e.target.value = '';
-  if (!f) return;
-  if (!/^image\//.test(f.type)) { pfSay(errText({ message: 'BAD_IMAGE' }), false); return; }
-  try { draft.avatar = await fileToAvatar(f); draft.clear = false; pfSay('', true); pfBuild(); pfRefresh(); }
-  catch (err) { pfSay(errText({ message: 'BAD_IMAGE' }), false); }
-});
-$('pfRemove').addEventListener('click', () => { draft.avatar = null; draft.clear = true; pfBuild(); pfRefresh(); });
-$('pfVipBtn').addEventListener('click', openVip);
-$('pfSave').addEventListener('click', async () => {
-  $('pfSave').disabled = true; pfSay('', true);
-  const { error } = await sb.rpc('save_my_profile', {
-    p_border: draft.border,
-    p_avatar: (!draft.clear && draft.avatar) ? draft.avatar : null,
-    p_clear_avatar: !!draft.clear,
-  });
-  $('pfSave').disabled = false;
-  if (error) { pfSay(errText(error), false); return; }
-  await loadMe();
-  pfSay('✓ သိမ်းပြီးပါပြီ', true);
-  setTimeout(closePf, 700);
-});
-
-// ----- VIP modal -----
-const vipModal = $('vipModal');
-function vipSay(t, ok) { $('vipMsg').textContent = t; $('vipMsg').className = 'msg ' + (ok ? 'ok' : 'err'); }
-function renderVipAction() {
-  const box = $('vipAction'); box.replaceChildren();
-  const state = (html) => { const d = el('div', 'vip-state'); d.innerHTML = html; box.appendChild(d); };
-  if (!me) { state('ယူနေသည်...'); return; }
-  if (me.gift_pending > 0) {
-    state('🎁 <b>VIP လက်ဆောင်</b> စောင့်နေပါသည်');
-    const b = el('button', 'btn-gold', 'Mail Box ကို ဖွင့်မည်'); b.type = 'button';
-    b.addEventListener('click', () => { closeVip(); closePf(); $('mailBtn').click(); });
-    box.appendChild(b); return;
-  }
-  if (me.vip_active) {
-    state('👑 <b>VIP Member</b> · ကျန် <b>' + me.days_left + '</b> ရက်');
-    if (me.daily_ready) {
-      const b = el('button', 'btn-gold', 'နေ့စဉ် Credit 300 ယူမည်'); b.type = 'button';
-      b.addEventListener('click', async () => {
-        b.disabled = true; vipSay('', true);
-        const { data, error } = await sb.rpc('vip_claim_daily');
-        if (error) { b.disabled = false; vipSay(errText(error), false); return; }
-        if (data && data.credit != null) setCredit(data.credit, true);
-        vipSay('✓ Credit +300 ရပါပြီ', true);
-        await loadMe();
-      });
-      box.appendChild(b);
-    } else {
-      state('ဒီနေ့အတွက် ယူပြီးပါပြီ · ကျန် ' + me.daily_left + ' ကြိမ်');
-    }
-    return;
-  }
-  if (me.requested) { state('✓ လျောက်ထားပြီးပါပြီ<br>Admin ခွင့်ပြုချက် စောင့်ပါ'); return; }
-  const ta = el('textarea', 'text vip-note'); ta.rows = 2; ta.maxLength = 200; ta.placeholder = 'Admin ဆီ စာတို (မရေးလည်းရ)';
-  const b = el('button', 'btn-gold', 'Admin ဆီ လျောက်ထားမည်'); b.type = 'button';
-  b.addEventListener('click', async () => {
-    b.disabled = true; vipSay('', true);
-    cons
+  pfpRender($('avatar'), { name: myName, avatar: me && me.av
