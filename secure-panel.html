@@ -375,6 +375,7 @@ select.text {
 
 /* ---------- profile / VIP modals ---------- */
 .top-modal { z-index: 60; }
+.crop-modal { z-index: 55; }
 .pf-hero { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 26px 0 14px; margin-bottom: 4px; background: linear-gradient(160deg, #2B2166, #1E1A4D); border-radius: var(--r-lg); color: #fff; }
 .pf-name { margin-top: 8px; font: 800 18px var(--display); }
 .pf-tag { font-size: 12px; color: #D9D4FF; }
@@ -2783,7 +2784,7 @@ function cropRelease() {
 }
 function cropOpen(file) {
   const maxBytes = 20 * 1024 * 1024;
-  if (!file || !(file.type || '').toLowerCase().startsWith('image/') || file.size <= 0 || file.size > maxBytes) {
+  if (!file || ((file.type || '') && !file.type.toLowerCase().startsWith('image/')) || file.size <= 0 || file.size > maxBytes) {
     pfSay('ပုံဖိုင်ကို ဖွင့်မရပါ', false); return;
   }
   cropRelease();
@@ -2854,10 +2855,11 @@ $('cropApply').addEventListener('click', () => {
 });
 $('pfFile').addEventListener('change', e => {
   const f = e.target.files && e.target.files[0];
-  e.target.value = '';
   if (!f) return;
-  if (!(f.type || '').toLowerCase().startsWith('image/')) { pfSay('ပုံဖိုင်သာ ရွေးပါ', false); return; }
+  const t = (f.type || '').toLowerCase();
+  if (t && !t.startsWith('image/')) { e.target.value = ''; pfSay('ပုံဖိုင်သာ ရွေးပါ', false); return; }
   cropOpen(f);
+  setTimeout(() => { e.target.value = ''; }, 1000);
 });
 $('pfRemove').addEventListener('click', () => { draft.avatar = null; draft.clear = true; pfBuild(); pfRefresh(); });
 $('pfVipBtn').addEventListener('click', openVip);
