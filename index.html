@@ -686,6 +686,7 @@ body {
 .pm-bubble.show { opacity: 1; transform: none; pointer-events: auto; }
 .pm-bubble::before { content: ""; position: absolute; top: -9px; right: 18px; width: 14px; height: 14px; background: #fff; border-left: 2px solid var(--ink); border-top: 2px solid var(--ink); transform: rotate(45deg); }
 .pm-bubble small { display: block; margin-bottom: 2px; font-size: 12px; font-weight: 700; color: var(--pink); }
+.pm-bubble .pm-timer { display: block; margin-top: 9px; padding-top: 8px; border-top: 1px solid #e8e5f2; color: #d12b58; font-size: 14px; font-weight: 800; font-variant-numeric: tabular-nums; }
 .pm-ta { min-height: 110px; }
 body.modal-open .postman, body.modal-open .pm-bubble { display: none; }
 .pm-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
@@ -1101,7 +1102,7 @@ body.modal-open .postman, body.modal-open .pm-bubble { display: none; }
   </svg>
   <span class="pm-dot" id="pmDot" hidden></span>
 </button>
-<div class="pm-bubble" id="pmBubble" role="status" aria-live="polite"><small id="pmTag">📮 စာပို့သမား</small><span id="pmText"></span></div>
+<div class="pm-bubble" id="pmBubble" role="status" aria-live="polite"><small id="pmTag">📮 စာပို့သမား</small><span id="pmText"></span><span id="pmTimer" class="pm-timer" hidden></span></div>
 
 <script>
 /* DIAG vip-6: error ဖြစ်ရင် ဖန်သားပြင်အောက်ခြေမှာ အနီရောင်နဲ့ ပြမည် (screenshot ရိုက်ပို့ပါ) */
@@ -2750,17 +2751,30 @@ async function admVipLoad() {
 // ===== Postman popup (စာပို့သမား) =====
 const PM_DEFAULT = 'မင်္ဂလာပါ ပျော်ရွှင်စရာ နေ့လေးတစ်နေ့ဖြစ်ပါစေ';
 const PM_SUGGEST = 'ပျော်ရွှင်စရာအချိန်လေးဖြစ်ပါစေ 1 နာရီအတွင်း Task တစ်ခုလုပ်ဆောင်ပြီးတိုင်း Credit 1 ခုအပိုရယူပါ';
-const pmEl = $('postman'), pmBubble = $('pmBubble'), pmText = $('pmText'), pmDot = $('pmDot'), pmTag = $('pmTag');
+const pmEl = $('postman'), pmBubble = $('pmBubble'), pmText = $('pmText'), pmDot = $('pmDot'), pmTag = $('pmTag'), pmTimer = $('pmTimer');
 let pmData = null, pmHideT = null;
 const pmGet = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
 const pmSet = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
 function pmHide() { clearTimeout(pmHideT); pmBubble.classList.remove('show'); }
+function pmUpdateTimer() {
+  if (!pmData || !pmData.updated_at) { pmTimer.hidden = true; pmTimer.textContent = ''; return; }
+  const started = Date.parse(pmData.updated_at);
+  if (!Number.isFinite(started)) { pmTimer.hidden = true; return; }
+  const left = Math.max(0, 3600 - Math.floor((Date.now() - started) / 1000));
+  const mm = String(Math.floor(left / 60)).padStart(2, '0');
+  const ss = String(left % 60).padStart(2, '0');
+  pmTimer.textContent = left > 0 ? '⏳ Bonus ကျန်ချိန် ' + mm + ':' + ss : '⏳ Bonus အချိန် ပြည့်သွားပါပြီ (00:00)';
+  pmTimer.hidden = false;
+}
 function pmShow(text, special) {
   clearTimeout(pmHideT);
   pmText.textContent = text;
   pmTag.hidden = !special;
+  pmTimer.hidden = !special;
+  if (special) pmUpdateTimer();
   pmBubble.classList.add('show');
-  pmHideT = setTimeout(pmHide, special ? 9000 : 4000);
+  // Keep the timed bonus popup visible until the user closes it.
+  if (!special) pmHideT = setTimeout(pmHide, 4000);
 }
 async function pmFetch() {
   if (!sb) return null;
@@ -2781,6 +2795,7 @@ async function pmOpen(auto) {
 }
 pmEl.addEventListener('click', () => { if (pmBubble.classList.contains('show')) pmHide(); else pmOpen(false); });
 pmBubble.addEventListener('click', pmHide);
+setInterval(pmUpdateTimer, 1000);
 (async () => {
   await pmFetch();
   pmOpen(true);
