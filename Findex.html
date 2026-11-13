@@ -1,0 +1,3142 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#120F33">
+<title>TikTok Boost — Like တစ်ခုအတွက် Like တစ်ခု၊ ကြည့်ရှုမှုတစ်ခုအတွက် ကြည့်ရှုမှု</title>
+<meta name="description" content="TikTok Boost — တခြားသူ့ Video ကို Like ပေး/ကြည့်ပြီး Credit ရယူကာ ကိုယ့် Video အတွက် Like နှင့် ကြည့်ရှုမှု လဲလှယ်နိုင်သော Myanmar app။">
+<link rel="canonical" href="https://tiktok-boost-lemon.vercel.app/">
+<meta name="robots" content="index, follow">
+<meta property="og:type" content="website">
+<meta property="og:title" content="TikTok Boost">
+<meta property="og:description" content="Like တစ်ခုအတွက် Like တစ်ခု၊ ကြည့်ရှုမှုတစ်ခုအတွက် ကြည့်ရှုမှု">
+<meta property="og:url" content="https://tiktok-boost-lemon.vercel.app/">
+<meta property="og:site_name" content="TikTok Boost">
+<meta property="og:locale" content="my_MM">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="TikTok Boost">
+<meta name="twitter:description" content="Like တစ်ခုအတွက် Like တစ်ခု၊ ကြည့်ရှုမှုတစ်ခုအတွက် ကြည့်ရှုမှု">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%231E1A4D'/%3E%3Cg transform='translate(3.5 3.5) scale(.7)'%3E%3Cpath fill='%2325F4EE' transform='translate(-.9 -.9)' d='M16.6 5.8A4.3 4.3 0 0 1 15.5 3h-3.1v12.4a2.6 2.6 0 1 1-2.6-2.6c.3 0 .5 0 .8.1V9.7a5.7 5.7 0 1 0 4.9 5.7V9a7.3 7.3 0 0 0 4.3 1.4V7.3a4.3 4.3 0 0 1-3.2-1.5z'/%3E%3Cpath fill='%23FE2C55' transform='translate(.9 .9)' d='M16.6 5.8A4.3 4.3 0 0 1 15.5 3h-3.1v12.4a2.6 2.6 0 1 1-2.6-2.6c.3 0 .5 0 .8.1V9.7a5.7 5.7 0 1 0 4.9 5.7V9a7.3 7.3 0 0 0 4.3 1.4V7.3a4.3 4.3 0 0 1-3.2-1.5z'/%3E%3Cpath fill='%23fff' d='M16.6 5.8A4.3 4.3 0 0 1 15.5 3h-3.1v12.4a2.6 2.6 0 1 1-2.6-2.6c.3 0 .5 0 .8.1V9.7a5.7 5.7 0 1 0 4.9 5.7V9a7.3 7.3 0 0 0 4.3 1.4V7.3a4.3 4.3 0 0 1-3.2-1.5z'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Noto+Sans+Myanmar:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* =====================================================================
+   TikTok Boost — design system v3
+   Tokens → base → layout → components → states → breakpoints
+   ===================================================================== */
+:root {
+  --ground: #1E1A4D;  --sheet: #F7F5FF;  --card: #FFFFFF;
+  --ink: #17143C;     --muted: #625F89;  --line: #E3E0F5;  --soft: #EFECFC;
+  --cyan: #25F4EE;    --pink: #FE2C55;   --gold: #FFC933;
+  --ok: #0A7F5F;      --err: #C80F3A;
+  --r-sm: 10px; --r-md: 14px; --r-lg: 18px; --r-xl: 28px;
+  --sh-card: 0 1px 2px rgba(23,20,60,.06), 0 8px 20px -10px rgba(23,20,60,.18);
+  --sh-float: 0 24px 48px -16px rgba(8,6,36,.55);
+  --ring: 0 0 0 4px rgba(37,244,238,.38);
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  --sans:    "Noto Sans Myanmar", "Padauk", "Myanmar Text", system-ui, sans-serif;
+  --display: "Bricolage Grotesque", "Noto Sans Myanmar", system-ui, sans-serif;
+}
+
+/* ---------- base ---------- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; background: var(--ground); color-scheme: light; }
+body {
+  font-family: var(--sans); font-size: 15px; line-height: 1.7;
+  background: var(--ground); color: var(--ink);
+  min-height: 100vh; min-height: 100dvh; overflow-x: hidden;
+  -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent;
+}
+body.modal-open { overflow: hidden; }
+[hidden] { display: none !important; }
+button { font-family: inherit; touch-action: manipulation; }
+:focus-visible { outline: 3px solid var(--pink); outline-offset: 2px; }
+::selection { background: var(--cyan); color: var(--ink); }
+
+/* ---------- page frame ---------- */
+.screen { display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh; max-width: 480px; margin: 0 auto; }
+.sheet {
+  flex: 1; background: var(--sheet);
+  border-radius: var(--r-xl) var(--r-xl) 0 0;
+  padding: 20px 18px calc(32px + env(safe-area-inset-bottom));
+  box-shadow: 0 -14px 36px rgba(8,6,36,.28);
+}
+
+/* ---------- segmented tabs ---------- */
+.tabs {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 4px;
+  padding: 4px; margin-bottom: 18px;
+  background: #E8E5F9; border-radius: var(--r-md);
+}
+.tab {
+  min-height: 44px; min-width: 0; padding: 8px 6px;
+  border: 0; background: transparent; cursor: pointer;
+  border-radius: 11px; font-size: 14px; font-weight: 700; color: var(--muted);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  transition: background .2s var(--ease), color .2s var(--ease), box-shadow .2s var(--ease);
+}
+.tab.active { background: var(--ink); color: #fff; box-shadow: 0 3px 10px rgba(23,20,60,.32); }
+
+/* ---------- login / register ---------- */
+.auth-top { padding: calc(56px + env(safe-area-inset-top)) 24px 36px; text-align: center; color: #fff; }
+.logo {
+  width: 84px; height: 84px; margin: 0 auto; display: grid; place-items: center;
+  background: #fff; border-radius: 24px;
+  box-shadow: -5px -5px 0 var(--cyan), 5px 5px 0 var(--pink);
+}
+.logo svg { width: 44px; height: 44px; fill: var(--ink); }
+.auth-top h1 { margin-top: 28px; font: 800 44px/1.05 var(--display); letter-spacing: -.025em; }
+.tag { margin-top: 14px; font-size: 14px; line-height: 1.9; color: #CFCBF5; }
+
+.panel { display: none; }
+.panel.show { display: block; }
+.field { display: block; margin-bottom: 14px; }
+.field > span { display: block; margin: 0 0 6px 2px; font-size: 14px; font-weight: 600; }
+.input-box {
+  display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 0 14px;
+  background: var(--card); border: 1.5px solid var(--line); border-radius: var(--r-md);
+  transition: border-color .15s, box-shadow .15s;
+}
+.input-box:focus-within { border-color: var(--ink); box-shadow: var(--ring); }
+.input-box svg { width: 20px; height: 20px; fill: var(--muted); flex: none; }
+.input-box input {
+  flex: 1; min-width: 0; border: 0; background: transparent;
+  font: inherit; font-size: 16px; color: var(--ink); padding: 13px 0;
+}
+.input-box input:focus-visible { outline: none; }
+.input-box input::placeholder, .text::placeholder { color: #8C89B0; }
+.eye {
+  display: flex; align-items: center; justify-content: center;
+  min-width: 40px; min-height: 40px; margin-right: -8px;
+  border: 0; background: transparent; cursor: pointer; border-radius: var(--r-sm);
+}
+.eye svg { width: 22px; height: 22px; }
+
+.btn-primary {
+  width: 100%; min-height: 52px; margin-top: 12px; padding: 13px;
+  font-size: 16px; font-weight: 700; color: #fff;
+  background: var(--ink); border: 0; border-radius: var(--r-md); cursor: pointer;
+  box-shadow: 4px 4px 0 var(--pink);
+  transition: transform .12s var(--ease), box-shadow .12s var(--ease);
+}
+.btn-primary:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--pink); }
+.btn-primary:disabled { opacity: .55; cursor: not-allowed; }
+.msg { margin-top: 14px; min-height: 22px; font-size: 14px; text-align: center; overflow-wrap: anywhere; }
+.msg.ok  { color: var(--ok); }
+.msg.err { color: var(--err); }
+.note { margin: -2px 0 10px; font-size: 13px; line-height: 1.7; color: var(--muted); }
+
+/* ---------- top bar + wallet ---------- */
+.top {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: calc(14px + env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) 6px max(20px, env(safe-area-inset-left));
+  color: #fff;
+}
+.top-r { display: flex; align-items: center; gap: 8px; flex: none; }
+.who { display: flex; align-items: center; gap: 10px; min-width: 0; font-size: 15px; font-weight: 600; }
+.who #who { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.avatar {
+  flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--cyan); color: var(--ink); font: 800 16px var(--display);
+  box-shadow: 0 0 0 3px rgba(37,244,238,.22);
+}
+.ghost {
+  flex: none; display: inline-flex; align-items: center; justify-content: center;
+  min-height: 40px; padding: 6px 16px; cursor: pointer; color: #fff;
+  background: rgba(255,255,255,.06); border: 1.5px solid rgba(255,255,255,.26);
+  border-radius: 999px; font-size: 13px; font-weight: 600;
+  transition: background .15s, border-color .15s;
+}
+.mail { position: relative; min-width: 44px; padding: 6px 12px; }
+.mail svg { width: 18px; height: 18px; fill: #fff; }
+.mail-badge {
+  position: absolute; top: -6px; right: -4px; min-width: 18px; height: 18px; padding: 0 4px;
+  border-radius: 99px; background: var(--pink); color: #fff;
+  font: 700 11px/18px var(--sans); text-align: center; box-shadow: 0 0 0 2px var(--ground);
+}
+.wallet {
+  display: flex; align-items: center; justify-content: center; gap: 16px;
+  padding: 12px max(20px, env(safe-area-inset-right)) 28px max(20px, env(safe-area-inset-left)); color: #fff;
+}
+.coin {
+  flex: none; width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--gold); color: var(--ink); font: 800 22px/1 var(--display);
+  box-shadow: -3px -3px 0 var(--cyan), 3px 3px 0 var(--pink), inset 0 0 0 3px #FFE08A;
+}
+.wallet-text { text-align: left; }
+.bal-label { font-size: 13px; line-height: 1.3; color: #CFCBF5; }
+.bal { font: 800 42px/1.1 var(--display); letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+
+/* ---------- choice tiles ---------- */
+.tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tile {
+  display: flex; flex-direction: column; justify-content: flex-start; gap: 2px;
+  min-height: 108px; padding: 14px; text-align: left; cursor: pointer; color: var(--ink);
+  background: var(--card); border: 1.5px solid var(--line); border-radius: var(--r-lg);
+  box-shadow: var(--sh-card);
+  transition: transform .15s var(--ease), box-shadow .15s var(--ease), background .15s, border-color .15s;
+}
+.tile svg { width: 40px; height: 40px; margin-bottom: 8px; padding: 9px; fill: var(--ink); background: var(--soft); border-radius: 12px; transition: background .15s; }
+.tile b { font-size: 15px; line-height: 1.5; }
+.tile small { font-size: 12.5px; line-height: 1.5; color: var(--muted); }
+.tile.active { background: var(--cyan); border-color: var(--ink); box-shadow: 4px 4px 0 var(--ink); transform: translate(-1px, -1px); }
+.tile.active svg { background: rgba(255,255,255,.6); }
+.tile.active small { color: var(--ink); }
+.hint { padding: 26px 0 8px; text-align: center; font-size: 14px; color: var(--muted); }
+
+/* ---------- earn task ---------- */
+.task {
+  margin-top: 18px; overflow: hidden; background: var(--card);
+  border: 2px solid var(--ink); border-radius: 20px; box-shadow: 5px 5px 0 var(--pink);
+}
+.desc { margin-top: 2px; font-size: 13px; color: var(--muted); }
+.btn {
+  flex: none; min-height: 44px; padding: 11px 20px; cursor: pointer; white-space: nowrap;
+  border: 0; border-radius: 999px; font-size: 15px; font-weight: 700; color: #fff; background: var(--ink);
+  transition: transform .12s var(--ease), opacity .15s;
+}
+.btn:active { transform: scale(.97); }
+.btn:disabled { opacity: .55; cursor: not-allowed; }
+.btn.claim { background: var(--gold); color: var(--ink); animation: pulse 1.2s ease-in-out infinite; }
+.btn.claim:disabled { animation: none; }
+.btn.next  { background: var(--cyan); color: var(--ink); animation: none; }
+.lk-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 10px; background: var(--soft); border-bottom: 1.5px solid var(--line); }
+.lk-reward { font-size: 13px; font-weight: 600; color: var(--muted); }
+.lk-reward b { margin: 0 2px; font: 800 26px var(--display); color: var(--pink); vertical-align: -2px; }
+.lk-time { font: 800 18px var(--display); color: var(--ink); font-variant-numeric: tabular-nums; }
+.player-wrap {
+  position: relative; width: min(100%, 250px); max-height: 62vh; aspect-ratio: 9 / 16;
+  margin: 16px auto 0; background: #000; border-radius: var(--r-lg); overflow: hidden;
+  box-shadow: 0 10px 28px rgba(23,20,60,.32);
+}
+.player-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.lk-bar { height: 8px; margin: 16px 16px 0; background: var(--line); border-radius: 99px; overflow: hidden; }
+.lk-bar div { width: 0; height: 100%; background: var(--pink); border-radius: inherit; transition: width .25s linear; }
+.lk-status { padding: 10px 16px 0; min-height: 1.7em; font-size: 13px; text-align: center; color: var(--muted); overflow-wrap: anywhere; }
+.lk-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 12px 16px 16px; }
+.lk-actions.one { grid-template-columns: 1fr; }
+.lk-actions .btn { display: block; width: 100%; padding: 13px 8px; text-align: center; text-decoration: none; font-size: 15px; border-radius: var(--r-md); white-space: normal; }
+.lk-actions .btn[aria-disabled="true"], .lk-actions .btn:disabled { opacity: .45; pointer-events: none; }
+.lk-skip-link { display: block; min-height: 40px; margin: 0 auto 12px; padding: 6px 10px; cursor: pointer; background: none; border: 0; font-size: 13px; color: var(--muted); text-decoration: underline; }
+
+/* ---------- spend panel ---------- */
+.use-panel { margin-top: 18px; padding: 18px; background: var(--card); border: 1.5px solid var(--line); border-radius: 20px; box-shadow: var(--sh-card); }
+.use-panel .type { font-size: 17px; font-weight: 700; }
+.field-label { margin: 16px 0 6px; font-size: 13px; font-weight: 600; }
+.text {
+  width: 100%; padding: 12px 14px; font: inherit; font-size: 16px; color: var(--ink);
+  background: var(--card); border: 1.5px solid var(--line); border-radius: var(--r-md);
+  transition: border-color .15s, box-shadow .15s;
+}
+.text:focus { outline: none; border-color: var(--ink); box-shadow: var(--ring); }
+select.text {
+  appearance: none; -webkit-appearance: none; padding-right: 38px;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%2317143C' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E") no-repeat right 8px center / 22px;
+}
+.chips { display: grid; gap: 8px; }
+.c6 { grid-template-columns: repeat(6, 1fr); }
+.c3 { grid-template-columns: repeat(3, 1fr); }
+.chip {
+  min-height: 44px; padding: 9px 0; cursor: pointer; color: var(--ink);
+  font-size: 15px; font-weight: 700; background: var(--card);
+  border: 1.5px solid var(--line); border-radius: 12px;
+  transition: background .15s, border-color .15s, box-shadow .15s;
+}
+.c3 .chip { font-size: 14px; }
+.chip.active { background: var(--cyan); border-color: var(--ink); box-shadow: 2px 2px 0 var(--ink); }
+.chip:disabled { opacity: .35; cursor: not-allowed; text-decoration: line-through; }
+.cost { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px; margin-top: 18px; padding: 12px 16px; background: var(--soft); border-radius: var(--r-md); font-size: 14px; color: var(--muted); }
+.cost > span { min-width: 0; }
+.cost b { font: 800 28px/1 var(--display); color: var(--ink); }
+.cost b small { margin-left: 4px; font: 600 13px var(--sans); color: var(--muted); }
+.cost-note { display: block; margin-top: 2px; font-size: 12px; line-height: 1.5; }
+.preview { margin-top: 12px; }
+.preview .player-wrap { width: min(100%, 200px); max-height: 46vh; margin-top: 10px; }
+
+/* ---------- order history ---------- */
+.orders { margin-top: 28px; }
+.orders-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; font-size: 15px; font-weight: 700; }
+.orders-head span { font-size: 12px; font-weight: 500; color: var(--muted); }
+.ord { margin-bottom: 10px; padding: 14px; background: var(--card); border: 1.5px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--sh-card); }
+.ord-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.ord-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; font-weight: 700; color: var(--ink); text-decoration: none; }
+.adm-head { width: 100%; min-height: 40px; padding: 0; background: none; border: 0; font: inherit; color: inherit; text-align: left; cursor: pointer; }
+.adm-head .ord-name { flex: 1; }
+.adm-chev { flex: none; width: 22px; text-align: center; color: var(--muted); transition: transform .2s; }
+.adm-open .adm-chev { transform: rotate(180deg); }
+.adm-body { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--line); }
+.adm-body[hidden] { display: none; }
+.badge { flex: none; padding: 2px 10px; border-radius: 99px; font-size: 12px; font-weight: 700; }
+.st-open { background: #DDF5EC; color: var(--ok); }
+.st-warn { background: #FFE9C4; color: #8A5A00; }
+.st-done { background: var(--soft); color: var(--muted); }
+.ord-meta { margin-top: 4px; font-size: 12.5px; color: var(--muted); overflow-wrap: anywhere; }
+.ord-bar { height: 5px; margin-top: 8px; background: var(--line); border-radius: 99px; overflow: hidden; }
+.ord-bar div { height: 100%; background: var(--pink); }
+.ord-act { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.ord-act button {
+  flex: 1 1 auto; min-height: 40px; padding: 7px 12px; cursor: pointer; border-radius: 10px;
+  font-size: 13px; font-weight: 600; color: var(--ink); background: var(--card); border: 1.5px solid var(--line);
+  transition: background .15s, border-color .15s;
+}
+.ord-act .del { color: var(--err); }
+.ord-edit { display: grid; gap: 10px; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line); }
+.ord-edit label { display: grid; gap: 4px; font-size: 12.5px; font-weight: 600; }
+.ord-edit .text { padding: 9px 12px; font-size: 16px; border-radius: 10px; }
+.ord-edit .text:disabled { opacity: .55; }
+.ord-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.ord-row .btn-primary { min-height: 40px; }
+.ord-edit .msg { margin: 0; min-height: 0; font-size: 13px; }
+.ord-empty { padding: 16px; text-align: center; font-size: 13px; color: var(--muted); background: var(--soft); border-radius: var(--r-md); }
+
+/* ---------- mail box (modal) ---------- */
+.modal { position: fixed; inset: 0; z-index: 50; display: flex; align-items: flex-end; justify-content: center; background: rgba(23,20,60,.62); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); }
+.modal-box {
+  position: relative; width: 100%; max-width: 480px; max-height: 82vh; max-height: 82dvh; overflow-y: auto; overscroll-behavior: contain;
+  background: var(--sheet); border-radius: var(--r-xl) var(--r-xl) 0 0;
+  padding: 26px 18px calc(22px + env(safe-area-inset-bottom)); animation: pop .25s var(--ease);
+}
+.modal-box::before { content: ""; position: absolute; top: 9px; left: 50%; width: 40px; height: 4px; margin-left: -20px; border-radius: 99px; background: #CFCBF0; }
+.modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; font-size: 18px; }
+.modal-head button { min-height: 36px; padding: 6px 16px; cursor: pointer; background: var(--soft); color: var(--ink); border: 0; border-radius: 99px; font-size: 13px; font-weight: 600; }
+.mail-item { margin-bottom: 8px; padding: 12px 14px; background: var(--card); border: 1.5px solid var(--line); border-radius: var(--r-md); }
+.mail-item.unread { border-color: var(--pink); box-shadow: inset 3px 0 0 var(--pink); }
+.mail-item b { display: block; font-size: 14px; }
+.mail-item p { margin: 4px 0; font-size: 14px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.mail-item small { font-size: 12px; color: var(--muted); }
+
+/* ---------- gift box ---------- */
+.gift { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; padding: 12px 14px; background: var(--card); border: 1.5px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--sh-card); }
+.gift.ready { background: #FFF6D6; border-color: var(--gold); }
+.gift-box { flex: none; width: 54px; height: 54px; padding: 0; cursor: pointer; background: none; border: 0; }
+.gift-box svg { width: 100%; height: 100%; overflow: visible; }
+.gift.ready .gift-box { animation: giftwiggle 1.1s ease-in-out infinite; }
+.gift-lid { transform-box: fill-box; transform-origin: 10% 100%; transition: transform .45s ease; }
+.gift.opening .gift-lid { transform: translateY(-9px) rotate(-22deg); }
+.gift.opening .gift-box { animation: none; }
+.gift-info { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.gift-info b { font-size: 15px; }
+.gift-info small { font-size: 12.5px; line-height: 1.5; color: var(--muted); }
+.gift-bar { height: 6px; margin-top: 4px; background: var(--line); border-radius: 99px; overflow: hidden; }
+.gift-bar div { height: 100%; width: 0; background: var(--pink); border-radius: inherit; transition: width .4s ease; }
+.gift-count { flex: none; font: 800 15px var(--display); }
+.gift-pop { position: fixed; left: 50%; top: 40%; z-index: 60; pointer-events: none; font: 800 46px var(--display); color: var(--pink); text-shadow: 0 3px 0 var(--ink); animation: giftpop 1.3s ease forwards; }
+
+/* ---------- admin: credit list ---------- */
+.credit-list { margin-bottom: 26px; }
+#clList { background: var(--card); border: 1.5px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--sh-card); overflow: hidden; }
+#clList:empty { display: none; }
+.cl-row { display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-bottom: 1px solid var(--line); }
+.cl-row:last-child { border-bottom: 0; }
+.cl-rank { flex: none; min-width: 26px; font: 700 13px var(--display); color: var(--muted); font-variant-numeric: tabular-nums; }
+.cl-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; font-weight: 600; }
+.cl-credit { flex: none; font: 800 17px var(--display); font-variant-numeric: tabular-nums; }
+.credit-list .btn { display: block; width: 100%; margin-top: 10px; background: var(--soft); color: var(--ink); }
+
+
+/* ---------- profile picture + borders ---------- */
+.who-btn { background: none; border: 0; color: inherit; font: inherit; font-weight: 600; text-align: left; cursor: pointer; padding: 3px 8px 3px 3px; margin-left: -3px; border-radius: 999px; }
+.who-btn:active { background: rgba(255,255,255,.1); }
+.vip-pill { flex: none; padding: 0 8px; font: 800 10.5px/18px var(--display); letter-spacing: .06em; color: var(--ink); background: linear-gradient(135deg, #FFF1B8, #FFC933); border-radius: 99px; box-shadow: 0 0 10px rgba(255,201,51,.5); }
+.pfp { --s: 36px; --bw: 3px; --bc: #25F4EE; --glow: transparent; --dur: 4s;
+  position: relative; flex: none; display: inline-block; width: var(--s); height: var(--s); border-radius: 50%; isolation: isolate; vertical-align: middle; }
+.pfp-sm { --s: 46px; --bw: 4px; }
+.pfp-xl { --s: 116px; --bw: 6px; }
+.pfp-ring { position: absolute; inset: 0; border-radius: 50%; background: var(--bc); z-index: 0; }
+.pfp-face { position: absolute; inset: var(--bw); z-index: 1; overflow: hidden; border-radius: 50%; display: grid; place-items: center; color: var(--ink);
+  background: linear-gradient(145deg, #fff, #E3E0F5); font: 800 calc(var(--s) * .4)/1 var(--display); }
+.pfp-face img { display: block; width: 100%; height: 100%; object-fit: cover; -webkit-user-drag: none; user-select: none; }
+.pfp-crown { position: absolute; z-index: 3; left: 50%; top: calc(var(--s) * -.32); width: calc(var(--s) * .54); transform: translateX(-50%) rotate(-9deg); filter: drop-shadow(0 1px 2px rgba(0,0,0,.5)); pointer-events: none; }
+.pfp-crown svg { display: block; width: 100%; height: auto; }
+/* VIP only: spinning gradient ring + glow */
+.pfp[data-b]:not([data-b="solid"])::before { content: ""; position: absolute; inset: -3px; z-index: -1; border-radius: 50%; background: var(--glow); filter: blur(calc(var(--s) * .13)); opacity: .8; animation: pfglow 2.4s ease-in-out infinite; }
+.pfp[data-b]:not([data-b="solid"]) .pfp-ring { animation: pfspin var(--dur) linear infinite; }
+.pfp[data-b]:not([data-b="solid"]) .pfp-face { box-shadow: 0 0 0 max(1.5px, calc(var(--s) * .03)) #17143C; }
+.pfp[data-b="gold"]   { --glow: #FFC933; --dur: 4s; }
+.pfp[data-b="gold"]   .pfp-ring { background: conic-gradient(#FFF6C2, #FFC933, #A8740A, #FFE08A, #FFC933, #FFF6C2); }
+.pfp[data-b="aurora"] { --glow: #8B5CF6; --dur: 3s; }
+.pfp[data-b="aurora"] .pfp-ring { background: conic-gradient(#25F4EE, #8B5CF6, #FE2C55, #25F4EE); }
+.pfp[data-b="flame"]  { --glow: #FF6A00; --dur: 2.2s; }
+.pfp[data-b="flame"]  .pfp-ring { background: conic-gradient(#FF3D00, #FF9100, #FFE066, #FF9100, #FF3D00); }
+.pfp[data-b="ice"]    { --glow: #38BDF8; --dur: 5s; }
+.pfp[data-b="ice"]    .pfp-ring { background: conic-gradient(#FFFFFF, #7DD3FC, #38BDF8, #E0F2FE, #FFFFFF, #7DD3FC, #FFFFFF); }
+.pfp[data-b="royal"]  { --glow: #C026D3; --dur: 4s; }
+.pfp[data-b="royal"]  .pfp-ring { background: conic-gradient(#7C3AED, #F5D060, #C026D3, #F5D060, #7C3AED); }
+@keyframes pfspin { to { transform: rotate(360deg); } }
+@keyframes pfglow { 0%,100% { opacity: .45; } 50% { opacity: .95; } }
+@keyframes vbshine { from { left: -40%; } to { left: 140%; } }
+
+/* ---------- VIP banner ---------- */
+.vip-banner { position: relative; overflow: hidden; display: flex; align-items: center; gap: 12px; width: 100%; min-height: 58px; margin-bottom: 16px; padding: 9px 14px; cursor: pointer; text-align: left; color: #fff;
+  background: linear-gradient(115deg, #2B2166 0%, #1E1A4D 55%, #43287A 100%); border: 1.5px solid var(--gold); border-radius: var(--r-md); box-shadow: 4px 4px 0 var(--ink); }
+.vip-banner::after { content: ""; position: absolute; top: 0; bottom: 0; left: -40%; width: 30%; pointer-events: none; background: linear-gradient(100deg, transparent, rgba(255,255,255,.28), transparent); transform: skewX(-18deg); animation: vbshine 3.2s ease-in-out infinite; }
+.vip-banner:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--ink); }
+.vip-banner > svg { flex: none; width: 34px; height: 34px; filter: drop-shadow(0 1px 3px rgba(0,0,0,.5)); }
+.vbn-text { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.4; }
+.vbn-text b { font-size: 15px; color: var(--gold); }
+.vbn-text small { font-size: 12px; color: #D9D4FF; }
+.vbn-go { flex: none; font-size: 26px; line-height: 1; color: var(--gold); }
+.vip-banner.ready { animation: pulse 1.2s ease-in-out infinite; }
+
+/* ---------- profile / VIP modals ---------- */
+.top-modal { z-index: 60; }
+.pf-hero { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 26px 0 14px; margin-bottom: 4px; background: linear-gradient(160deg, #2B2166, #1E1A4D); border-radius: var(--r-lg); color: #fff; }
+.pf-name { margin-top: 8px; font: 800 18px var(--display); }
+.pf-tag { font-size: 12px; color: #D9D4FF; }
+.pf-photo { display: flex; gap: 8px; margin: 12px 0 4px; }
+.pf-photo .btn { flex: 1; padding: 10px 8px; }
+.btn.alt { background: var(--soft); color: var(--ink); }
+.swatches, .vbt-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+.swatch { position: relative; width: 38px; height: 38px; padding: 0; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 0 0 1.5px var(--line); cursor: pointer; overflow: hidden; }
+.swatch[aria-checked="true"] { box-shadow: 0 0 0 3px var(--ink); transform: scale(1.08); }
+.swatch input { position: absolute; inset: -8px; width: 60px; height: 60px; opacity: 0; cursor: pointer; }
+.swatch.custom { background: conic-gradient(#FE2C55, #FFC933, #25F4EE, #8B5CF6, #FE2C55); }
+.vip-panel { margin-top: 18px; padding: 14px; background: linear-gradient(135deg, #2B2166, #43287A); border: 1.5px solid var(--gold); border-radius: var(--r-lg); color: #fff; }
+.vip-panel-head { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.vip-panel-head svg { width: 26px; height: 26px; flex: none; }
+.vip-panel-head b { color: var(--gold); }
+.vip-panel-head small { margin-left: auto; font-size: 11.5px; color: #D9D4FF; }
+.vbt-grid { margin-bottom: 14px; }
+.vbt { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 64px; padding: 8px 0 6px; color: #fff; font-size: 11px; font-weight: 600; background: rgba(255,255,255,.08); border: 1.5px solid transparent; border-radius: var(--r-md); cursor: pointer; }
+.vbt[aria-checked="true"] { border-color: var(--gold); background: rgba(255,201,51,.18); }
+.vbt.locked { opacity: .55; }
+.vbt.locked::after { content: "🔒"; font-size: 11px; }
+.btn-gold { display: block; width: 100%; padding: 13px 16px; font-size: 15px; font-weight: 800; color: var(--ink); background: linear-gradient(135deg, #FFF1B8, #FFC933); border: 0; border-radius: var(--r-md); cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+.btn-gold:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+.btn-gold:disabled { opacity: .55; cursor: not-allowed; }
+.pf-savebar { position: sticky; bottom: calc(-22px - env(safe-area-inset-bottom)); margin: 16px -18px calc(-22px - env(safe-area-inset-bottom)); padding: 12px 18px calc(14px + env(safe-area-inset-bottom)); background: var(--sheet); border-top: 1px solid var(--line); }
+.pf-savebar .msg { margin: 6px 0 0; min-height: 18px; }
+.vip-hero { display: flex; flex-direction: column; align-items: center; padding: 22px 12px 18px; background: linear-gradient(160deg, #2B2166, #1E1A4D 60%, #43287A); border: 1.5px solid var(--gold); border-radius: var(--r-lg); text-align: center; color: #fff; }
+.vip-crown-big { width: 76px; height: 76px; filter: drop-shadow(0 4px 10px rgba(255,201,51,.55)); animation: pfglow 2.4s ease-in-out infinite; }
+.vip-title { margin-top: 6px; font: 800 24px var(--display); letter-spacing: .08em; color: var(--gold); }
+.vip-sub { font-size: 13px; color: #D9D4FF; }
+.vip-perks { margin: 14px 0; display: grid; gap: 8px; }
+.perk { display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: var(--card); border: 1.5px solid var(--line); border-radius: var(--r-md); }
+.perk-ic { flex: none; min-width: 44px; height: 44px; display: grid; place-items: center; padding: 0 6px; font: 800 15px var(--display); color: var(--ink); background: linear-gradient(135deg, #FFF1B8, #FFC933); border-radius: 12px; }
+.perk div { display: flex; flex-direction: column; line-height: 1.5; }
+.perk small { font-size: 12.5px; color: var(--muted); }
+.vip-state { margin: 0 0 10px; padding: 12px 14px; font-size: 14px; text-align: center; background: var(--soft); border-radius: var(--r-md); }
+.vip-state b { color: var(--ink); }
+.vip-note { margin-bottom: 10px; resize: vertical; font-family: inherit; }
+.mail-item.vip-gift { background: linear-gradient(135deg, #FFF9E0, #FFF1B8); border-color: var(--gold); }
+.mail-item.vip-gift .btn-gold { margin-top: 8px; }
+.adm-vip-badge { display: inline-block; margin-left: 6px; padding: 0 8px; font-size: 11.5px; line-height: 20px; border-radius: 99px; background: var(--soft); color: var(--ink); font-weight: 700; }
+.adm-vip-badge.act { background: linear-gradient(135deg, #FFF1B8, #FFC933); }
+
+/* ---------- admin: tidy layout ---------- */
+/* sub-tabs: 5 equal columns; badge floats on the corner so it never squeezes the label */
+.adm-tabs { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.adm-tabs .tab { position: relative; overflow: visible; text-overflow: clip; padding: 8px 2px; font-size: 13px; }
+.adm-dot { position: absolute; top: -5px; right: -1px; min-width: 18px; padding: 0 5px; border-radius: 99px; background: var(--pink); color: #fff; font-size: 11px; font-weight: 700; line-height: 18px; text-align: center; box-shadow: 0 0 0 2px #E6E2FA; pointer-events: none; }
+.adm-tabs .tab.active .adm-dot { background: #fff; color: var(--pink); box-shadow: 0 0 0 2px var(--pink); }
+@media (max-width: 400px) { .adm-tabs .tab { font-size: 12px; } .adm-dot { min-width: 16px; font-size: 10px; line-height: 16px; padding: 0 4px; } }
+
+.adm-pane > .field-label:first-child, .adm-pane > .note:first-child { margin-top: 0; }
+.adm-search { display: flex; align-items: stretch; gap: 8px; }
+.adm-search .text { flex: 1; min-width: 0; -webkit-appearance: none; appearance: none; }
+.adm-search .btn { flex: none; }
+.adm-status { margin-top: 10px; min-height: 0; font-size: 13px; text-align: left; color: var(--muted); }
+.adm-status:empty { display: none; }
+.adm-status.err { color: var(--err); }
+.adm-pane .adm-status.ok { color: var(--ok); }
+.btn.adm-more { display: block; width: 100%; margin-top: 10px; background: var(--soft); color: var(--ink); }
+.adm-pane > .btn-primary { margin-top: 12px; }
+
+/* user cards */
+.adm-card { padding: 4px 14px; transition: border-color .15s; }
+.adm-card.adm-open { padding-bottom: 14px; border-color: var(--ink); }
+.adm-head { min-height: 48px; gap: 10px; }
+.adm-head .badge { font-variant-numeric: tabular-nums; }
+.adm-body { margin-top: 4px; }
+.adm-amt { display: block; margin: 0 0 10px; }
+.adm-body .msg, .mail-item .msg { margin: 8px 0 0; min-height: 0; font-size: 13px; text-align: left; }
+.adm-act { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 0; }
+.adm-act button { min-width: 0; padding: 7px 8px; line-height: 1.5; }
+.adm-act .wide { grid-column: 1 / -1; }
+.adm-act .pri, .adm-act .pri:hover { color: #fff; background: var(--ink); border-color: var(--ink); }
+.adm-act .vip, .adm-act .vip:hover { background: linear-gradient(135deg, #FFF1B8, #FFC933); border-color: var(--gold); font-weight: 700; }
+.ord-act button:disabled { opacity: .5; cursor: not-allowed; }
+
+.adm-compose { margin-top: 10px; padding: 12px; background: var(--soft); border-radius: var(--r-md); }
+.adm-compose .text { background: #fff; }
+.adm-compose .btn-primary { min-height: 46px; margin-top: 10px; font-size: 15px; }
+.adm-act .on, .adm-act .on:hover { background: var(--soft); border-color: var(--ink); }
+/* mail / feedback / vip lists share the mail-item card */
+.adm-mi-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.adm-mi-head b { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.adm-mi-head small, .adm-mi-head .adm-vip-badge { flex: none; margin: 0; }
+.mail-item .ord-act { margin-top: 10px; }
+.adm-ta { margin-top: 8px; min-height: 110px; resize: vertical; font-family: inherit; line-height: 1.7; }
+
+/* credit pane */
+.adm-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 12px; }
+.adm-stat { min-width: 0; padding: 12px 14px; background: var(--card); border: 1.5px solid var(--line); border-radius: var(--r-md); box-shadow: var(--sh-card); }
+.adm-stat small { display: block; font-size: 12px; color: var(--muted); }
+.adm-stat b { display: block; margin-top: 2px; font: 800 20px var(--display); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+#clList { max-height: min(58vh, 520px); max-height: min(58dvh, 520px); overflow-y: auto; overscroll-behavior: contain; }
+.cl-go { cursor: pointer; }
+.cl-go:active { background: var(--soft); }
+.cl-row:nth-child(-n+3) .cl-rank { color: var(--pink); }
+
+
+/* ---------- admin: mail composer (recipient + gift box) ---------- */
+.mail-to { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 5px; background: #E6E2FA; border-radius: 16px; }
+.mail-to button { min-height: 42px; padding: 8px 6px; font: inherit; font-size: 14px; font-weight: 700; color: var(--ink); background: transparent; border: 0; border-radius: 12px; cursor: pointer; }
+.mail-to button.on { background: var(--ink); color: #fff; box-shadow: 0 3px 10px rgba(23,20,60,.28); }
+.mail-who { position: relative; margin-top: 10px; }
+.mail-sug { margin-top: 6px; max-height: 220px; overflow-y: auto; overscroll-behavior: contain; background: var(--card); border: 1.5px solid var(--line); border-radius: var(--r-md); box-shadow: var(--sh-card); }
+.mail-sug button { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 44px; padding: 8px 14px; font: inherit; font-size: 14px; text-align: left; color: var(--ink); background: transparent; border: 0; border-bottom: 1px solid var(--line); cursor: pointer; }
+.mail-sug button:last-child { border-bottom: 0; }
+.mail-sug button:active, .mail-sug button:hover { background: var(--soft); }
+.mail-sug .ms-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+.mail-sug .ms-cr { flex: none; font: 800 13px var(--display); color: var(--muted); font-variant-numeric: tabular-nums; }
+.mail-sug .ms-empty { padding: 12px 14px; font-size: 13px; color: var(--muted); }
+.mail-picked { display: flex; align-items: center; gap: 10px; margin-top: 8px; padding: 10px 12px; background: var(--soft); border: 1.5px solid var(--ink); border-radius: var(--r-md); }
+.mail-picked b { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; }
+.mail-picked small { flex: none; color: var(--muted); font-variant-numeric: tabular-nums; }
+.mail-picked button { flex: none; width: 32px; height: 32px; font-size: 16px; line-height: 1; color: var(--ink); background: #fff; border: 1.5px solid var(--line); border-radius: 99px; cursor: pointer; }
+.mail-gift { margin-top: 12px; background: var(--card); border: 1.5px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--sh-card); overflow: hidden; }
+.mail-gift.has { background: #FFF6D6; border-color: var(--gold); }
+.mg-box { display: flex; align-items: center; gap: 12px; width: 100%; padding: 10px 14px; font: inherit; text-align: left; color: var(--ink); background: transparent; border: 0; cursor: pointer; }
+.mg-box svg { flex: none; width: 46px; height: 46px; overflow: visible; }
+.mg-box span { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.mg-box b { font-size: 15px; }
+.mg-box small { font-size: 12.5px; line-height: 1.5; color: var(--muted); }
+.mg-lid { transform-box: fill-box; transform-origin: 10% 100%; transition: transform .4s ease; }
+.mail-gift.open .mg-lid, .mail-gift.has .mg-lid { transform: translateY(-7px) rotate(-18deg); }
+.mail-gift.has .mg-box svg { animation: giftwiggle 1.4s ease-in-out infinite; }
+.mg-panel { padding: 0 14px 14px; }
+.mg-panel .text { background: #fff; }
+.mg-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.mg-chips button { flex: 1; min-width: 64px; min-height: 40px; padding: 6px 8px; font: 800 14px var(--display); color: var(--ink); background: #fff; border: 1.5px solid var(--ink); border-radius: var(--r-sm); cursor: pointer; }
+.mg-chips button:active { background: var(--gold); }
+.mg-clear { display: block; margin: 10px auto 0; padding: 6px 10px; font: inherit; font-size: 13px; color: var(--muted); background: none; border: 0; text-decoration: underline; cursor: pointer; }
+
+/* ---------- motion ---------- */
+.task.pop, .use-panel.pop { animation: pop .3s var(--ease); }
+.coin.drop { animation: drop .7s cubic-bezier(.2, 1.3, .4, 1); }
+.bal.bump  { animation: bump .35s ease; }
+@keyframes pop   { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes pulse { 50% { transform: scale(1.05); } }
+@keyframes bump  { 40% { transform: scale(1.14); } }
+@keyframes drop  { from { opacity: 0; transform: translateY(-28px) rotate(-120deg) scale(.6); } to { opacity: 1; transform: none; } }
+@keyframes giftwiggle { 0%, 100% { transform: rotate(0); } 20% { transform: rotate(-9deg); } 40% { transform: rotate(8deg); } 60% { transform: rotate(-5deg); } 80% { transform: rotate(4deg); } }
+@keyframes giftpop { 0% { opacity: 0; transform: translate(-50%, 20px) scale(.5); } 25% { opacity: 1; transform: translate(-50%, -10px) scale(1.15); } 100% { opacity: 0; transform: translate(-50%, -90px) scale(1); } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+
+/* ---------- pointer devices: hover ---------- */
+@media (hover: hover) {
+  .tab:not(.active):hover { color: var(--ink); background: rgba(255,255,255,.6); }
+  .ghost:hover { background: rgba(255,255,255,.14); border-color: rgba(255,255,255,.5); }
+  .tile:not(.active):hover { transform: translateY(-2px); border-color: #C9C4EC; }
+  .chip:not(.active):not(:disabled):hover { border-color: var(--ink); }
+  .ord-act button:hover { background: var(--soft); border-color: #C9C4EC; }
+  .btn:not(:disabled):hover { opacity: .9; }
+  .btn-primary:not(:disabled):hover { transform: translate(-1px, -1px); box-shadow: 5px 5px 0 var(--pink); }
+  .btn-primary:not(:disabled):active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--pink); }
+}
+
+/* ---------- breakpoints ---------- */
+@media (max-width: 360px) {
+  .auth-top h1 { font-size: 38px; }
+  .bal { font-size: 36px; }
+  .sheet { padding-left: 14px; padding-right: 14px; }
+  .tiles { gap: 8px; }
+  .tile { padding: 12px; }
+  .tab { font-size: 13px; }
+}
+@media (max-height: 480px) {
+  .auth-top { padding: calc(20px + env(safe-area-inset-top)) 24px 16px; }
+  .logo { width: 60px; height: 60px; }
+  .auth-top h1 { margin-top: 12px; font-size: 32px; }
+  .player-wrap { max-height: 70vh; }
+}
+@media (min-width: 640px) {
+  body { padding: 28px 16px 48px; }
+  .screen { min-height: calc(100vh - 76px); min-height: calc(100dvh - 76px); }
+  .sheet { border-radius: var(--r-xl); box-shadow: var(--sh-float); }
+  .modal { align-items: center; }
+  .modal-box { border-radius: var(--r-xl); padding-bottom: 24px; box-shadow: var(--sh-float); }
+  .modal-box::before { display: none; }
+}
+
+/* =====================================================================
+   v4 refresh — layered on top of v3 (JS / HTML untouched)
+   Glow backdrop · glass wallet · soft depth instead of hard offsets
+   ===================================================================== */
+:root {
+  --ground: #120F33;
+  --sheet: #F6F4FF;
+  --grad-pink: linear-gradient(135deg, #FF4D73 0%, #FE2C55 45%, #D1135F 100%);
+  --grad-cyan: linear-gradient(160deg, #25F4EE 0%, #9BFBF7 100%);
+  --grad-gold: linear-gradient(135deg, #FFE27A 0%, #FFC933 100%);
+  --sh-card: 0 1px 0 rgba(255,255,255,.9) inset, 0 14px 30px -16px rgba(23,20,60,.30);
+  --r-xl: 32px;
+}
+html { background: #120F33; }
+body {
+  background:
+    radial-gradient(560px 420px at 100% -6%, rgba(254,44,85,.42), transparent 70%),
+    radial-gradient(560px 460px at -10% 14%, rgba(37,244,238,.30), transparent 70%),
+    #120F33;
+  background-attachment: fixed;
+}
+
+/* logo + hero */
+.logo { width: 92px; height: 92px; border-radius: 28px; box-shadow: -6px -6px 0 var(--cyan), 6px 6px 0 var(--pink), 0 24px 50px -10px rgba(254,44,85,.55); }
+.logo svg { width: 48px; height: 48px; }
+.auth-top h1 { font-size: 48px; letter-spacing: -.035em; text-shadow: 0 6px 30px rgba(37,244,238,.25); }
+.tag { color: #D8D4FA; }
+
+/* sheet */
+.sheet {
+  background: linear-gradient(180deg, #FFFFFF 0, var(--sheet) 90px);
+  border-top: 1px solid rgba(255,255,255,.7);
+  padding-top: 22px;
+  box-shadow: 0 -20px 60px rgba(0,0,0,.35);
+}
+
+/* tabs */
+.tabs { padding: 5px; background: #E6E2FA; border-radius: 18px; box-shadow: inset 0 1px 3px rgba(23,20,60,.10); }
+.tab { border-radius: 14px; }
+.tab.active { background: var(--grad-pink); color: #fff; box-shadow: 0 8px 18px -8px rgba(254,44,85,.8); }
+
+/* inputs */
+.input-box, .text { border-radius: 16px; border-color: #DAD6F2; background: #fff; }
+.input-box:focus-within, .text:focus { border-color: var(--pink); box-shadow: 0 0 0 4px rgba(254,44,85,.16); }
+
+/* buttons */
+.btn-primary {
+  background: var(--grad-pink); border-radius: 16px; min-height: 54px;
+  box-shadow: 0 14px 26px -12px rgba(254,44,85,.85), inset 0 1px 0 rgba(255,255,255,.35);
+}
+.btn-primary:active, .btn-primary:not(:disabled):active { transform: translateY(1px) scale(.99); box-shadow: 0 6px 12px -8px rgba(254,44,85,.8); }
+.btn-primary:not(:disabled):hover { transform: translateY(-1px); box-shadow: 0 18px 30px -12px rgba(254,44,85,.9), inset 0 1px 0 rgba(255,255,255,.35); }
+.btn { background: linear-gradient(135deg, #2A2566, var(--ink)); }
+.btn.claim { background: var(--grad-gold); box-shadow: 0 10px 22px -10px rgba(255,201,51,.9); }
+.btn.next { background: var(--grad-cyan); }
+.btn-gold { background: var(--grad-gold); border-radius: 16px; box-shadow: 0 12px 24px -12px rgba(255,170,0,.9), inset 0 1px 0 rgba(255,255,255,.6); }
+.btn-gold:active { transform: translateY(1px); box-shadow: 0 5px 10px -6px rgba(255,170,0,.8); }
+
+/* top bar + wallet (glass card) */
+.avatar { box-shadow: 0 0 0 3px rgba(37,244,238,.25), 0 0 18px rgba(37,244,238,.45); }
+.ghost { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.22); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.wallet {
+  justify-content: flex-start; gap: 18px;
+  margin: 8px max(18px, env(safe-area-inset-right)) 28px max(18px, env(safe-area-inset-left));
+  padding: 18px 22px;
+  background: linear-gradient(135deg, rgba(255,255,255,.14), rgba(255,255,255,.04));
+  border: 1px solid rgba(255,255,255,.18); border-radius: 26px;
+  box-shadow: 0 24px 50px -24px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.2);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+}
+.coin { width: 56px; height: 56px; background: radial-gradient(circle at 30% 28%, #FFF2B0, #FFC933 62%, #F0A800); box-shadow: -3px -3px 0 var(--cyan), 3px 3px 0 var(--pink), 0 10px 24px -6px rgba(255,201,51,.7); }
+.bal { font-size: 46px; }
+
+/* choice tiles */
+.tile { border-radius: 22px; border-color: transparent; }
+.tile svg { border-radius: 14px; }
+.tile.active { background: var(--grad-cyan); border-color: transparent; transform: translateY(-2px); box-shadow: 0 18px 32px -16px rgba(37,244,238,.95); }
+.tile.active svg { background: rgba(255,255,255,.7); }
+
+/* earn task + spend panel */
+.task { border: 1px solid var(--line); border-radius: 26px; box-shadow: 0 26px 50px -26px rgba(254,44,85,.55), 0 1px 0 #fff inset; }
+.lk-head { background: linear-gradient(135deg, #F0EDFF, #FFF0F4); }
+.lk-bar { height: 10px; }
+.lk-bar div { background: var(--grad-pink); }
+.player-wrap { border-radius: 22px; box-shadow: 0 22px 40px -16px rgba(23,20,60,.5); }
+.use-panel { border-color: transparent; border-radius: 26px; }
+.chip { border-radius: 14px; border-color: #DAD6F2; }
+.chip.active { background: var(--ink); color: #fff; border-color: var(--ink); box-shadow: 0 8px 16px -8px rgba(23,20,60,.65); }
+.cost { background: linear-gradient(135deg, #F0EDFF, #FFF0F4); border-radius: 16px; }
+.cost b { color: var(--pink); }
+
+/* lists */
+.ord, .adm-stat, .perk { border-color: transparent; border-radius: 20px; }
+.vip-hero { border-radius: 24px; box-shadow: 0 24px 44px -22px rgba(255,201,51,.5); }
+
+/* desktop: add breathing room */
+@media (min-width: 640px) {
+  .screen { max-width: 520px; }
+  .sheet { box-shadow: 0 40px 80px -30px rgba(0,0,0,.7); }
+}
+
+/* ---------- login: compact centered card ---------- */
+#authScreen { justify-content: center; max-width: 380px; padding: 0 16px; }
+#authScreen .auth-top { padding: calc(28px + env(safe-area-inset-top)) 0 22px; }
+#authScreen .logo { width: 68px; height: 68px; border-radius: 22px; box-shadow: -4px -4px 0 var(--cyan), 4px 4px 0 var(--pink), 0 18px 36px -10px rgba(254,44,85,.55); }
+#authScreen .logo svg { width: 36px; height: 36px; }
+#authScreen .auth-top h1 { margin-top: 20px; font-size: 34px; }
+#authScreen .tag { margin-top: 8px; font-size: 13px; line-height: 1.8; }
+#authScreen .sheet { flex: none; padding: 16px 16px 20px; border-radius: 28px; margin-bottom: calc(28px + env(safe-area-inset-bottom)); box-shadow: 0 40px 80px -30px rgba(0,0,0,.75); }
+#authScreen .tab { min-height: 40px; font-size: 13px; }
+#authScreen .input-box { min-height: 48px; }
+#authScreen .btn-primary { min-height: 50px; margin-top: 8px; }
+
+/* ---------- postman + popup bubble ---------- */
+.postman { position: fixed; z-index: 70; right: max(10px, env(safe-area-inset-right)); top: calc(env(safe-area-inset-top) + 64px); width: 52px; height: 52px; padding: 0; cursor: pointer; border: 2px solid var(--ink); border-radius: 50%; background: var(--cyan); box-shadow: 0 6px 16px -4px rgba(8,6,36,.55); display: grid; place-items: center; }
+.postman svg { width: 38px; height: 38px; }
+.postman:active { transform: scale(.94); }
+.postman.new { animation: pmwiggle 1.6s ease-in-out infinite; }
+.postman .pm-dot { position: absolute; top: -2px; right: -2px; width: 14px; height: 14px; border-radius: 50%; background: var(--pink); border: 2px solid #fff; }
+@keyframes pmwiggle { 0%, 100% { transform: rotate(0); } 15% { transform: rotate(-9deg); } 30% { transform: rotate(8deg); } 45% { transform: rotate(-6deg); } 60% { transform: rotate(0); } }
+.pm-bubble { position: fixed; z-index: 71; right: max(10px, env(safe-area-inset-right)); top: calc(env(safe-area-inset-top) + 124px); width: min(300px, calc(100vw - 20px)); padding: 14px 16px; color: var(--ink); background: #fff; border: 2px solid var(--ink); border-radius: 18px; box-shadow: 0 16px 36px -10px rgba(8,6,36,.6); font-size: 15px; line-height: 1.7; font-weight: 600; overflow-wrap: anywhere; opacity: 0; transform: translateY(-8px) scale(.96); transform-origin: top right; pointer-events: none; transition: opacity .25s var(--ease), transform .25s var(--ease); }
+.pm-bubble.show { opacity: 1; transform: none; pointer-events: auto; }
+.pm-bubble::before { content: ""; position: absolute; top: -9px; right: 18px; width: 14px; height: 14px; background: #fff; border-left: 2px solid var(--ink); border-top: 2px solid var(--ink); transform: rotate(45deg); }
+.pm-bubble small { display: block; margin-bottom: 2px; font-size: 12px; font-weight: 700; color: var(--pink); }
+.pm-bubble .pm-timer { display: block; margin-top: 9px; padding-top: 8px; border-top: 1px solid #e8e5f2; color: #d12b58; font-size: 14px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.pm-ta { min-height: 110px; }
+body.modal-open .postman, body.modal-open .pm-bubble { display: none; }
+.pm-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+.pm-row .btn-primary, .pm-row .btn { margin-top: 0; }
+
+/* =====================================================================
+   TikTok Boost UI refresh v5
+   Visual-only layer: preserves existing HTML ids, data attributes and JS.
+   Responsive spacing, typography, touch targets, cards and admin layout.
+   ===================================================================== */
+:root {
+  --ground: #10152d;
+  --sheet: #f7f8ff;
+  --card: #ffffff;
+  --ink: #171b3b;
+  --muted: #68708f;
+  --line: #e5e8f4;
+  --soft: #f0f2fb;
+  --pink: #f12e63;
+  --cyan: #27d9d2;
+  --gold: #ffc94a;
+  --r-sm: 12px;
+  --r-md: 16px;
+  --r-lg: 21px;
+  --r-xl: 28px;
+  --sh-card: 0 8px 24px rgba(24,31,70,.07), 0 1px 2px rgba(24,31,70,.04);
+  --sh-float: 0 28px 70px rgba(5,8,25,.28);
+}
+
+html { background: var(--ground); }
+body {
+  color: var(--ink);
+  background:
+    radial-gradient(700px 420px at 100% 0%, rgba(241,46,99,.24), transparent 68%),
+    radial-gradient(650px 480px at 0% 16%, rgba(39,217,210,.18), transparent 68%),
+    #10152d;
+  background-attachment: fixed;
+  font-size: 15px;
+  line-height: 1.65;
+}
+button, input, textarea, select { font: inherit; }
+button { -webkit-appearance: none; appearance: none; }
+:focus-visible { outline: 3px solid rgba(241,46,99,.75); outline-offset: 3px; }
+
+.screen { width: 100%; max-width: 560px; min-height: 100dvh; }
+#appScreen { overflow: visible; }
+.top {
+  min-height: 66px;
+  padding: calc(12px + env(safe-area-inset-top)) 18px 10px;
+  gap: 10px;
+}
+.who { gap: 11px; font-size: 15px; }
+.avatar { width: 40px; height: 40px; }
+.ghost {
+  min-height: 42px;
+  padding: 8px 15px;
+  background: rgba(255,255,255,.09);
+  border: 1px solid rgba(255,255,255,.22);
+  border-radius: 14px;
+  font-size: 13px;
+}
+.mail { min-width: 44px; padding: 8px 12px; }
+.wallet {
+  justify-content: flex-start;
+  gap: 16px;
+  margin: 8px 16px 18px;
+  padding: 19px 20px;
+  border: 1px solid rgba(255,255,255,.20);
+  border-radius: 24px;
+  background: linear-gradient(135deg, rgba(255,255,255,.16), rgba(255,255,255,.055));
+  box-shadow: 0 16px 36px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.16);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+}
+.coin { width: 58px; height: 58px; font-size: 25px; }
+.bal-label { font-size: 13px; color: #d7dcf6; }
+.bal { font-size: clamp(32px, 8vw, 44px); line-height: 1.18; letter-spacing: -.035em; }
+
+.sheet {
+  min-width: 0;
+  padding: 18px 18px calc(30px + env(safe-area-inset-bottom));
+  background: linear-gradient(180deg, #fff 0, #f8f8ff 150px, #f5f6ff 100%);
+  border: 1px solid rgba(255,255,255,.8);
+  border-bottom: 0;
+  border-radius: 28px 28px 0 0;
+  box-shadow: 0 -12px 34px rgba(5,8,25,.12);
+}
+.vip-banner {
+  width: 100%; min-height: 76px;
+  display: flex; align-items: center; gap: 13px;
+  padding: 13px 15px; margin: 0 0 16px;
+  border: 1px solid rgba(255,201,74,.75);
+  border-radius: 19px;
+  background: linear-gradient(115deg, #211b53 0%, #34216c 55%, #48236e 100%);
+  box-shadow: 0 12px 25px rgba(38,26,91,.18), inset 0 1px 0 rgba(255,255,255,.12);
+  color: #fff; text-align: left;
+}
+.vip-banner > svg { width: 36px; height: 36px; flex: none; }
+.vbn-text { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.vbn-text b { font-size: 15px; line-height: 1.45; }
+.vbn-text small { color: #d8d2f4; font-size: 12px; line-height: 1.5; }
+.vbn-go { font-size: 28px; }
+
+.tabs {
+  display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 5px;
+  padding: 5px; margin: 0 0 17px;
+  border: 1px solid #e4e6f3; border-radius: 17px;
+  background: #eceefa;
+  box-shadow: inset 0 1px 2px rgba(20,25,60,.04);
+}
+.tab {
+  min-width: 0; min-height: 46px; padding: 9px 8px;
+  border: 0; border-radius: 13px;
+  color: #69708f; background: transparent;
+  font-size: 14px; font-weight: 700; line-height: 1.35;
+  white-space: normal; overflow-wrap: anywhere;
+}
+.tab.active {
+  color: #fff;
+  background: linear-gradient(135deg,#fa4774,#e51e5b);
+  box-shadow: 0 7px 15px rgba(229,30,91,.20);
+}
+
+.gift {
+  gap: 13px; margin: 0 0 16px; padding: 13px 14px;
+  border: 1px solid #e8e7f4; border-radius: 19px;
+  background: #fff; box-shadow: var(--sh-card);
+}
+.gift-box { width: 50px; height: 50px; }
+.gift-info { gap: 3px; }
+.gift-info b { font-size: 15px; }
+.gift-info small { font-size: 12.5px; line-height: 1.55; }
+.gift-bar { height: 7px; background: #e9eaf5; }
+.gift-bar div { background: linear-gradient(90deg,#fb4774,#e51e5b); }
+.gift-count { font-size: 15px; color: #282b4c; }
+
+.tiles { gap: 12px; }
+.tile {
+  min-height: 128px; padding: 16px;
+  gap: 4px; border: 1px solid #eaebf5; border-radius: 21px;
+  background: #fff; box-shadow: var(--sh-card);
+}
+.tile svg {
+  width: 42px; height: 42px; margin: 0 0 7px; padding: 10px;
+  color: var(--ink); background: #f0effb; border-radius: 14px;
+}
+.tile b { font-size: 15px; line-height: 1.55; }
+.tile small { font-size: 12px; }
+.tile.active {
+  color: #123b42; background: linear-gradient(145deg,#d7fbf8,#f2fffe);
+  border-color: #9dece7; box-shadow: 0 10px 24px rgba(39,217,210,.16);
+  transform: translateY(-1px);
+}
+.tile.active svg { background: rgba(255,255,255,.78); }
+.hint { padding: 22px 0 8px; font-size: 13px; color: #7a809b; }
+
+.task, .use-panel {
+  margin-top: 16px; overflow: hidden;
+  border: 1px solid #e7e8f3; border-radius: 22px;
+  background: #fff; box-shadow: var(--sh-card);
+}
+.lk-head {
+  min-height: 58px; padding: 12px 15px;
+  background: linear-gradient(110deg,#f3f1ff,#fff0f4);
+  border-bottom: 1px solid #eceaf5;
+}
+.lk-reward { font-size: 13px; }
+.lk-reward b { font-size: 25px; color: var(--pink); }
+.lk-time { font-size: 17px; }
+.player-wrap { width: min(100% - 28px, 280px); margin-top: 14px; border-radius: 18px; }
+.lk-bar { height: 8px; margin: 15px 15px 0; background: #ececf5; }
+.lk-bar div { background: linear-gradient(90deg,#fa4774,#e51e5b); }
+.lk-status { padding: 10px 14px 0; font-size: 13px; }
+.lk-actions { gap: 9px; padding: 12px 14px 15px; }
+.lk-actions .btn { min-height: 48px; border-radius: 14px; }
+.btn {
+  min-height: 44px; padding: 10px 16px; border-radius: 13px;
+  background: #24234f; font-size: 14px; line-height: 1.45;
+}
+.btn.claim { color: #332600; background: linear-gradient(135deg,#ffe58d,#ffc83e); }
+.btn.next { color: #123b42; background: linear-gradient(135deg,#b9f7f2,#6de5df); }
+.btn-primary {
+  min-height: 50px; padding: 12px 16px; margin-top: 10px;
+  border-radius: 15px; background: linear-gradient(135deg,#fa4774,#e51e5b);
+  box-shadow: 0 9px 20px rgba(229,30,91,.18);
+  font-size: 15px;
+}
+.btn-primary:active, .btn-primary:not(:disabled):active { transform: translateY(1px); box-shadow: 0 4px 10px rgba(229,30,91,.16); }
+
+.use-panel { padding: 16px; }
+.use-panel .type { font-size: 17px; }
+.field-label { margin: 15px 0 7px; font-size: 13px; color: #353957; }
+.text, .input-box {
+  border: 1px solid #e1e4f0; border-radius: 14px; background: #fff;
+}
+.text { min-height: 48px; padding: 11px 13px; font-size: 15px; }
+textarea.text { min-height: 100px; line-height: 1.65; }
+.input-box { min-height: 50px; }
+.input-box input { font-size: 16px; }
+.chips { gap: 8px; }
+.chip { min-height: 44px; border: 1px solid #e3e5f0; border-radius: 12px; background: #fff; font-size: 14px; }
+.chip.active { color: #fff; background: #25234f; border-color: #25234f; box-shadow: 0 5px 12px rgba(37,35,79,.15); }
+.cost { margin-top: 16px; padding: 13px 14px; border: 1px solid #e9e7f4; border-radius: 15px; background: #f5f4fc; }
+.cost b { font-size: 26px; }
+
+.orders { margin-top: 24px; }
+.orders-head { margin-bottom: 12px; font-size: 15px; }
+.ord, .mail-item, .adm-card, .perk {
+  border: 1px solid #e8e9f3; border-radius: 17px;
+  background: #fff; box-shadow: 0 5px 16px rgba(24,31,70,.045);
+}
+.ord { padding: 13px; margin-bottom: 10px; }
+.ord-name { font-size: 14px; }
+.badge { padding: 4px 9px; font-size: 11.5px; }
+.ord-act { gap: 7px; }
+.ord-act button { min-height: 42px; border-radius: 11px; }
+
+/* Admin area: readable 3-by-2 subnavigation rather than six cramped tabs. */
+.adm-tabs {
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: 6px; padding: 6px; margin-bottom: 16px;
+}
+.adm-tabs .tab {
+  min-height: 42px; padding: 8px 5px; overflow: visible;
+  border-radius: 11px; font-size: 13px; line-height: 1.35;
+}
+.adm-dot { top: -5px; right: -3px; }
+.adm-search { gap: 7px; }
+.adm-search .btn { min-width: 62px; }
+.adm-stats { gap: 9px; }
+.adm-stat { padding: 12px; border: 1px solid #e8e9f3; border-radius: 15px; }
+.adm-stat b { font-size: 20px; }
+.adm-compose { border: 1px solid #e7e8f3; border-radius: 15px; background: #f5f6fc; }
+#clList { border: 1px solid #e8e9f3; border-radius: 16px; box-shadow: var(--sh-card); }
+.cl-row { min-height: 50px; padding: 10px 13px; }
+.mail-to { border: 1px solid #e7e8f3; background: #eff0fa; }
+.mail-to button { min-height: 44px; }
+.adm-ta { min-height: 112px; }
+.pm-row { gap: 9px; }
+
+/* Pop-up and timer: comfortable reading, no overlap with the floating postman. */
+.postman {
+  top: calc(env(safe-area-inset-top) + 72px);
+  right: max(14px,env(safe-area-inset-right));
+  width: 54px; height: 54px;
+  border: 2px solid #1d2044;
+  box-shadow: 0 8px 22px rgba(7,10,32,.28);
+}
+.pm-bubble {
+  top: calc(env(safe-area-inset-top) + 135px);
+  right: max(12px,env(safe-area-inset-right));
+  width: min(340px,calc(100vw - 24px));
+  padding: 16px 17px;
+  border: 1px solid #e5e6f0; border-radius: 19px;
+  box-shadow: 0 18px 45px rgba(8,10,35,.24);
+  font-size: 15px; line-height: 1.75;
+}
+.pm-bubble::before { border-color: #e5e6f0; }
+.pm-bubble small { margin-bottom: 4px; font-size: 12px; }
+.pm-bubble .pm-timer {
+  display: block; margin-top: 11px; padding: 10px 11px;
+  border: 1px solid #f5d5df; border-radius: 12px;
+  background: #fff5f8; color: #d91f59;
+  font-size: 14px; line-height: 1.5;
+}
+
+/* Dialogs */
+.modal { padding: 14px; align-items: center; }
+.modal-box {
+  width: min(100%,540px); max-height: min(86dvh,780px);
+  padding: 24px 18px calc(20px + env(safe-area-inset-bottom));
+  border: 1px solid rgba(255,255,255,.8); border-radius: 24px;
+  box-shadow: 0 24px 70px rgba(4,7,28,.28);
+}
+.modal-box::before { display: none; }
+.modal-head { min-height: 38px; font-size: 17px; }
+.modal-head button { min-height: 38px; padding: 7px 14px; }
+.mail-item { padding: 13px; margin-bottom: 9px; }
+.pf-hero, .vip-hero { border-radius: 20px; }
+.pf-savebar { bottom: calc(-20px - env(safe-area-inset-bottom)); }
+
+/* Auth screen */
+#authScreen { width: min(100%,420px); padding: 0 17px; }
+#authScreen .auth-top { padding-top: calc(30px + env(safe-area-inset-top)); }
+#authScreen .auth-top h1 { font-size: clamp(32px,8vw,40px); }
+#authScreen .sheet { padding: 16px; border-radius: 22px; }
+#authScreen .tabs { margin-bottom: 13px; }
+#authScreen .tab { min-height: 42px; }
+
+@media (max-width: 380px) {
+  .top { padding-left: 14px; padding-right: 14px; }
+  .wallet { margin-left: 12px; margin-right: 12px; padding: 16px; gap: 13px; }
+  .coin { width: 50px; height: 50px; }
+  .sheet { padding-left: 13px; padding-right: 13px; }
+  .tile { min-height: 118px; padding: 13px; }
+  .tile b { font-size: 13.5px; }
+  .adm-tabs .tab { font-size: 12px; }
+  .c6 { grid-template-columns: repeat(3,minmax(0,1fr)); }
+}
+@media (min-width: 600px) {
+  body { padding: 22px 16px 38px; }
+  .screen { min-height: calc(100dvh - 60px); }
+  .sheet { border-radius: 28px; box-shadow: 0 24px 65px rgba(3,6,25,.20); }
+  #appScreen .sheet { border-radius: 28px; }
+  .modal { padding: 24px; }
+}
+@media (min-width: 760px) {
+  .screen { max-width: 600px; }
+  .sheet { padding-left: 22px; padding-right: 22px; }
+  .wallet { margin-left: 20px; margin-right: 20px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+
+</style>
+</head>
+<body>
+<noscript><p style="padding:24px;text-align:center;color:#fff;font-family:system-ui,sans-serif">ဒီ website ကို သုံးဖို့ JavaScript ဖွင့်ထားရန် လိုအပ်ပါသည်။</p></noscript>
+
+<!-- ================= Login / Register ================= -->
+<div class="screen" id="authScreen">
+  <div class="auth-top">
+    <div class="logo">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.6 5.8A4.3 4.3 0 0 1 15.5 3h-3.1v12.4a2.6 2.6 0 1 1-2.6-2.6c.3 0 .5 0 .8.1V9.7a5.7 5.7 0 1 0 4.9 5.7V9a7.3 7.3 0 0 0 4.3 1.4V7.3a4.3 4.3 0 0 1-3.2-1.5z"/></svg>
+    </div>
+    <h1>TikTok Boost</h1>
+    <p class="tag">Like တစ်ခုအတွက် Like တစ်ခု<br>ကြည့်ရှုမှုတစ်ခုအတွက် ကြည့်ရှုမှု</p>
+  </div>
+
+  <div class="sheet">
+    <div class="tabs" id="authTabs" role="tablist">
+      <button type="button" class="tab active" data-mode="login" role="tab" aria-selected="true">အကောင့်ဝင်မည်</button>
+      <button type="button" class="tab" data-mode="register" role="tab" aria-selected="false">အကောင့်သစ်ဖွင့်မည်</button>
+    </div>
+
+    <!-- Login -->
+    <div class="panel show" id="loginPanel">
+      <label class="field">
+        <span>နာမည်</span>
+        <div class="input-box">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9zm0 2c-4 0-8 2-8 5v2h16v-2c0-3-4-5-8-5z"/></svg>
+          <input type="text" id="loginName" autocomplete="username" autocapitalize="none" placeholder="နာမည်ထည့်ပါ">
+        </div>
+      </label>
+      <label class="field">
+        <span>စကားဝှက်</span>
+        <div class="input-box">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 9V7a5 5 0 0 0-10 0v2H5v12h14V9h-2zm-8-2a3 3 0 0 1 6 0v2H9V7z"/></svg>
+          <input type="password" id="loginPass" autocomplete="current-password" placeholder="စကားဝှက်ထည့်ပါ">
+          <button type="button" class="eye" data-for="loginPass" aria-label="စကားဝှက်ပြရန်"></button>
+        </div>
+      </label>
+      <button type="button" class="btn-primary" id="loginBtn">အကောင့်ဝင်မည်</button>
+      <div class="msg" id="loginMsg" role="status"></div>
+    </div>
+
+    <!-- Register -->
+    <div class="panel" id="registerPanel">
+      <label class="field">
+        <span>အသုံးပြုမည့်နာမည်</span>
+        <div class="input-box">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9zm0 2c-4 0-8 2-8 5v2h16v-2c0-3-4-5-8-5z"/></svg>
+          <input type="text" id="regName" autocomplete="username" autocapitalize="none" placeholder="အနည်းဆုံး ၃ လုံး">
+        </div>
+      </label>
+      <label class="field">
+        <span>စကားဝှက်</span>
+        <div class="input-box">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 9V7a5 5 0 0 0-10 0v2H5v12h14V9h-2zm-8-2a3 3 0 0 1 6 0v2H9V7z"/></svg>
+          <input type="password" id="regPass" autocomplete="new-password" placeholder="ဥပမာ Abc234">
+          <button type="button" class="eye" data-for="regPass" aria-label="စကားဝှက်ပြရန်"></button>
+        </div>
+      </label>
+      <p class="note" style="margin:-6px 2px 14px">အနည်းဆုံး ၆ လုံး — English စာလုံးကြီး (A-Z)၊ စာလုံးသေး (a-z)၊ ဂဏန်း (0-9) ပါရမည်</p>
+      <label class="field">
+        <span>စကားဝှက်ကို ပြန်ရိုက်ပါ</span>
+        <div class="input-box">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>
+          <input type="password" id="regPass2" autocomplete="new-password" placeholder="စကားဝှက်ကို ထပ်ရိုက်ပါ">
+          <button type="button" class="eye" data-for="regPass2" aria-label="စကားဝှက်ပြရန်"></button>
+        </div>
+      </label>
+      <button type="button" class="btn-primary" id="regBtn">အကောင့်ဖွင့်မည်</button>
+      <div class="msg" id="regMsg" role="status"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= Main App ================= -->
+<div class="screen" id="appScreen" hidden>
+  <header class="top">
+    <button type="button" class="who who-btn" id="whoBtn" aria-label="Profile ဖွင့်ရန်">
+      <span class="pfp" id="avatar"></span><span id="who"></span><span class="vip-pill" id="whoVip" hidden>VIP</span>
+    </button>
+    <div class="top-r">
+      <button type="button" class="ghost mail" id="mailBtn" aria-label="စာများ">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zm9 7.2L4.6 7H4v.4l8 5.5 8-5.5V7h-.6L12 12.2z"/></svg>
+        <span class="mail-badge" id="mailBadge" hidden>0</span>
+      </button>
+      <button type="button" class="ghost" id="logoutBtn">ထွက်ရန်</button>
+    </div>
+  </header>
+
+  <div class="modal" id="mailModal" hidden role="dialog" aria-modal="true" aria-label="စာများ">
+    <div class="modal-box">
+      <div class="modal-head"><b>Mail Box</b><button type="button" id="mailClose">ပိတ်</button></div>
+      <div id="fbBox">
+      <div class="field-label" style="margin-top:0">Admin ကို စာပို့ရန် (Error / အကြံပေးချက်)</div>
+      <textarea class="text" id="fbBody" rows="3" maxlength="1000" placeholder="ဘာဖြစ်လဲ ရေးပါ" style="resize:vertical;font-family:inherit"></textarea>
+      <button type="button" class="btn" id="fbSend" style="margin-top:8px">Admin ဆီ ပို့မည်</button>
+      <div class="msg" id="fbMsg" role="status" style="margin:8px 0 4px"></div>
+      </div>
+      <div class="field-label">ရရှိထားသော စာများ</div>
+      <div id="mailList"></div>
+    </div>
+  </div>
+
+  <!-- ================= Profile ================= -->
+  <div class="modal" id="pfModal" hidden role="dialog" aria-modal="true" aria-label="Profile">
+    <div class="modal-box">
+      <div class="modal-head"><b>Profile</b><button type="button" id="pfClose">ပိတ်</button></div>
+      <div class="pf-hero">
+        <span class="pfp pfp-xl" id="pfPreview"></span>
+        <div class="pf-name" id="pfName"></div>
+        <div class="pf-tag" id="pfTag"></div>
+      </div>
+      <div class="pf-photo">
+        <button type="button" class="btn" id="pfPick">ပုံတင်မည်</button>
+        <button type="button" class="btn alt" id="pfRemove">ပုံဖယ်မည်</button>
+      </div>
+      <input type="file" id="pfFile" accept="image/*" hidden>
+
+      <div class="field-label">ဘောင်အရောင် (စိတ်ကြိုက်ရွေးပါ)</div>
+      <div class="swatches" id="pfSwatches" role="radiogroup" aria-label="ဘောင်အရောင်"></div>
+
+      <div class="vip-panel">
+        <div class="vip-panel-head"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#FFC933" stroke="#8A5A00" stroke-width="1.1" stroke-linejoin="round" d="M3 8l4.5 6.5L12 5l4.5 9.5L21 8l-2 10H5L3 8z"/><rect x="5" y="18" width="14" height="2.6" rx="1.2" fill="#FFB400" stroke="#8A5A00" stroke-width="1"/><circle cx="12" cy="13" r="1.3" fill="#FE2C55"/><circle cx="7.6" cy="14" r="1" fill="#25F4EE"/><circle cx="16.4" cy="14" r="1" fill="#25F4EE"/></svg><b>VIP သီးသန့် ဘောင်</b><small id="pfLockNote"></small></div>
+        <div class="vbt-grid" id="pfVipGrid"></div>
+        <button type="button" class="btn-gold" id="pfVipBtn">VIP ဝင်ရန်</button>
+      </div>
+
+      <div class="pf-savebar">
+        <button type="button" class="btn-primary" id="pfSave" style="margin-top:0">သိမ်းမည်</button>
+        <div class="msg" id="pfMsg" role="status"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= VIP ================= -->
+  <div class="modal top-modal" id="vipModal" hidden role="dialog" aria-modal="true" aria-label="VIP">
+    <div class="modal-box vip-box">
+      <div class="modal-head"><b>VIP ဝင်ရန်</b><button type="button" id="vipClose">ပိတ်</button></div>
+      <div class="vip-hero">
+        <svg class="vip-crown-big" viewBox="0 0 24 24" aria-hidden="true"><path fill="#FFC933" stroke="#8A5A00" stroke-width="1.1" stroke-linejoin="round" d="M3 8l4.5 6.5L12 5l4.5 9.5L21 8l-2 10H5L3 8z"/><rect x="5" y="18" width="14" height="2.6" rx="1.2" fill="#FFB400" stroke="#8A5A00" stroke-width="1"/><circle cx="12" cy="13" r="1.3" fill="#FE2C55"/><circle cx="7.6" cy="14" r="1" fill="#25F4EE"/><circle cx="16.4" cy="14" r="1" fill="#25F4EE"/></svg>
+        <div class="vip-title">VIP MEMBER</div>
+        <p class="vip-sub">Credit ပိုရ၊ ဘောင်ကြီး ဆန်းဆန်းနဲ့ ထင်ရှားပါစေ</p>
+      </div>
+      <div class="vip-perks">
+        <div class="perk"><span class="perk-ic">1K</span><div><b>ဝင်ဝင်ချင်း Credit 1,000</b><small>VIP လက်ဆောင်ကို ယူလိုက်တာနဲ့ ချက်ချင်း ရပါမည်</small></div></div>
+        <div class="perk"><span class="perk-ic">300</span><div><b>နေ့စဉ် Credit 300</b><small>တစ်လတိတိ (၃၀ ရက်) — တစ်ရက် တစ်ကြိမ်</small></div></div>
+        <div class="perk"><span class="perk-ic">👑</span><div><b>VIP သီးသန့် ဘောင် ၅ မျိုး</b><small>Gold · Aurora · Flame · Ice · Royal</small></div></div>
+      </div>
+      <div id="vipAction"></div>
+      <div class="msg" id="vipMsg" role="status"></div>
+    </div>
+  </div>
+
+  <section class="wallet" aria-live="polite">
+    <div class="coin" id="coin" aria-hidden="true">C</div>
+    <div class="wallet-text">
+      <div class="bal-label">သင့်ရဲ့ Credit</div>
+      <div class="bal" id="credit">0</div>
+    </div>
+  </section>
+
+  <div class="sheet">
+    <button type="button" class="vip-banner" id="vipBanner">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#FFC933" stroke="#8A5A00" stroke-width="1.1" stroke-linejoin="round" d="M3 8l4.5 6.5L12 5l4.5 9.5L21 8l-2 10H5L3 8z"/><rect x="5" y="18" width="14" height="2.6" rx="1.2" fill="#FFB400" stroke="#8A5A00" stroke-width="1"/><circle cx="12" cy="13" r="1.3" fill="#FE2C55"/><circle cx="7.6" cy="14" r="1" fill="#25F4EE"/><circle cx="16.4" cy="14" r="1" fill="#25F4EE"/></svg>
+      <span class="vbn-text"><b id="vbnTitle">VIP ဝင်ရန်</b><small id="vbnSub">ဝင်ဝင်ချင်း Credit 1,000 + နေ့စဉ် 300</small></span>
+      <span class="vbn-go" aria-hidden="true">›</span>
+    </button>
+    <div class="tabs" id="appTabs" role="tablist">
+      <button type="button" class="tab active" data-view="earn" role="tab" aria-selected="true">Credit ယူရန်</button>
+      <button type="button" class="tab" data-view="spend" role="tab" aria-selected="false">Credit သုံးရန်</button>
+      <button type="button" class="tab" data-view="admin" id="adminTab" role="tab" aria-selected="false" hidden>Admin</button>
+    </div>
+
+    <!-- Earn -->
+    <div id="earnView">
+      <div class="gift" id="giftCard" hidden>
+        <button type="button" class="gift-box" id="giftBtn" aria-label="လက်ဆောင်ပုံး">
+          <svg viewBox="0 0 64 64" aria-hidden="true">
+            <rect x="10" y="28" width="44" height="30" rx="3" fill="#FE2C55"/>
+            <rect x="29" y="28" width="6" height="30" fill="#FFC933"/>
+            <g class="gift-lid">
+              <rect x="6" y="19" width="52" height="11" rx="3" fill="#D81F48"/>
+              <rect x="29" y="19" width="6" height="11" fill="#FFC933"/>
+              <path d="M32 19c-3-9-14-9-12-3s9 3 12 3zM32 19c3-9 14-9 12-3s-9 3-12 3z" fill="none" stroke="#FFC933" stroke-width="3.5" stroke-linejoin="round"/>
+            </g>
+          </svg>
+        </button>
+        <div class="gift-info">
+          <b>လက်ဆောင်ပုံး</b>
+          <small id="giftSub"></small>
+          <div class="gift-bar"><div id="giftFill"></div></div>
+        </div>
+        <span class="gift-count" id="giftCount">0/30</span>
+      </div>
+
+      <div class="tiles" id="earnTiles">
+        <button type="button" class="tile" data-v="watch">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.5C7 4.5 2.7 7.6 1 12c1.7 4.4 6 7.5 11 7.5s9.3-3.1 11-7.5c-1.7-4.4-6-7.5-11-7.5zM12 17a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/></svg>
+          <b>TikTok ကြည့်ရန်</b>
+        </button>
+        <button type="button" class="tile" data-v="like">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+          <b>TikTok Like ပေးရန်</b>
+        </button>
+      </div>
+
+      <p class="hint" id="hint">အပေါ်က တစ်ခုကို ရွေးပါ</p>
+
+      <div class="task" id="likeTask" hidden>
+        <div class="lk-head">
+          <span class="lk-reward">ရမည့် Credit <b id="lkReward">0</b></span>
+          <span class="lk-time" id="lkTime"></span>
+        </div>
+        <div class="player-wrap" id="lkPlayerWrap" hidden>
+          <iframe id="lkFrame" allow="autoplay; fullscreen" allowfullscreen title="TikTok video"></iframe>
+        </div>
+        <div class="lk-bar" id="lkBar"><div id="lkFill"></div></div>
+        <div class="desc lk-status" id="lkStatus" role="status" aria-live="polite"></div>
+        <div class="lk-actions" id="lkActions">
+          <button type="button" class="btn claim" id="lkClaim" disabled>Credit ရယူမည်</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Admin -->
+    <div id="adminView" hidden>
+      <div class="tabs adm-tabs" id="admTabs" role="tablist">
+        <button type="button" class="tab active" data-pane="user" role="tab" aria-selected="true">User</button>
+        <button type="button" class="tab" data-pane="credit" role="tab" aria-selected="false">Credit</button>
+        <button type="button" class="tab" data-pane="mail" role="tab" aria-selected="false">စာပို့</button>
+        <button type="button" class="tab" data-pane="fb" role="tab" aria-selected="false">စာများ<span class="adm-dot" id="admFbCount" hidden></span></button>
+        <button type="button" class="tab" data-pane="vip" role="tab" aria-selected="false">VIP<span class="adm-dot" id="admVipCount" hidden></span></button>
+        <button type="button" class="tab" data-pane="popup" role="tab" aria-selected="false">PopUp</button>
+      </div>
+
+      <!-- User: ရှာ + စီမံ -->
+      <div class="adm-pane" id="admPane-user">
+        <div class="adm-search">
+          <input class="text" type="search" id="admQ" placeholder="User နာမည် ရှာရန်..." autocapitalize="none" autocomplete="off">
+          <button type="button" class="btn" id="admSearch">ရှာ</button>
+        </div>
+        <div class="msg adm-status" id="admMsg" role="status"></div>
+        <div id="admList"></div>
+        <button type="button" class="btn adm-more" id="admMore" hidden></button>
+      </div>
+
+      <!-- Credit စာရင်း -->
+      <div class="adm-pane" id="admPane-credit" hidden>
+        <div class="adm-stats">
+          <div class="adm-stat"><small>User စုစုပေါင်း</small><b id="clUsers">–</b></div>
+          <div class="adm-stat"><small>Credit စုစုပေါင်း</small><b id="clTotal">–</b></div>
+        </div>
+        <p class="note" id="clSum">Credit များသူ စီထားသည် · နာမည်ကို နှိပ်ရင် User tab မှာ ဖွင့်ပေးမည်</p>
+        <div id="clList"></div>
+        <button type="button" class="btn adm-more" id="clMore" hidden>နောက်ထပ်ကြည့်မည်</button>
+      </div>
+
+      <!-- စာပို့ -->
+      <div class="adm-pane" id="admPane-mail" hidden>
+        <div class="field-label">ဘယ်သူ့ဆီ ပို့မလဲ</div>
+        <div class="mail-to" id="mailTo" role="tablist">
+          <button type="button" class="on" data-to="all" role="tab" aria-selected="true">👥 User အားလုံး</button>
+          <button type="button" data-to="one" role="tab" aria-selected="false">👤 User တစ်ယောက်</button>
+        </div>
+
+        <div class="mail-who" id="mailWho" hidden>
+          <input class="text" type="search" id="mailUser" placeholder="User နာမည် ရိုက်ပြီး ရှာပါ..." autocapitalize="none" autocomplete="off" aria-label="User နာမည်">
+          <div class="mail-sug" id="mailSug" hidden></div>
+          <div class="mail-picked" id="mailPicked" hidden></div>
+        </div>
+
+        <input class="text" type="text" id="admMailTitle" maxlength="100" placeholder="ခေါင်းစဉ်" style="margin-top:12px">
+        <textarea class="text adm-ta" id="admMailBody" rows="4" maxlength="1000" placeholder="စာအကြောင်းအရာ"></textarea>
+
+        <div class="mail-gift" id="mailGift" hidden>
+          <button type="button" class="mg-box" id="mgBtn" aria-expanded="false">
+            <svg viewBox="0 0 64 64" aria-hidden="true">
+              <rect x="10" y="28" width="44" height="28" rx="4" fill="#FE2C55" stroke="#17143C" stroke-width="3"/>
+              <rect x="29" y="28" width="6" height="28" fill="#FFC933" stroke="#17143C" stroke-width="2"/>
+              <g class="mg-lid">
+                <rect x="6" y="18" width="52" height="12" rx="4" fill="#FF6B86" stroke="#17143C" stroke-width="3"/>
+                <rect x="29" y="18" width="6" height="12" fill="#FFC933" stroke="#17143C" stroke-width="2"/>
+                <path d="M32 18c-6-12-18-8-13-2 2 2 8 2 13 2zM32 18c6-12 18-8 13-2-2 2-8 2-13 2z" fill="#FFC933" stroke="#17143C" stroke-width="2.5" stroke-linejoin="round"/>
+              </g>
+            </svg>
+            <span><b>Credit လက်ဆောင် ထည့်မည်</b><small id="mgSub">နှိပ်ပြီး ပမာဏ ထည့်ပါ (မထည့်လည်း ရ)</small></span>
+          </button>
+          <div class="mg-panel" id="mgPanel" hidden>
+            <input class="text" type="number" inputmode="numeric" min="1" step="1" id="mgAmt" placeholder="လက်ဆောင် Credit ပမာဏ" aria-label="လက်ဆောင် Credit ပမာဏ">
+            <div class="mg-chips" id="mgChips">
+              <button type="button" data-n="50">+50</button>
+              <button type="button" data-n="100">+100</button>
+              <button type="button" data-n="500">+500</button>
+              <button type="button" data-n="1000">+1,000</button>
+            </div>
+            <button type="button" class="mg-clear" id="mgClear">လက်ဆောင် မပေးတော့ပါ</button>
+          </div>
+        </div>
+
+        <button type="button" class="btn-primary" id="admMailAll">User အားလုံးသို့ ပို့မည်</button>
+        <div class="msg" id="admMailMsg" role="status"></div>
+        <p class="note" id="mailNote">User အားလုံးဆီ စာပို့မည်။ တစ်ယောက်တည်းကို ပို့ချင်ရင် "User တစ်ယောက်" ကိုရွေးပြီး နာမည်ထည့်ပါ၊ ထိုအခါ 🎁 Credit လက်ဆောင်ပါ ထည့်ပေးနိုင်ပါမည်။</p>
+      </div>
+
+      <!-- User တွေဆီက စာများ -->
+      <div class="adm-pane" id="admPane-fb" hidden>
+        <div id="admFb"></div>
+      </div>
+
+      <!-- VIP: လျောက်ထားသူ + VIP Member များ -->
+      <div class="adm-pane" id="admPane-vip" hidden>
+        <p class="note">"VIP ဖွင့်ပေးမည်" ကိုနှိပ်ရင် User ရဲ့ Mail Box ထဲကို "VIP လက်ဆောင်ရယူရန်" (Credit 1,000 + 300 နှင့် VIP Border) ရောက်သွားမည်</p>
+        <div class="msg adm-status" id="admVipMsg" role="status"></div>
+        <div id="admVipList"></div>
+      </div>
+    </div>
+
+      <!-- PopUp: စာပို့သမားက User အားလုံးဆီ ပြမည့်စာ -->
+      <div class="adm-pane" id="admPane-popup" hidden>
+        <p class="note">"PopUp Sent" ကိုနှိပ်ရင် User အားလုံးရဲ့ စာပို့သမားပုံကနေ ဒီစာ ပေါ်လာမည်။ မပို့ထားရင် "မင်္ဂလာပါ ပျော်ရွှင်စရာ နေ့လေးတစ်နေ့ဖြစ်ပါစေ" ပဲ ပြပြီး ပျောက်သွားမည်။</p>
+        <textarea class="text adm-ta pm-ta" id="pmInput" rows="4" maxlength="300" placeholder="PopUp စာအကြောင်းအရာ"></textarea>
+        <div class="pm-row">
+          <button type="button" class="btn-primary" id="pmSend">PopUp Sent</button>
+          <button type="button" class="btn" id="pmOff">ပိတ်မည်</button>
+        </div>
+        <div class="msg" id="pmMsg" role="status"></div>
+      </div>
+
+    <!-- Spend -->
+    <div id="spendView" hidden>
+      <div class="tiles" id="useTiles">
+        <button type="button" class="tile" data-v="like">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+          <b>TikTok Like</b><small>ကိုယ့် Video အတွက်</small>
+        </button>
+        <button type="button" class="tile" data-v="views">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.5C7 4.5 2.7 7.6 1 12c1.7 4.4 6 7.5 11 7.5s9.3-3.1 11-7.5c-1.7-4.4-6-7.5-11-7.5zM12 17a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/></svg>
+          <b>TikTok ကြည့်ရှုမှု</b><small>ကိုယ့် Video အတွက်</small>
+        </button>
+      </div>
+
+      <div class="use-panel" id="usePanel" hidden>
+        <div class="type" id="useTitle"></div>
+
+        <div class="field-label">သင့်ရဲ့ TikTok Video Link</div>
+        <input class="text" type="url" id="videoLink" inputmode="url" autocapitalize="none" placeholder="https://www.tiktok.com/@name/video/...">
+
+        <div id="durBlock" hidden>
+          <div class="field-label">ကြည့်ရှုမည့် ကြာချိန်</div>
+          <div class="chips c3" id="durChips">
+            <button type="button" class="chip active" data-sec="6" data-cost="8">6 စက္ကန့်</button>
+            <button type="button" class="chip" data-sec="30" data-cost="32">30 စက္ကန့်</button>
+            <button type="button" class="chip" data-sec="60" data-cost="64">1 မိနစ်</button>
+          </div>
+        </div>
+
+        <div id="amountBlock">
+          <div class="field-label" id="amountLabel">အသုံးပြုမယ့် Credit ပမာဏ</div>
+          <p class="note" id="amountNote">သုံးမည့် Credit များလေ ပိုမြန်လေ ဖြစ်သည်</p>
+          <div class="chips c6" id="chips">
+            <button type="button" class="chip" data-n="3">3</button>
+            <button type="button" class="chip" data-n="4">4</button>
+            <button type="button" class="chip active" data-n="5">5</button>
+            <button type="button" class="chip" data-n="6">6</button>
+            <button type="button" class="chip" data-n="8">8</button>
+            <button type="button" class="chip" data-n="10">10</button>
+          </div>
+        </div>
+
+        <div id="countBlock" hidden>
+          <div class="field-label">လိုချင်တဲ့ Like အရေအတွက်</div>
+          <div class="chips" id="countChips" style="grid-template-columns:repeat(5,1fr)">
+            <button type="button" class="chip active" data-c="1">1</button>
+            <button type="button" class="chip" data-c="5">5</button>
+            <button type="button" class="chip" data-c="10">10</button>
+            <button type="button" class="chip" data-c="20">20</button>
+            <button type="button" class="chip" data-c="50">50</button>
+          </div>
+        </div>
+        <div class="preview" id="previewBox" hidden>
+          <p class="note">Video မှန်/မမှန် စစ်ကြည့်ပါ (Play နှိပ်ရင် ကြာချိန်ကိုပါ မှတ်ထားမည်)</p>
+          <div class="player-wrap"><iframe id="pvFrame" allow="autoplay; fullscreen" allowfullscreen title="preview"></iframe></div>
+        </div>
+
+        <div class="cost"><span>ကုန်ကျမည့် Credit<small id="costNote" class="cost-note"></small></span><b><span id="costVal">5</span><small>Credit</small></b></div>
+        <button type="button" class="btn-primary" id="doneBtn">မှာယူမည်</button>
+        <div class="msg" id="useMsg" role="status"></div>
+      </div>
+
+      <div class="orders" id="ordersBox">
+        <div class="orders-head"><b>မှတ်တမ်း</b><span id="ordersCount"></span></div>
+        <div id="ordersList"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<button type="button" class="postman" id="postman" aria-label="Admin ဆီက စာ ကြည့်ရန်">
+  <svg viewBox="0 0 48 48" aria-hidden="true">
+    <path d="M12 44c0-8 5-13 12-13s12 5 12 13z" fill="#2B6BFF" stroke="#17143C" stroke-width="2.2" stroke-linejoin="round"/>
+    <path d="M14 33l20 11" stroke="#FFC933" stroke-width="3.2" stroke-linecap="round"/>
+    <circle cx="24" cy="20" r="8.5" fill="#FFD7B5" stroke="#17143C" stroke-width="2.2"/>
+    <path d="M14.5 17.5c1-6.5 5-9 9.5-9s8.5 2.5 9.5 9z" fill="#2B6BFF" stroke="#17143C" stroke-width="2.2" stroke-linejoin="round"/>
+    <path d="M13 18.2h22" stroke="#17143C" stroke-width="2.6" stroke-linecap="round"/>
+    <circle cx="20.8" cy="21" r="1.2" fill="#17143C"/><circle cx="27.2" cy="21" r="1.2" fill="#17143C"/>
+    <path d="M20.6 24.6c1.8 1.6 4.9 1.6 6.8 0" fill="none" stroke="#17143C" stroke-width="1.8" stroke-linecap="round"/>
+    <rect x="28" y="30" width="16" height="11" rx="2" fill="#fff" stroke="#17143C" stroke-width="2"/>
+    <path d="M28.6 31l7.4 5.6 7.4-5.6" fill="none" stroke="#FE2C55" stroke-width="2" stroke-linejoin="round"/>
+  </svg>
+  <span class="pm-dot" id="pmDot" hidden></span>
+</button>
+<div class="pm-bubble" id="pmBubble" role="status" aria-live="polite"><small id="pmTag">📮 စာပို့သမား</small><span id="pmText"></span><span id="pmTimer" class="pm-timer" hidden></span></div>
+
+<script>
+/* DIAG vip-6: error ဖြစ်ရင် ဖန်သားပြင်အောက်ခြေမှာ အနီရောင်နဲ့ ပြမည် (screenshot ရိုက်ပို့ပါ) */
+(function () {
+  var box;
+  function show(t) {
+    try {
+      if (!box) {
+        box = document.createElement('pre');
+        box.style.cssText = 'position:fixed;z-index:99999;left:0;right:0;bottom:0;margin:0;max-height:45vh;overflow:auto;padding:8px 10px;background:#b00020;color:#fff;font:12px/1.4 monospace;white-space:pre-wrap;';
+        (document.body || document.documentElement).appendChild(box);
+      }
+      box.textContent += t + '\n';
+    } catch (e) {}
+  }
+  window.addEventListener('error', function (e) {
+    if (e.target && e.target !== window && (e.target.src || e.target.href)) { show('LOAD FAIL: ' + (e.target.src || e.target.href)); return; }
+    show('ERR: ' + e.message + ' @' + String(e.filename || '').split('/').pop() + ':' + e.lineno + ':' + e.colno);
+  }, true);
+  window.addEventListener('unhandledrejection', function (e) { show('PROMISE: ' + ((e.reason && e.reason.message) || e.reason)); });
+  document.addEventListener('DOMContentLoaded', function () {
+    var s = document.createElement('div');
+    s.textContent = 'build version 1.0.0';
+    s.style.cssText = 'position:fixed;left:6px;bottom:4px;z-index:99998;font:10px monospace;color:#999;opacity:.6;pointer-events:none;';
+    document.body.appendChild(s);
+  });
+})();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ================= Config (Supabase URL + anon public key) =================
+window.APP_CONFIG = {
+  SUPABASE_URL: 'https://dzszuhsfrfaumcvrtouf.supabase.co',
+  SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR6c3p1aHNmcmZhdW1jdnJ0b3VmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ0MjM4OTUsImV4cCI6MjEwOTk5OTg5NX0.ovpL1EAi2pRRoyCCxe3vRLlkobRLgfUR9FJCJv__9rk',
+};
+
+// ================= Supabase =================
+const cfg = window.APP_CONFIG || {};
+const configured = !!(cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY &&
+                      !/YOUR[-_]/i.test(cfg.SUPABASE_URL + cfg.SUPABASE_ANON_KEY));
+const sb = configured && window.supabase
+  ? window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY)
+  : null;
+
+const ERR = {
+  INSUFFICIENT_CREDIT: 'Credit မလုံလောက်ပါ',
+  INVALID_LINK:        'TikTok Video Link ကို မှန်ကန်စွာ ထည့်ပါ',
+  INVALID_OPTION:      'ရွေးချယ်မှု မှားနေပါသည်',
+  NO_TASK:             'အစကပြန်စပါ',
+  NO_VIDEO:            'ယခု Like ပေးစရာ Video မရှိသေးပါ၊ နောက်မှ ပြန်စစ်ပါ',
+  ORDER_FULL:          'ဒီ Video အတွက် Like ပြည့်သွားပါပြီ',
+  TOO_EARLY:           'Video ကို အဆုံးထိ မကြည့်ရသေးပါ',
+  LIKE_NOT_FOUND:      'Like မတွေ့ပါ ✗ Credit မရပါ၊ နောက်တစ်ပုဒ် ပြောင်းပေးမည်',
+  NO_BASELINE:         'စစ်ဆေးမှု မစတင်ရသေးပါ၊ နောက်တစ်ပုဒ် ယူပါ',
+  VERIFY_UNAVAILABLE:  'Like စစ်ဆေးမရပါ၊ ခဏနေမှ ထပ်ကြိုးစားပါ',
+  NO_GIFT:             'လက်ဆောင်ပုံး မရှိသေးပါ',
+  NOT_ADMIN:           'Admin မဟုတ်ပါ',
+  EMPTY:               'စာအကြောင်းအရာ ထည့်ပါ',
+  TOO_MANY:            'ခဏနေမှ ထပ်ပို့ပါ (တစ်နာရီမှာ ၅ စောင်အထိသာ)',
+  VIP_ONLY:            'VIP သီးသန့် ဘောင်ဖြစ်ပါသည်၊ VIP ဝင်မှ သုံးလို့ရပါမည်',
+  ALREADY_VIP:         'VIP ဖြစ်နေပြီးသားပါ',
+  ALREADY_APPLIED:     'လျောက်ထားပြီးသားပါ၊ Admin ခွင့်ပြုချက် စောင့်ပါ',
+  GIFT_WAITING:        'VIP လက်ဆောင် ရယူရန် စောင့်နေပါသည်၊ Mail Box ကို ကြည့်ပါ',
+  NO_VIP_GIFT:         'ရယူစရာ VIP လက်ဆောင် မရှိပါ',
+  NOT_VIP:             'VIP မဟုတ်ပါ',
+  DAILY_DONE:          'ဒီနေ့အတွက် ယူပြီးပါပြီ၊ မနက်ဖြန်မှ ပြန်ယူပါ',
+  DAILY_FINISHED:      'နေ့စဉ် Credit ၃၀ ကြိမ် ပြည့်သွားပါပြီ',
+  BAD_IMAGE:           'ပုံ မမှန်ပါ၊ တခြားပုံ ရွေးပါ',
+  BAD_BORDER:          'ဘောင် မမှန်ပါ',
+  NO_USER:             'User မတွေ့ပါ',
+  NO_PROFILE:          'Profile မတွေ့ပါ',
+};
+function errText(e) {
+  const m = (e && e.message) || '';
+  if (/Could not find the function|PGRST202/.test(m)) return 'Database ပြင်ဆင်မှု မပြီးသေးပါ (vip_profile.sql ကို Supabase SQL Editor မှာ Run ပါ)';
+  const lock = m.match(/EARN_LOCKED:(\d+)/);
+  if (lock) return 'Credit 1000 စုပြီးပါပြီ၊ ခဏနားပါ — ' + fmtT(Number(lock[1])) + ' အကြာမှ ပြန်ယူနိုင်မည်';
+  for (const k in ERR) if (m.includes(k)) return ERR[k];
+  if (/JWT|expired|not authenticated/i.test(m)) return 'Login သက်တမ်းကုန်သွားပါပြီ၊ ပြန်ဝင်ပါ';
+  return 'ချိတ်ဆက်မှု မအောင်မြင်ပါ၊ ထပ်ကြိုးစားပါ';
+}
+
+const $ = (id) => document.getElementById(id);
+
+function restart(el, cls) { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
+
+// ---------- small UI helpers ----------
+function bindTabs(tabsEl, onPick) {
+  const visible = () => Array.from(tabsEl.querySelectorAll('.tab:not([hidden])'));
+  const pick = (t, focus) => {
+    tabsEl.querySelectorAll('.tab').forEach(x => {
+      x.classList.toggle('active', x === t);
+      x.setAttribute('aria-selected', x === t ? 'true' : 'false');
+      x.tabIndex = x === t ? 0 : -1;
+    });
+    if (focus) t.focus();
+    onPick(t.dataset);
+  };
+  tabsEl.addEventListener('click', (e) => { const t = e.target.closest('.tab'); if (t) pick(t); });
+  tabsEl.addEventListener('keydown', (e) => {
+    const list = visible(), i = list.indexOf(document.activeElement);
+    if (i < 0) return;
+    let n = -1;
+    if (e.key === 'ArrowRight') n = (i + 1) % list.length;
+    else if (e.key === 'ArrowLeft') n = (i - 1 + list.length) % list.length;
+    else if (e.key === 'Home') n = 0;
+    else if (e.key === 'End') n = list.length - 1;
+    if (n >= 0) { e.preventDefault(); pick(list[n], true); }
+  });
+}
+function bindTiles(el, onPick) {
+  el.addEventListener('click', (e) => {
+    const t = e.target.closest('.tile');
+    if (!t) return;
+    el.querySelectorAll('.tile').forEach(x => x.classList.toggle('active', x === t));
+    onPick(t.dataset.v);
+  });
+}
+
+// ---------- Credit ----------
+const creditEl = $('credit');
+let credit = 0;
+function setCredit(n, animate) {
+  credit = n;
+  creditEl.textContent = n;
+  if (animate) restart(creditEl, 'bump');
+}
+
+// ---------- Earn credit ----------
+const hint = $('hint');
+let earnKind = '';                 // 'watch' | 'like'
+
+bindTabs($('appTabs'), (d) => {
+  $('earnView').hidden  = d.view !== 'earn';
+  $('spendView').hidden = d.view !== 'spend';
+  $('adminView').hidden = d.view !== 'admin';
+  if (d.view === 'admin') admLoad();
+  if (d.view === 'spend') loadOrders();
+  if (d.view !== 'earn') { lkStop(); }
+  else if (lk && !lkFinished && !likeTaskEl.hidden && !lkWrap.hidden) {
+    lkWatched = 0; lkLast = null; lkUI();
+    lkFrame.src = playerUrl(lk.video_id, false);
+  }
+});
+
+bindTiles($('earnTiles'), (v) => {
+  earnKind = v;
+  hint.hidden = true;
+  likeTaskEl.hidden = false;
+  restart(likeTaskEl, 'pop');
+  loadLikeTask();
+});
+
+// ---------- Like / view tasks ----------
+const likeTaskEl = $('likeTask');
+const lkFrame = $('lkFrame'), lkWrap = $('lkPlayerWrap'), lkFill = $('lkFill');
+const lkStatus = $('lkStatus'), lkClaim = $('lkClaim');
+const lkTime = $('lkTime'), lkActions = $('lkActions'), lkBar = $('lkBar');
+let lk = null;
+let lkErr = 0;
+let lkWatched = 0, lkLast = null, lkDur = 0, lkFinished = false, lkOpened = false;
+let previewDur = null;
+
+function playerUrl(id, autoplay) {
+  return 'https://www.tiktok.com/player/v1/' + id +
+    '?autoplay=' + (autoplay ? 1 : 0) + '&loop=0&music_info=0&description=0&controls=1';
+}
+function lkStop() { lkFrame.src = 'about:blank'; }
+
+function fmtT(sec) { sec = Math.max(0, Math.floor(sec)); return Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0'); }
+
+function lkNeed() {
+  if (!lk) return 0;
+  if (lk.view) return lkDur > 0 ? Math.min(lk.seconds, Math.max(lkDur - 1.5, 1)) : lk.seconds;
+  if (earnKind === 'like') return lkDur > 0 ? Math.min(3, Math.max(lkDur - 0.5, 1)) : 3;
+  if (lkDur > 0) return Math.min(trendTier(), Math.max(lkDur - 1.5, 1));
+  return 0;
+}
+function trendTier() { return (lk && lk.reward) ? lk.reward : (Math.round(lkDur) >= 30 ? 30 : 10); }   // Server ပေးတဲ့ reward
+
+function lkUI() {
+  if (earnKind === 'like') { lkTime.textContent = ''; lkClaim.disabled = !lkFinished; return; }
+  const tot = (lk && (lk.view || (lk.trending && earnKind === 'watch'))) ? lkNeed() : lkDur;
+  const pct = tot > 0 ? Math.min(100, lkWatched / tot * 100) : 0;
+  lkFill.style.width = pct + '%';
+  lkTime.textContent = tot ? '⏱ ' + fmtT(lkWatched) + ' / ' + fmtT(tot) : '';
+  lkClaim.disabled = !lkFinished;
+}
+
+function lkNextState(msg) {
+  lkStatus.textContent = msg;
+  lkClaim.classList.add('next');
+  lkClaim.textContent = 'နောက်တစ်ပုဒ်';
+  lkClaim.disabled = false;
+  lkActions.classList.add('one');
+  lkWrap.hidden = true; lkStop();
+}
+
+// ---------- Like lock ----------
+let likeLockUntil = 0, likeLockTimer = null;
+try { likeLockUntil = Number(localStorage.getItem('likeLockUntil')) || 0; } catch (e) {}
+function setLikeLock(sec) {
+  likeLockUntil = Date.now() + sec * 1000;
+  try { localStorage.setItem('likeLockUntil', String(likeLockUntil)); } catch (e) {}
+}
+function likeLockLeft() { return Math.max(0, Math.ceil((likeLockUntil - Date.now()) / 1000)); }
+function showLikeLock() {
+  clearInterval(likeLockTimer);
+  lk = null;
+  lkWrap.hidden = true; lkStop();
+  lkClaim.classList.remove('next');
+  lkClaim.disabled = true;
+  lkActions.classList.add('one');
+  const tick = () => {
+    const left = likeLockLeft();
+    if (left <= 0) {
+      clearInterval(likeLockTimer);
+      if (earnKind === 'like') loadLikeTask();
+      return;
+    }
+    lkStatus.textContent = 'Like မပေးဘဲ ထပ်ခါထပ်ခါ လုပ်လို့ ခဏပိတ်ထားသည်၊ ' + fmtT(left) + ' အကြာမှ ပြန်ယူနိုင်မည်';
+    lkClaim.textContent = 'ခဏစောင့်ပါ ' + fmtT(left);
+  };
+  tick();
+  likeLockTimer = setInterval(tick, 1000);
+}
+function likeFailed(lockSec) {
+  if (lockSec > 0) { setLikeLock(lockSec); showLikeLock(); return; }
+  const mine = lk;
+  lkStatus.textContent = errText({ message: 'LIKE_NOT_FOUND' });
+  lkClaim.disabled = true;
+  setTimeout(() => { if (lk === mine && earnKind === 'like') loadLikeTask(); }, 1800);
+}
+
+async function loadLikeTask() {
+  lkWatched = 0; lkLast = null; lkDur = 0; lkFinished = false; lkOpened = false;
+  const isWatch = earnKind === 'watch';
+  const isLike = earnKind === 'like';
+  lkBar.hidden = isLike;
+  lkClaim.classList.remove('next');
+  lkClaim.textContent = 'Credit ရယူမည်';
+  lkActions.classList.add('one');
+  lkWrap.hidden = true; lkStop();
+  lkStatus.textContent = 'Video ရှာနေသည်...';
+  lkTime.textContent = '';
+  lkUI();
+  clearInterval(likeLockTimer);
+  if (isLike && likeLockLeft() > 0) { showLikeLock(); return; }
+  let data = null, error = null;
+  {
+    const r = await sb.rpc('next_order_task', { p_kind: earnKind === 'watch' ? 'view' : 'like' });
+    if (!r.error && r.data) { data = r.data; data.view = data.kind === 'view'; } else error = r.error;
+  }
+  if (error && /NO_VIDEO/.test(error.message || '')) {
+    let t = await sb.rpc('next_trending_task', { p_kind: isLike ? 'like' : 'watch' });
+    if (t.error && /NO_VIDEO/.test(t.error.message || '')) {
+      lkStatus.textContent = 'Trending Video အသစ်ရှာနေသည်...';
+      try { await sb.functions.invoke('fetch-trending'); } catch (e) {}
+      t = await sb.rpc('next_trending_task', { p_kind: isLike ? 'like' : 'watch' });
+    }
+    if (!t.error && t.data) { data = t.data; data.trending = true; error = null; }
+    else if (t.error) { error = t.error; }
+  }
+  if (error) {
+    lk = null;
+    lkStatus.textContent = errText(error);
+    lkClaim.disabled = true;
+    return;
+  }
+  lk = data;
+  $('lkReward').textContent = (lk.trending && isLike) ? '2-3' : lk.reward;
+  if (isLike) {
+    const mine = lk;
+    lkClaim.textContent = 'စစ်ဆေးရန် ပြင်ဆင်နေသည်...';
+    lkStatus.textContent = '';
+    lkFinished = false; lkUI();
+    let ok = false, locked = 0;
+    try {
+      const r = await sb.functions.invoke('verify-like', {
+        body: { action: 'start', task_id: mine.task_id, trending: !!mine.trending }
+      });
+      ok = !r.error && r.data && r.data.ok;
+      if (r.data && r.data.code === 'LOCKED') locked = r.data.wait || 180;
+    } catch (e) {}
+    if (lk !== mine) return;
+    if (locked) { setLikeLock(locked); showLikeLock(); return; }
+    if (!ok) { lkNextState('Like စစ်ဆေးရန် ပြင်ဆင်မရပါ၊ နောက်တစ်ပုဒ် ယူပါ'); return; }
+    lkFinished = true;
+    lkClaim.textContent = 'Like ပေးရန်';
+    lkStatus.textContent = 'နှိပ်ပြီး TikTok မှာ Like ပေးပါ၊ Like တကယ်ပေးမှ Credit ရမည်';
+    lkUI();
+    return;
+  }
+  lkStatus.textContent = lk.view ? 'Play နှိပ်ပြီး ' + lk.seconds + ' စက္ကန့် ကြည့်ပါ' : 'Play နှိပ်ပါ';
+  lkWrap.hidden = false;
+  lkFrame.src = playerUrl(lk.video_id, false);
+  lkUI();
+}
+
+function readPlayerMsg(e) {
+  let host = '';
+  try { host = new URL(e.origin).hostname; } catch (x) { return null; }
+  if (!/(^|\.)tiktok\.com$/i.test(host)) return null;
+  let m = e.data;
+  if (typeof m === 'string') { try { m = JSON.parse(m); } catch (x) { return null; } }
+  return (m && m['x-tiktok-player']) ? m : null;
+}
+
+window.addEventListener('message', (e) => {
+  const m = readPlayerMsg(e);
+  if (!m) return;
+
+  if (e.source === $('pvFrame').contentWindow) {
+    if (m.type === 'onCurrentTime' && m.value && m.value.duration > 0) {
+      previewDur = Math.round(m.value.duration);
+    }
+    return;
+  }
+
+  if (!lk || e.source !== lkFrame.contentWindow) return;
+  if (m.type === 'onCurrentTime' && m.value) {
+    const t = Number(m.value.currentTime), dur = Number(m.value.duration);
+    if (dur > 0) {
+      lkDur = dur; lkErr = 0;
+      if (lk.trending && earnKind === 'watch') $('lkReward').textContent = trendTier();
+    }
+    if (lkLast !== null) {
+      const d = t - lkLast;
+      if (d > 0 && d <= 2) lkWatched += d;
+    }
+    lkLast = t;
+    if (!lkFinished && lkDur > 0 && lkWatched >= lkNeed()) {
+      lkFinished = true;
+      lkStatus.textContent = earnKind === 'watch'
+        ? 'ပြီးပါပြီ ✓ Credit ရယူနိုင်ပါပြီ'
+        : 'ပြီးပါပြီ ✓ Credit ရယူမည်ကို နှိပ်ပါ၊ TikTok ထဲရောက်ရင် Like ပေးပါ';
+    }
+    lkUI();
+  } else if (m.type === 'onError') {
+    if (++lkErr <= 3) loadLikeTask();
+    else lkStatus.textContent = 'Video ဖွင့်မရပါ၊ ခဏနေမှ ပြန်ကြိုးစားပါ';
+  } else if (m.type === 'onStateChange') {
+    if (m.value !== 1) lkLast = null;
+  }
+});
+
+let lkBusy = false, lkAwayAt = 0;
+lkClaim.addEventListener('click', () => {
+  if (lkBusy) return;
+  if (lkClaim.classList.contains('next')) { loadLikeTask(); return; }
+  if (!lk) return;
+  if (earnKind === 'like' && !lkOpened) {
+    lkOpened = true; lkAwayAt = 0;
+    lkStatus.textContent = 'TikTok မှာ Like ပေးပြီး ဒီကိုပြန်လာပါ၊ Like စစ်ပြီး Credit ထည့်မည်';
+    lkClaim.textContent = 'Like ပေးပြီးပြီ၊ စစ်ဆေးမည်';
+    window.open(lk.video_url, '_blank', 'noopener');
+    return;
+  }
+  claimNow();
+});
+
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) { if (lkOpened) lkAwayAt = Date.now(); return; }
+  if (lk && earnKind === 'like' && lkOpened && lkAwayAt && Date.now() - lkAwayAt >= 3000 && !lkClaim.classList.contains('next')) {
+    lkAwayAt = 0; claimNow();
+  }
+});
+
+async function claimNow() {
+  if (lkBusy || !lk) return;
+  lkBusy = true; lkClaim.disabled = true;
+  const credit0 = credit;
+  try {
+    if (earnKind === 'like') {
+      lkStatus.textContent = 'Like စစ်ဆေးနေသည်...';
+      const r = await sb.functions.invoke('verify-like', {
+        body: { action: 'claim', task_id: lk.task_id, trending: !!lk.trending }
+      });
+      const d = r.data;
+      if (r.error || !d) { lkStatus.textContent = errText({ message: 'VERIFY_UNAVAILABLE' }); lkClaim.disabled = false; lkClaim.textContent = 'ထပ်စစ်မည်'; return; }
+      if (!d.ok) {
+        if (d.code === 'LIKE_NOT_FOUND') { likeFailed(d.lock || 0); return; }
+        if (d.code === 'LOCKED') { setLikeLock(d.wait || 180); showLikeLock(); return; }
+        const gone = /NO_TASK|ORDER_FULL|NO_BASELINE/.test(d.code || '');
+        if (gone) { lkNextState(errText({ message: d.code })); return; }
+        lkStatus.textContent = errText({ message: d.code });
+        lkClaim.disabled = false; lkClaim.textContent = 'ထပ်စစ်မည်';
+        return;
+      }
+      if (d.credit < 0) { lkNextState('ဒီ Video အတွက် Credit မရတော့ပါ၊ နောက်တစ်ပုဒ် ယူပါ'); return; }
+      setCredit(d.credit, true); refreshBonus();
+      lkNextState('+' + (lk.trending ? (d.credit - credit0) : lk.reward) + ' Credit ရပါပြီ ✓ (Like မှန်ကန်ကြောင်း စစ်ပြီး)');
+      lkFill.style.width = '0'; lkTime.textContent = '';
+      return;
+    }
+    const { data, error } = lk.trending
+      ? await sb.rpc('complete_trending_task', { p_task: lk.task_id, p_duration: Math.round(lkDur) || null })
+      : await sb.rpc('complete_order_task', {
+          p_task: lk.task_id, p_watched: Math.round(lkWatched * 10) / 10, p_dur: Math.round(lkDur * 10) / 10
+        });
+    if (error) {
+      const gone = /NO_TASK|ORDER_FULL/.test(error.message || '');
+      if (gone) lkNextState(errText(error));
+      else { lkStatus.textContent = errText(error); lkClaim.disabled = false; }
+      return;
+    }
+    if (data < 0) {
+      lkNextState('ဒီ Video အတွက် Credit မရတော့ပါ၊ နောက်တစ်ပုဒ် ယူပါ');
+      return;
+    }
+    setCredit(data, true); refreshBonus();
+    lkNextState('+' + (lk.trending ? (data - credit0) : lk.reward) + ' Credit ရပါပြီ ✓');
+    lkFill.style.width = '0'; lkTime.textContent = '';
+  } catch (e) {
+    lkStatus.textContent = errText(e); lkClaim.disabled = false;
+  } finally { lkBusy = false; }
+}
+
+// ---------- Spend credit ----------
+const usePanel    = $('usePanel');
+const useTitle    = $('useTitle');
+const linkInput   = $('videoLink');
+const chipsEl     = $('chips');
+const durChips    = $('durChips');
+const durBlock    = $('durBlock');
+const amountBlock = $('amountBlock');
+const costVal     = $('costVal');
+const doneBtn     = $('doneBtn');
+const useMsg      = $('useMsg');
+const USE_LABEL = { like: 'TikTok Like', views: 'TikTok ကြည့်ရှုမှု' };
+let service = '';
+let amount = 5;
+let viewCost = 8, viewLabel = '6 စက္ကန့်', viewSec = 6;
+let likes = 1;
+const countBlock = $('countBlock'), countChips = $('countChips');
+const previewBox = $('previewBox'), pvFrame = $('pvFrame');
+
+function cost() { return service === 'views' ? viewCost : amount; }
+function updateCost() { costVal.textContent = cost(); }
+function setMsg(text, ok) {
+  useMsg.textContent = text;
+  useMsg.className = 'msg ' + (ok ? 'ok' : 'err');
+}
+function validTikTok(url) {
+  try {
+    const u = new URL(url.trim());
+    return /(^|\.)tiktok\.com$/i.test(u.hostname);
+  } catch (e) { return false; }
+}
+
+bindTiles($('useTiles'), (v) => {
+  service = v;
+  useTitle.textContent = USE_LABEL[v];
+  durBlock.hidden    = v !== 'views';
+  amountBlock.hidden = v === 'views';
+  countBlock.hidden  = true;
+  previewBox.hidden  = true; pvFrame.src = 'about:blank'; previewDur = null;
+  setTimeout(loadDuration, 0);
+  $('amountLabel').textContent = v === 'like' ? 'Like တစ်ခုအတွက် ပေးမည့် Credit' : 'အသုံးပြုမယ့် Credit ပမာဏ';
+  $('amountNote').textContent  = v === 'like'
+    ? 'Credit များလေ တခြားသူတွေ ပိုလုပ်ချင်လေ၊ မြန်လေ ဖြစ်သည်'
+    : 'သုံးမည့် Credit များလေ ပိုမြန်လေ ဖြစ်သည်';
+  usePanel.hidden = false;
+  restart(usePanel, 'pop');
+  useMsg.textContent = '';
+  $('costNote').textContent = v === 'like' ? 'Like တစ်ခုရတိုင်း နုတ်မည်၊ Credit ကုန်ရင် Link ပိတ်မည်' : 'ကြည့်ပြီးတိုင်း နုတ်မည်၊ Credit ကုန်ရင် Link ပိတ်မည်';
+  updateCost();
+});
+
+chipsEl.addEventListener('click', (e) => {
+  const chip = e.target.closest('.chip');
+  if (!chip) return;
+  chipsEl.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  chip.classList.add('active');
+  amount = parseInt(chip.dataset.n, 10);
+  updateCost();
+});
+
+countChips.addEventListener('click', (e) => {
+  const chip = e.target.closest('.chip');
+  if (!chip) return;
+  countChips.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  chip.classList.add('active');
+  likes = parseInt(chip.dataset.c, 10);
+  updateCost();
+});
+
+function tiktokVideoId(url) {
+  const m = url.trim().match(/^https:\/\/(?:www\.)?tiktok\.com\/@[^\/?#]+\/video\/(\d{8,25})/i);
+  return m ? m[1] : null;
+}
+let resolving = false;
+async function normalizeLink() {
+  if (resolving) return;
+  let raw = linkInput.value.trim();
+  if (!raw) return;
+  if (!/^https?:\/\//i.test(raw) && /tiktok\.com/i.test(raw)) raw = 'https://' + raw;
+  let u;
+  try { u = new URL(raw); } catch (e) { return; }
+  if (!/(^|\.)tiktok\.com$/i.test(u.hostname)) return;
+
+  const id = tiktokVideoId(raw);
+  if (id) {
+    const m = raw.match(/^https:\/\/(?:www\.)?tiktok\.com\/(@[^\/?#]+)\/video\/\d+/i);
+    linkInput.value = 'https://www.tiktok.com/' + m[1] + '/video/' + id;
+  } else {
+    resolving = true; doneBtn.disabled = true;
+    setMsg('Link ကို ပြောင်းနေသည်...', true);
+    try {
+      const { data, error } = await sb.functions.invoke('resolve-tiktok', { body: { url: raw } });
+      if (error || !data || !data.url) throw error || new Error('x');
+      linkInput.value = data.url;
+      useMsg.textContent = '';
+    } catch (e) {
+      setMsg('Link ကို မပြောင်းနိုင်ပါ၊ TikTok app ထဲက Share → Copy link ကို ပြန်ထည့်ပါ', false);
+    } finally { resolving = false; doneBtn.disabled = false; }
+  }
+  loadDuration();
+}
+linkInput.addEventListener('change', normalizeLink);
+linkInput.addEventListener('paste', () => setTimeout(normalizeLink, 0));
+
+
+// ---------- Video duration limits ----------
+let durReq = 0;
+const fmtDur = (n) => n >= 60 ? Math.floor(n / 60) + ' မိနစ် ' + (n % 60 ? (n % 60) + ' စက္ကန့်' : '') : n + ' စက္ကန့်';
+function applyDurLimit() {
+  const chips = Array.from(durChips.querySelectorAll('.chip'));
+  chips.forEach(c => { c.disabled = previewDur != null && parseInt(c.dataset.sec, 10) > previewDur; });
+  const act = durChips.querySelector('.chip.active');
+  if (act && act.disabled) {
+    act.classList.remove('active');
+    const ok = chips.filter(c => !c.disabled).pop();
+    if (ok) ok.click();
+  }
+}
+async function loadDuration() {
+  const my = ++durReq;
+  previewDur = null; applyDurLimit();
+  if (service !== 'views' || !tiktokVideoId(linkInput.value)) return;
+  setMsg('Video အရှည် စစ်နေသည်...', true);
+  let d = null;
+  try {
+    const r = await sb.functions.invoke('verify-like', { body: { action: 'info', video_url: linkInput.value.trim() } });
+    if (r.data && r.data.ok && r.data.duration > 0) d = Math.round(r.data.duration);
+  } catch (e) {}
+  if (my !== durReq) return;
+  previewDur = d;
+  applyDurLimit();
+  if (d == null) setMsg('Video အရှည် စစ်မရပါ၊ ခဏနေမှ Link ကို ပြန်ထည့်ပါ', false);
+  else if (d < 6) setMsg('Video အရှည် ' + fmtDur(d) + ' — တိုလွန်းလို့ ကြည့်ရှုမှု မတင်နိုင်ပါ', false);
+  else setMsg('Video အရှည် ' + fmtDur(d) + ' — ဒီထက်ပိုရှည်တဲ့ ကြာချိန် ရွေးလို့ မရပါ', true);
+}
+
+durChips.addEventListener('click', (e) => {
+  const chip = e.target.closest('.chip');
+  if (!chip) return;
+  durChips.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  chip.classList.add('active');
+  viewCost  = parseInt(chip.dataset.cost, 10);
+  viewLabel = chip.textContent;
+  viewSec   = parseInt(chip.dataset.sec, 10);
+  updateCost();
+});
+
+doneBtn.addEventListener('click', async () => {
+  if (!service || doneBtn.disabled) return;
+  if (!validTikTok(linkInput.value) || !tiktokVideoId(linkInput.value)) {
+    setMsg('Link အပြည့်အစုံ ထည့်ပါ (https://www.tiktok.com/@name/video/...)', false);
+    return;
+  }
+  const price = cost();
+  const have = availableCredit();
+  if (have < price) {
+    setMsg('Credit မလုံလောက်ပါ (သုံးနိုင်သည့် လက်ကျန် ' + Math.max(have, 0) + ')', false);
+    return;
+  }
+  const isViews = service === 'views';
+  if (isViews) {
+    if (previewDur == null) {
+      const wanted = viewSec;
+      doneBtn.disabled = true;
+      await loadDuration();
+      doneBtn.disabled = false;
+      if (previewDur != null && viewSec !== wanted) { setMsg('Video တိုလို့ ကြာချိန်ကို ပြောင်းထားသည်၊ စစ်ပြီး ထပ်နှိပ်ပါ', false); return; }
+    }
+    if (previewDur == null) { setMsg('Video အရှည် စစ်မရပါ၊ Link မှန်မမှန် စစ်ပြီး ထပ်ကြိုးစားပါ', false); return; }
+    if (previewDur < 6)       { setMsg('Video တိုလွန်းလို့ (' + fmtDur(previewDur) + ') ကြည့်ရှုမှု မတင်နိုင်ပါ', false); return; }
+    if (viewSec > previewDur) { setMsg('Video အရှည်ထက် ကြာချိန် မများရပါ၊ ထပ်ရွေးပါ', false); return; }
+  }
+  doneBtn.disabled = true;
+  try {
+    const { data, error } = await sb.rpc('create_order', {
+      p_kind: isViews ? 'view' : 'like', p_link: linkInput.value.trim(),
+      p_reward: price, p_seconds: isViews ? viewSec : null, p_duration: previewDur
+    });
+    if (error) { setMsg(errText(error), false); return; }
+    setCredit(data);
+    setMsg('✓ တင်ပြီးပါပြီ၊ တစ်ယောက် ' + (isViews ? 'ကြည့်' : 'Like ပေး') + 'တိုင်း Credit ' + price + ' နုတ်မည်၊ Credit ကုန်ရင် Link အလိုအလျောက် ပိတ်မည်', true);
+    loadOrders();
+    linkInput.value = '';
+    previewBox.hidden = true; pvFrame.src = 'about:blank'; previewDur = null;
+  } catch (e) {
+    setMsg(errText(e), false);
+  } finally {
+    doneBtn.disabled = false;
+  }
+});
+
+// ---------- Order history ----------
+const ordersList = $('ordersList'), ordersCount = $('ordersCount');
+let myOrders = [];
+function availableCredit() { return credit; }
+
+function el(tag, cls, text) {
+  const n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (text !== undefined) n.textContent = text;
+  return n;
+}
+function canonLink(url) {
+  const m = String(url).trim().match(/^https:\/\/(?:www\.)?tiktok\.com\/(@[^\/?#]+)\/video\/(\d{8,25})/i);
+  return m ? 'https://www.tiktok.com/' + m[1] + '/video/' + m[2] : null;
+}
+
+async function loadOrders() {
+  const { data, error } = await sb.from('video_orders')
+    .select('id, kind, video_url, reward, seconds, done, status, created_at')
+    .neq('status', 'cancelled')
+    .order('created_at', { ascending: false })
+    .limit(30);
+  if (error) return;
+  myOrders = data || [];
+  renderOrders();
+}
+
+function renderOrders() {
+  ordersList.replaceChildren();
+  ordersCount.textContent = myOrders.length ? myOrders.length + ' ခု' : '';
+  if (!myOrders.length) { ordersList.appendChild(el('div', 'ord-empty', 'မှတ်တမ်း မရှိသေးပါ')); return; }
+  myOrders.forEach(o => ordersList.appendChild(orderCard(o)));
+}
+
+function orderCard(o) {
+  const card = el('div', 'ord');
+  const isView = o.kind === 'view';
+  const name = (o.video_url.match(/\/(@[^\/?#]+)/) || [])[1] || 'TikTok Video';
+  const ended = o.status === 'ended';
+  const low = o.status === 'open' && credit < o.reward;
+  const st = ended ? ['Credit ကုန်၍ ပိတ်ပြီး', 'st-done']
+           : low   ? ['Credit မလောက်', 'st-warn']
+           :         ['လုပ်ဆောင်နေ', 'st-open'];
+
+  const top = el('div', 'ord-top');
+  const a = el('a', 'ord-name', (isView ? '👁 ' : '♥ ') + name);
+  a.href = o.video_url; a.target = '_blank'; a.rel = 'noopener noreferrer';
+  top.append(a, el('span', 'badge ' + st[1], st[0]));
+
+  const meta = el('div', 'ord-meta',
+    (isView ? 'ကြည့်ရှုမှု ' + o.done + ' · ' + o.seconds + ' စက္ကန့် · ' : 'Like ' + o.done + ' · ') +
+    'တစ်ခုကို ' + o.reward + ' Credit · သုံးပြီး ' + (o.done * o.reward));
+
+  const act = el('div', 'ord-act');
+  const delBtn = el('button', 'del', ended ? 'ဖယ်ရှားမည်' : 'ဖျက်မည်');
+  delBtn.type = 'button';
+  const editBtn = (!isView && o.status === 'open') ? el('button', '', 'ပြင်မည်') : null;
+  if (editBtn) { editBtn.type = 'button'; act.append(editBtn); }
+  act.append(delBtn);
+
+  delBtn.addEventListener('click', async () => {
+    if (!ended && !confirm('ဒီမှတ်တမ်းကို ဖျက်မလား?\nLink ကို မပြတော့ပါ၊ ပေးပြီးသား Credit ပြန်မရပါ')) return;
+    delBtn.disabled = true;
+    const { error } = await sb.rpc('cancel_order', { p_id: o.id });
+    if (error) { delBtn.disabled = false; alert(errText(error)); return; }
+    loadOrders();
+  });
+
+  card.append(top, meta, act);
+  if (editBtn) {
+    const form = buildEditForm(o);
+    form.hidden = true;
+    editBtn.addEventListener('click', () => { form.hidden = !form.hidden; });
+    card.append(form);
+  }
+  return card;
+}
+
+function buildEditForm(o) {
+  const f = el('div', 'ord-edit');
+  const l1 = el('label', '', 'Like တစ်ခုအတွက် Credit');
+  const sel = el('select', 'text');
+  for (let i = 3; i <= 10; i++) {
+    const op = el('option', '', String(i)); op.value = i; if (i === o.reward) op.selected = true;
+    sel.appendChild(op);
+  }
+  l1.appendChild(sel);
+
+  const l3 = el('label', '', o.done > 0 ? 'Video Link (Like ရပြီးသားမို့ မပြင်နိုင်ပါ)' : 'Video Link');
+  const link = el('input', 'text');
+  link.type = 'url'; link.value = o.video_url; link.disabled = o.done > 0;
+  l3.appendChild(link);
+
+  const btns = el('div', 'ord-row');
+  const save = el('button', 'btn-primary', 'သိမ်းမည်');
+  const cancel = el('button', 'btn-primary', 'မလုပ်တော့ပါ');
+  save.type = cancel.type = 'button';
+  save.style.margin = cancel.style.margin = '0';
+  save.style.padding = cancel.style.padding = '9px';
+  save.style.fontSize = cancel.style.fontSize = '14px';
+  cancel.style.background = '#fff'; cancel.style.color = 'var(--ink)';
+  cancel.style.boxShadow = 'none'; cancel.style.border = '1.5px solid var(--line)';
+  btns.append(save, cancel);
+
+  const msg = el('div', 'msg');
+  const fail = (t) => { msg.textContent = t; msg.className = 'msg err'; };
+  cancel.addEventListener('click', () => { f.hidden = true; msg.textContent = ''; });
+  save.addEventListener('click', async () => {
+    const r = parseInt(sel.value, 10);
+    let newLink = null;
+    if (o.done === 0 && link.value.trim() !== o.video_url) {
+      newLink = canonLink(link.value);
+      if (!newLink) return fail('Link အပြည့်အစုံ ထည့်ပါ (…/@name/video/…)');
+    }
+    if (credit < r) return fail('Credit မလုံလောက်ပါ');
+    save.disabled = true;
+    const { error } = await sb.rpc('update_order', { p_id: o.id, p_reward: r, p_link: newLink });
+    save.disabled = false;
+    if (error) return fail(/NO_TASK/.test(error.message || '') ? 'ဒီမှတ်တမ်း မရှိတော့ပါ' : errText(error));
+    loadOrders();
+  });
+
+  f.append(l1, l3, btns, msg);
+  return f;
+}
+
+// ===== Admin =====
+let myId = null, isAdm = false;
+async function checkAdmin() {
+  try {
+    const { data } = await sb.rpc('is_admin');
+    isAdm = !!data;
+    $('fbBox').hidden = isAdm;
+    $('adminTab').hidden = !data;
+    if (data) { admFbLoad(); admVipLoad(); }
+    $('appTabs').style.gridTemplateColumns = data ? 'repeat(3, 1fr)' : '';
+  } catch (e) {}
+}
+const admList = $('admList'), admMsg = $('admMsg'), admQ = $('admQ');
+function admSay(t, ok) { admMsg.textContent = t; admMsg.className = 'msg adm-status ' + (ok ? 'ok' : 'err'); }
+
+let admTok = 0, admRows = [], admShown = 0;
+const ADM_PAGE = 20;
+const admMore = $('admMore');
+function admRender() {
+  const next = admRows.slice(admShown, admShown + ADM_PAGE);
+  next.forEach(u => admList.appendChild(admCard(u)));
+  admShown += next.length;
+  const left = admRows.length - admShown;
+  admMore.hidden = left <= 0;
+  admMore.textContent = 'နောက်ထပ်ကြည့်မည် (ကျန် ' + left + ' ဦး)';
+}
+admMore.addEventListener('click', admRender);
+async function admSearchUsers() {
+  const my = ++admTok;
+  const { data, error } = await sb.rpc('admin_list_users', { p_search: admQ.value.trim() || null });
+  if (my !== admTok) return;                       // နောက်ဆုံးရိုက်တာကိုသာ ပြ
+  if (error) { admSay('ယူမရပါ (' + (error.message || '') + ')', false); return; }
+  admList.replaceChildren();
+  admRows = data; admShown = 0; admMore.hidden = true;
+  if (!data.length) { admSay('', true); admList.appendChild(el('div', 'ord-empty', 'User မတွေ့ပါ')); return; }
+  admSay('User ' + data.length + ' ဦး · နာမည်ကို နှိပ်ပြီး ဖွင့်ပါ', true);
+  admRender();
+  if (data.length === 1) admList.firstChild.admToggle(true);   // တစ်ယောက်တည်းဆို အလိုအလျောက် ဖွင့်
+}
+async function admLoad() {
+  admSay('', true);
+  admFbLoad();
+  admVipLoad();
+  creditListLoad(true);
+  await admSearchUsers();
+}
+const clList = $('clList'), clSum = $('clSum'), clMore = $('clMore');
+const CL_PAGE = 50;
+let clOffset = 0;
+const fmtNum = (n) => Number(n || 0).toLocaleString('en-US');
+async function creditListLoad(reset) {
+  if (reset) { clOffset = 0; clList.replaceChildren(); }
+  clMore.disabled = true;
+  const { data, error } = await sb.rpc('admin_credit_list', { p_limit: CL_PAGE, p_offset: clOffset });
+  if (error || !Array.isArray(data)) {
+    clSum.textContent = 'စာရင်း ယူမရပါ';
+    clMore.hidden = true;
+    return;
+  }
+  if (data.length) { $('clUsers').textContent = fmtNum(data[0].total_users); $('clTotal').textContent = fmtNum(data[0].total_credit); }
+  data.forEach((u, i) => {
+    const row = el('div', 'cl-row cl-go');
+    row.addEventListener('click', () => { admQ.value = u.username || ''; admGoUser(); });
+    row.append(el('span', 'cl-rank', String(clOffset + i + 1)), el('span', 'cl-name', u.username || '-'), el('b', 'cl-credit', fmtNum(u.credit)));
+    clList.appendChild(row);
+  });
+  clOffset += data.length;
+  clMore.hidden = data.length < CL_PAGE;
+  clMore.disabled = false;
+  if (!clOffset) { clList.appendChild(el('div', 'ord-empty', 'User မရှိသေးပါ')); }
+}
+clMore.addEventListener('click', () => creditListLoad(false));
+$('admSearch').addEventListener('click', admLoad);
+admQ.addEventListener('keydown', e => { if (e.key === 'Enter') admLoad(); });
+// ---- Admin sub-tabs ----
+const admPanes = { user: $('admPane-user'), credit: $('admPane-credit'), mail: $('admPane-mail'), fb: $('admPane-fb'), vip: $('admPane-vip'), popup: $('admPane-popup') };
+bindTabs($('admTabs'), (d) => {
+  for (const k in admPanes) admPanes[k].hidden = k !== d.pane;
+  if (d.pane === 'vip') admVipLoad();
+  if (d.pane === 'popup') pmAdminFill();
+});
+function admGoUser() {                              // Credit စာရင်းကနေ နာမည်နှိပ်ရင် User tab ကို ပြောင်းပြီး ရှာ
+  $('admTabs').querySelector('[data-pane="user"]').click();
+  admSearchUsers();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+let admTimer = null;
+admQ.addEventListener('input', () => { clearTimeout(admTimer); admTimer = setTimeout(admSearchUsers, 300); });   // ရိုက်ရင်း ရှာ
+
+function admCard(u) {
+  const card = el('div', 'ord adm-card');
+  const top = el('button', 'ord-top adm-head');
+  top.type = 'button'; top.setAttribute('aria-expanded', 'false');
+  const badge = el('span', 'badge st-open', u.credit + ' Credit');
+  top.append(el('span', 'ord-name', u.username), badge, el('span', 'adm-chev', '▾'));
+  const body = el('div', 'adm-body'); body.hidden = true;
+  const setOpen = (o) => { body.hidden = !o; card.classList.toggle('adm-open', o); top.setAttribute('aria-expanded', String(o)); };
+  card.admToggle = setOpen;
+
+  const inp = el('input', 'text');
+  inp.type = 'number'; inp.inputMode = 'numeric'; inp.placeholder = 'Credit ပမာဏ';
+  inp.classList.add('adm-amt'); inp.setAttribute('aria-label', 'Credit ပမာဏ');
+
+  const act = el('div', 'ord-act adm-act');
+  const add = el('button', '', 'ထည့်မည် (+)');
+  const set = el('button', '', 'သတ်မှတ် (=)');
+  const pw  = el('button', '', 'Password');
+  const vp  = el('button', '', '👑 VIP ဖွင့်ပေးမည်');
+  [add, set, pw, vp].forEach(b => b.type = 'button');
+  add.classList.add('pri'); set.classList.add('pri'); vp.classList.add('vip', 'wide');
+  act.append(add, set, pw, vp);
+
+  const msg = el('div', 'msg');
+  const say = (t, ok) => { msg.textContent = t; msg.className = 'msg ' + (ok ? 'ok' : 'err'); };
+  const done = (v) => {
+    badge.textContent = v + ' Credit'; u.credit = v; inp.value = '';
+    say('✓ ပြီးပါပြီ', true);
+    if (u.id === myId) setCredit(v, true);
+    creditListLoad(true);
+  };
+  const num = () => { const n = parseInt(inp.value, 10); if (isNaN(n)) { say('ပမာဏ ထည့်ပါ', false); return null; } return n; };
+
+  vp.addEventListener('click', async () => {
+    if (!confirm((u.username || 'User') + ' ကို VIP ဖွင့်ပေးမလား? (Mail Box ထဲ လက်ဆောင်ရောက်မည်)')) return;
+    vp.disabled = true;
+    const { error } = await sb.rpc('admin_vip_action', { p_user: u.id, p_action: 'grant' });
+    vp.disabled = false;
+    if (error) { say('မအောင်မြင်ပါ (' + errText(error) + ')', false); return; }
+    say('✓ VIP လက်ဆောင် ပို့ပြီးပါပြီ', true);
+    admVipLoad();
+  });
+  add.addEventListener('click', async () => {
+    const n = num(); if (n === null) return;
+    const { data, error } = await sb.rpc('admin_adjust_credit', { p_user: u.id, p_delta: n });
+    error ? say('မအောင်မြင်ပါ (' + (error.message || '') + ')', false) : done(data);
+  });
+  set.addEventListener('click', async () => {
+    const n = num(); if (n === null) return;
+    if (n < 0) { say('0 နှင့်အထက် ထည့်ပါ', false); return; }
+    const { data, error } = await sb.rpc('admin_set_credit', { p_user: u.id, p_credit: n });
+    error ? say('မအောင်မြင်ပါ (' + (error.message || '') + ')', false) : done(data);
+  });
+  pw.addEventListener('click', async () => {
+    const v = prompt(u.username + ' ၏ စကားဝှက်အသစ် (အနည်းဆုံး ၆ လုံး)');
+    if (!v) return;
+    if (v.length < 6) { say('အနည်းဆုံး ၆ လုံး ထည့်ပါ', false); return; }
+    const { error } = await sb.rpc('admin_set_password', { p_user: u.id, p_password: v });
+    error ? say('မအောင်မြင်ပါ (' + (error.message || '') + ')', false) : say('✓ စကားဝှက် ပြောင်းပြီးပါပြီ', true);
+  });
+
+  body.append(inp, act, msg);
+  card.append(top, body);
+  top.addEventListener('click', () => {
+    const open = body.hidden;
+    if (open) admList.querySelectorAll('.adm-card.adm-open').forEach(c => c.admToggle(false));   // တစ်ခုပဲ ဖွင့်
+    setOpen(open);
+  });
+  return card;
+}
+
+// ================= Mail Box =================
+const mailBtn = $('mailBtn'), mailBadge = $('mailBadge'), mailModal = $('mailModal'), mailList = $('mailList');
+function fmtDate(str) {
+  const d = new Date(str);
+  if (isNaN(d)) return '';
+  return d.toLocaleDateString() + ' ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+}
+let giftPending = 0;
+function setMailBadge(n) { n += giftPending; mailBadge.hidden = n === 0; mailBadge.textContent = n > 9 ? '9+' : String(n); }
+async function loadMail(show) {
+  let res, gres;
+  try {
+    [res, gres] = await Promise.all([sb.rpc('my_inbox'), sb.rpc('my_vip_gifts').then(r => r, e => ({ error: e }))]);
+  } catch (e) { res = { error: e }; }
+  const { data, error } = res;
+  if (error || !Array.isArray(data)) {
+    if (show) mailList.replaceChildren(el('div', 'ord-empty', 'စာများ မယူနိုင်ပါ'));
+    return false;
+  }
+  const gifts = (gres && Array.isArray(gres.data)) ? gres.data : [];
+  giftPending = gifts.filter(g => !g.claimed_at).length;
+  setMailBadge(data.filter(m => !m.is_read).length);
+  if (show) {
+    mailList.replaceChildren();
+    if (!data.length && !gifts.length) mailList.appendChild(el('div', 'ord-empty', 'စာ မရှိသေးပါ'));
+    gifts.forEach(g => {
+      const c = el('div', 'mail-item vip-gift' + (g.claimed_at ? '' : ' unread'));
+      c.append(el('b', '', '👑 VIP လက်ဆောင်ရယူရန်'),
+        el('p', '', g.claimed_at ? 'ရယူပြီးပါပြီ ✓' : 'Credit 1,000 + 300 နှင့် VIP Border ကို ရယူပါ'),
+        el('small', '', fmtDate(g.created_at)));
+      if (!g.claimed_at) {
+        const gb = el('button', 'btn-gold', '🎁 VIP လက်ဆောင် ယူမည်'); gb.type = 'button';
+        gb.addEventListener('click', () => claimVipGift(gb));
+        c.appendChild(gb);
+      }
+      mailList.appendChild(c);
+    });
+    data.forEach(m => {
+      const c = el('div', 'mail-item' + (m.is_read ? '' : ' unread'));
+      c.append(el('b', '', m.title), el('p', '', m.body), el('small', '', fmtDate(m.created_at)));
+      mailList.appendChild(c);
+    });
+  }
+  return true;
+}
+mailBtn.addEventListener('click', async () => {
+  mailModal.hidden = false;
+  document.body.classList.add('modal-open');
+  $('mailClose').focus();
+  mailList.replaceChildren(el('div', 'ord-empty', 'ယူနေသည်...'));
+  await loadMe();
+  const ok = await loadMail(true);
+  if (ok) {
+    const { error } = await sb.rpc('mark_inbox_read');
+    if (!error) setMailBadge(0);
+  }
+});
+function closeMail() {
+  if (mailModal.hidden) return;
+  mailModal.hidden = true;
+  document.body.classList.remove('modal-open');
+  mailBtn.focus();
+}
+$('mailClose').addEventListener('click', closeMail);
+mailModal.addEventListener('click', (e) => { if (e.target === mailModal) closeMail(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMail(); });
+let mailTimer = null;
+function startMailPolling() {
+  loadMail(false);
+  if (!mailTimer) mailTimer = setInterval(() => { if (!appScreen.hidden && mailModal.hidden) { loadMail(false); loadMe(); if (isAdm) { admFbLoad(); admVipLoad(); } } }, 60000);
+}
+
+async function admSendMail(userId, say, btn, src) {
+  const tEl = src ? src.t : $('admMailTitle'), bEl = src ? src.b : $('admMailBody');
+  const t = tEl.value.trim(), b = bEl.value.trim();
+  if (!t || !b) { say('ခေါင်းစဉ်နှင့် စာအကြောင်းအရာ ထည့်ပါ', false); return; }
+  if (!userId && !confirm('User အားလုံးဆီ ပို့မလား?')) return;
+  if (btn) btn.disabled = true;
+  const { data, error } = await sb.rpc('admin_send_message', { p_user: userId, p_title: t, p_body: b });
+  if (btn) btn.disabled = false;
+  if (error) { say('မအောင်မြင်ပါ (' + errText(error) + ')', false); return; }
+  say('✓ စာပို့ပြီးပါပြီ (' + data + ' ဦး)', true);
+  tEl.value = ''; bEl.value = '';
+  return true;
+}
+// ---- စာပို့ tab: User အားလုံး / User တစ်ယောက် + 🎁 Credit လက်ဆောင် ----
+const mailToEl = $('mailTo'), mailWho = $('mailWho'), mailUser = $('mailUser'), mailSug = $('mailSug'), mailPicked = $('mailPicked');
+const mailGift = $('mailGift'), mgBtn = $('mgBtn'), mgPanel = $('mgPanel'), mgAmt = $('mgAmt'), mgSub = $('mgSub');
+const mailSend = $('admMailAll'), mailMsg = $('admMailMsg');
+let mailMode = 'all', mailTarget = null, mailSugTok = 0, mailSugTimer = null;
+const mailSay = (t, ok) => { mailMsg.textContent = t; mailMsg.className = 'msg ' + (ok ? 'ok' : 'err'); };
+const giftAmt = () => { const n = parseInt(mgAmt.value, 10); return n > 0 ? n : 0; };
+
+function mailRefresh() {
+  const one = mailMode === 'one';
+  mailToEl.querySelectorAll('button').forEach(b => { const on = b.dataset.to === mailMode; b.classList.toggle('on', on); b.setAttribute('aria-selected', String(on)); });
+  mailWho.hidden = !one;
+  mailGift.hidden = !one;
+  const g = one ? giftAmt() : 0;
+  mailGift.classList.toggle('has', g > 0);
+  mgSub.textContent = g > 0 ? '🎁 ' + fmtNum(g) + ' Credit လက်ဆောင် ပါမည်' : 'နှိပ်ပြီး ပမာဏ ထည့်ပါ (မထည့်လည်း ရ)';
+  mailSend.textContent = !one ? 'User အားလုံးသို့ ပို့မည်'
+    : (mailTarget ? mailTarget.username + ' ဆီ ပို့မည်' : 'User ကို အရင်ရွေးပါ') + (g > 0 ? ' + 🎁 ' + fmtNum(g) : '');
+  $('mailNote').hidden = one && !!mailTarget;
+}
+function mailPick(u) {
+  mailTarget = u;
+  mailSug.hidden = true; mailSug.replaceChildren();
+  mailUser.hidden = true; mailUser.value = '';
+  mailPicked.hidden = false;
+  const x = el('button', '', '✕'); x.type = 'button'; x.setAttribute('aria-label', 'ပြောင်းရန်');
+  x.addEventListener('click', () => { mailTarget = null; mailPicked.hidden = true; mailUser.hidden = false; mailUser.focus(); mailRefresh(); });
+  mailPicked.replaceChildren(el('b', '', u.username), el('small', '', fmtNum(u.credit) + ' Credit'), x);
+  mailRefresh();
+}
+async function mailSuggest() {
+  const q = mailUser.value.trim();
+  const my = ++mailSugTok;
+  if (!q) { mailSug.hidden = true; mailSug.replaceChildren(); return; }
+  const { data, error } = await sb.rpc('admin_list_users', { p_search: q });
+  if (my !== mailSugTok) return;
+  mailSug.replaceChildren();
+  mailSug.hidden = false;
+  if (error || !Array.isArray(data)) { mailSug.appendChild(el('div', 'ms-empty', 'ရှာမရပါ')); return; }
+  if (!data.length) { mailSug.appendChild(el('div', 'ms-empty', 'User မတွေ့ပါ')); return; }
+  data.slice(0, 8).forEach(u => {
+    const b = el('button'); b.type = 'button';
+    b.append(el('span', 'ms-name', u.username || '-'), el('span', 'ms-cr', fmtNum(u.credit) + ' Credit'));
+    b.addEventListener('click', () => mailPick(u));
+    mailSug.appendChild(b);
+  });
+}
+mailToEl.addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b) return;
+  mailMode = b.dataset.to; mailSay('', true); mailRefresh();
+  if (mailMode === 'one' && !mailTarget) mailUser.focus();
+});
+mailUser.addEventListener('input', () => { clearTimeout(mailSugTimer); mailSugTimer = setTimeout(mailSuggest, 250); });
+mailUser.addEventListener('keydown', (e) => {
+  if (e.key !== 'Enter') return;
+  e.preventDefault();
+  const first = mailSug.querySelector('button');
+  if (first) first.click();
+});
+mgBtn.addEventListener('click', () => {
+  const open = mgPanel.hidden;
+  mgPanel.hidden = !open;
+  mailGift.classList.toggle('open', open);
+  mgBtn.setAttribute('aria-expanded', String(open));
+  if (open) mgAmt.focus();
+});
+mgAmt.addEventListener('input', mailRefresh);
+$('mgChips').addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b) return;
+  mgAmt.value = String(giftAmt() + Number(b.dataset.n));
+  mailRefresh();
+});
+$('mgClear').addEventListener('click', () => { mgAmt.value = ''; mailRefresh(); });
+mailRefresh();
+
+mailSend.addEventListener('click', async () => {
+  if (mailMode === 'all') {
+    admSendMail(null, mailSay, mailSend);
+    return;
+  }
+  if (!mailTarget) { mailSay('User နာမည် ရှာပြီး ရွေးပါ', false); mailUser.focus(); return; }
+  const u = mailTarget, g = giftAmt();
+  const tEl = $('admMailTitle'), bEl = $('admMailBody');
+  const t = tEl.value.trim(); let b = bEl.value.trim();
+  if (!t || !b) { mailSay('ခေါင်းစဉ်နှင့် စာအကြောင်းအရာ ထည့်ပါ', false); return; }
+  if (g > 0 && !confirm(u.username + ' ကို 🎁 Credit ' + fmtNum(g) + ' လက်ဆောင်နဲ့ စာပို့မလား?')) return;
+  mailSend.disabled = true;
+  try {
+    let newCredit = null;
+    if (g > 0) {                                     // လက်ဆောင် Credit ကို အရင်ထည့် — မအောင်ရင် စာမပို့
+      const r = await sb.rpc('admin_adjust_credit', { p_user: u.id, p_delta: g });
+      if (r.error) { mailSay('Credit မထည့်နိုင်ပါ (' + errText(r.error) + ')', false); return; }
+      newCredit = r.data;
+      u.credit = newCredit;
+      if (u.id === myId) setCredit(newCredit, true);
+      b = b + '\n\n🎁 လက်ဆောင် Credit ' + fmtNum(g) + ' ကို သင့်ဆီ ထည့်ပေးထားပါပြီ';
+    }
+    const m = await sb.rpc('admin_send_message', { p_user: u.id, p_title: (g > 0 ? '🎁 ' : '') + t, p_body: b });
+    if (m.error) {
+      mailSay((g > 0 ? 'Credit ' + fmtNum(g) + ' ထည့်ပြီးပါပြီ၊ ဒါပေမဲ့ ' : '') + 'စာ မပို့နိုင်ပါ (' + errText(m.error) + ')', false);
+      if (g > 0) { mgAmt.value = ''; mailPick(u); creditListLoad(true); }
+      return;
+    }
+    mailSay('✓ ' + u.username + ' ဆီ စာပို့ပြီးပါပြီ' + (g > 0 ? ' · 🎁 Credit ' + fmtNum(g) + ' လက်ဆောင်ပေးပြီး (လက်ကျန် ' + fmtNum(newCredit) + ')' : ''), true);
+    tEl.value = ''; bEl.value = ''; mgAmt.value = '';
+    mgPanel.hidden = true; mailGift.classList.remove('open'); mgBtn.setAttribute('aria-expanded', 'false');
+    mailPick(u);
+    if (g > 0) { creditListLoad(true); admSearchUsers(); }
+  } finally {
+    mailSend.disabled = false;
+  }
+});
+
+
+// ---------- User → Admin messages ----------
+$('fbSend').addEventListener('click', async () => {
+  const ta = $('fbBody'), msg = $('fbMsg'), b = ta.value.trim();
+  const say = (t, ok) => { msg.textContent = t; msg.className = 'msg ' + (ok ? 'ok' : 'err'); };
+  if (!b) { say('စာရေးပါ', false); return; }
+  $('fbSend').disabled = true;
+  const { error } = await sb.rpc('send_feedback', { p_body: b });
+  $('fbSend').disabled = false;
+  if (error) { say(errText(error), false); return; }
+  ta.value = '';
+  say('✓ Admin ဆီ ပို့ပြီးပါပြီ', true);
+});
+
+// ---------- Admin: user messages ----------
+async function admFbLoad() {
+  let res;
+  try { res = await sb.rpc('admin_list_feedback'); } catch (e) { return; }
+  const data = res.data;
+  if (res.error || !Array.isArray(data)) return;
+  const unread = data.filter(f => !f.is_read).length;
+  $('adminTab').textContent = unread ? 'Admin (' + unread + ')' : 'Admin';
+  $('admFbCount').textContent = unread > 9 ? '9+' : String(unread); $('admFbCount').hidden = !unread;
+  const box = $('admFb');
+  box.replaceChildren();
+  if (!data.length) { box.appendChild(el('div', 'ord-empty', 'စာ မရှိသေးပါ')); return; }
+  data.forEach(f => box.appendChild(admFbCard(f)));
+}
+function admFbCard(f) {
+  const c = el('div', 'mail-item' + (f.is_read ? '' : ' unread'));
+  const head = el('div', 'adm-mi-head');
+  head.append(el('b', '', f.username || 'User'), el('small', '', fmtDate(f.created_at)));
+  c.append(head, el('p', '', f.body));
+  const act = el('div', 'ord-act');
+  const rp = el('button', '', 'ပြန်စာ'), rd = el('button', '', 'ဖတ်ပြီး'), dl = el('button', 'del', 'ဖျက်');
+  [rp, rd, dl].forEach(b => b.type = 'button');
+  rd.hidden = !!f.is_read;
+  act.append(rp, rd, dl);
+  const msg = el('div', 'msg');
+  const say = (t, ok) => { msg.textContent = t; msg.className = 'msg ' + (ok ? 'ok' : 'err'); };
+  rp.addEventListener('click', async () => {
+    const v = prompt((f.username || 'User') + ' ကို ပြန်စာ');
+    if (!v || !v.trim()) return;
+    const r = await sb.rpc('admin_send_message', { p_user: f.user_id, p_title: 'Admin ပြန်စာ', p_body: v });
+    if (r.error) { say('မအောင်မြင်ပါ (' + errText(r.error) + ')', false); return; }
+    await sb.rpc('admin_mark_feedback', { p_id: f.id });
+    admFbLoad();
+  });
+  rd.addEventListener('click', async () => {
+    const r = await sb.rpc('admin_mark_feedback', { p_id: f.id });
+    r.error ? say('မအောင်မြင်ပါ', false) : admFbLoad();
+  });
+  dl.addEventListener('click', async () => {
+    if (!confirm('ဒီစာကို ဖျက်မလား?')) return;
+    const r = await sb.rpc('admin_delete_feedback', { p_id: f.id });
+    r.error ? say('မအောင်မြင်ပါ', false) : admFbLoad();
+  });
+  c.append(act, msg);
+  return c;
+}
+
+// ===== Gift box =====
+const giftCard = $('giftCard'), giftBtn = $('giftBtn');
+let giftReady = 0, giftReward = 50, giftBusy = false;
+async function refreshBonus() {
+  let res;
+  try { res = await sb.rpc('my_bonus'); } catch (e) { return; }
+  const d = res.data;
+  if (res.error || !d) return;
+  const goal = d.goal || 30;
+  giftReward = d.reward || 50;
+  giftReady = d.ready || 0;
+  const prog = (d.done || 0) % goal;
+  giftCard.hidden = false;
+  giftCard.classList.toggle('ready', giftReady > 0);
+  $('giftCount').textContent = giftReady > 0 ? '×' + giftReady : prog + '/' + goal;
+  $('giftFill').style.width = (giftReady > 0 ? 100 : prog / goal * 100) + '%';
+  $('giftSub').textContent = giftReady > 0
+    ? 'နှိပ်ပြီး ဖွင့်ပါ၊ Credit ' + giftReward + ' ရမည်'
+    : 'Task ' + goal + ' ပြီးတိုင်း Bonus Credit ' + giftReward + ' (ကျန် ' + (goal - prog) + ')';
+}
+giftBtn.addEventListener('click', async () => {
+  if (giftBusy) return;
+  if (giftReady <= 0) { restart(giftBtn, 'pop'); return; }
+  giftBusy = true;
+  giftCard.classList.add('opening');
+  const { data, error } = await sb.rpc('open_gift');
+  await new Promise(r => setTimeout(r, 500));
+  giftCard.classList.remove('opening');
+  giftBusy = false;
+  if (error) { $('giftSub').textContent = errText(error); refreshBonus(); return; }
+  setCredit(data, true);
+  const pop = el('div', 'gift-pop', '+' + giftReward);
+  document.body.appendChild(pop);
+  setTimeout(() => pop.remove(), 1400);
+  refreshBonus();
+});
+
+// ================= Login / Register =================
+const authScreen = $('authScreen');
+const appScreen  = $('appScreen');
+const loginPanel = $('loginPanel');
+const regPanel   = $('registerPanel');
+
+function authMsg(id, text, ok) {
+  const el = $(id);
+  el.textContent = text;
+  el.className = 'msg ' + (ok ? 'ok' : 'err');
+}
+
+// Do not change: existing accounts are keyed by this mapping.
+async function nameToEmail(name) {
+  const key = name.trim().normalize('NFC').toLowerCase();
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(key));
+  const hex = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+  return 'u' + hex.slice(0, 40) + '@gmail.com';
+}
+
+function passProblem(p) {
+  if (p.length < 6) return 'စကားဝှက် အနည်းဆုံး ၆ လုံးထည့်ပါ';
+  if (!/[a-z]/.test(p) || !/[A-Z]/.test(p) || !/[0-9]/.test(p))
+    return 'စကားဝှက်မှာ English စာလုံးကြီး (A-Z)၊ စာလုံးသေး (a-z)၊ ဂဏန်း (0-9) ပါရပါမယ် — ဥပမာ Abc234';
+  return '';
+}
+
+async function nameExists(email) {
+  try {
+    const { data, error } = await sb.rpc('auth_email_exists', { p_email: email });
+    if (error) { console.warn('auth_email_exists:', error); return null; }
+    return data === true;
+  } catch (e) { return null; }
+}
+
+function fail(id, userMsg, detail) {
+  if (detail) console.error('[auth]', detail);
+  authMsg(id, userMsg, false);
+}
+
+let enterErr = null;
+function errSuffix() { return enterErr ? ' [' + (enterErr.code || enterErr.message || '') + ']' : ''; }
+
+function loadProfile(user) {
+  return sb.from('profiles').select('username, credit').eq('id', user.id).maybeSingle();
+}
+
+async function enterApp(user) {
+  enterErr = null;
+  let { data, error } = await loadProfile(user);
+  if (!error && !data) {
+    const r = await sb.rpc('ensure_profile');
+    if (r.error) error = r.error;
+    else ({ data, error } = await loadProfile(user));
+  }
+  if (error || !data) {
+    enterErr = error || { message: 'no profile' };
+    console.error('enterApp failed:', enterErr);
+    return false;
+  }
+  $('who').textContent = data.username;
+  try { myName = data.username; me = null; paintMe(); loadMe().catch(() => {}); } catch (e) { console.error('profile paint:', e); }
+  setCredit(data.credit);
+  myId = user.id; checkAdmin();
+  startMailPolling(); refreshBonus();
+  authScreen.hidden = true;
+  appScreen.hidden = false;
+  window.scrollTo(0, 0);
+  restart($('coin'), 'drop');
+  return true;
+}
+
+function showPanel(panel) {
+  [loginPanel, regPanel].forEach(p => p.classList.remove('show'));
+  panel.classList.add('show');
+}
+
+bindTabs($('authTabs'), (d) => {
+  $('loginMsg').textContent = '';
+  $('regMsg').textContent = '';
+  showPanel(d.mode === 'login' ? loginPanel : regPanel);
+});
+
+$('loginBtn').addEventListener('click', async () => {
+  const btn  = $('loginBtn');
+  const name = $('loginName').value.trim();
+  const pass = $('loginPass').value;
+  if (!name || !pass) { authMsg('loginMsg', 'နာမည်နှင့် စကားဝှက်ကို ထည့်ပါ', false); return; }
+  btn.disabled = true;
+  try {
+    const email = await nameToEmail(name);
+    const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+    if (error) {
+      if (error.code === 'invalid_credentials' || /invalid login/i.test(error.message || '')) {
+        const exists = await nameExists(email);
+        authMsg('loginMsg',
+          exists === false ? 'ဒီနာမည်နဲ့ အကောင့် မရှိပါ'
+          : exists === true ? 'စကားဝှက် မှားနေပါသည်'
+          : 'နာမည် သို့မဟုတ် စကားဝှက် မှားနေပါသည်', false);
+      } else {
+        fail('loginMsg', 'အကောင့်ဝင်မရပါ၊ ထပ်ကြိုးစားပါ', error);
+      }
+      return;
+    }
+    $('loginPass').value = '';
+    if (!(await enterApp(data.user))) authMsg('loginMsg', 'အချက်အလက် ရယူမရပါ၊ ထပ်ကြိုးစားပါ' + errSuffix(), false);
+  } catch (e) {
+    fail('loginMsg', 'ချိတ်ဆက်မှု မအောင်မြင်ပါ၊ ထပ်ကြိုးစားပါ', e);
+  } finally { btn.disabled = false; }
+});
+
+$('regBtn').addEventListener('click', async () => {
+  const btn   = $('regBtn');
+  const name  = $('regName').value.trim();
+  const pass  = $('regPass').value;
+  const pass2 = $('regPass2').value;
+
+  if (name.length < 3)  { authMsg('regMsg', 'နာမည် အနည်းဆုံး ၃ လုံးထည့်ပါ', false); return; }
+  if (name.length > 20) { authMsg('regMsg', 'နာမည် အများဆုံး ၂၀ လုံးသာ ထည့်နိုင်ပါသည်', false); return; }
+  const pp = passProblem(pass);
+  if (pp)               { authMsg('regMsg', pp, false); return; }
+  if (pass !== pass2)  { authMsg('regMsg', 'စကားဝှက် နှစ်ခု မတူပါ', false); return; }
+
+  btn.disabled = true;
+  try {
+    const TAKEN = 'ဒီနာမည်ကို အသုံးပြုပြီးသားပါ၊ တခြားနာမည် ရွေးပါ';
+    const email = await nameToEmail(name);
+
+    if (await nameExists(email) === true) { authMsg('regMsg', TAKEN, false); return; }
+
+    const { data, error } = await sb.auth.signUp({
+      email,
+      password: pass,
+      options: { data: { username: name, display_name: name, full_name: name, name: name } }
+    });
+    if (error) {
+      const c = error.code || '', t = error.message || '';
+      if (c === 'user_already_exists' || /already|registered/i.test(t)) authMsg('regMsg', TAKEN, false);
+      else if (c === 'weak_password') fail('regMsg', 'စကားဝှက် အားနည်းလွန်းပါသည်၊ ပိုရှည်/ခက်အောင် ပြောင်းပါ', error);
+      else if (c === 'signup_disabled') fail('regMsg', 'အကောင့်သစ်ဖွင့်ခြင်းကို ယာယီပိတ်ထားပါသည်', error);
+      else if (/rate.?limit/i.test(c || t)) fail('regMsg', 'ခဏစောင့်ပြီး ပြန်ကြိုးစားပါ', error);
+      else fail('regMsg', 'အကောင့်ဖွင့်မရပါ (' + (c || t) + ')', error);
+      return;
+    }
+    if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+      authMsg('regMsg', TAKEN, false); return;
+    }
+    if (!data.session) {
+      fail('regMsg', 'အကောင့်ဖွင့်မရပါ၊ ထပ်ကြိုးစားပါ',
+        'signUp returned no session (email confirmation is enabled)');
+      return;
+    }
+
+    ['regName', 'regPass', 'regPass2'].forEach(id => $(id).value = '');
+    if (!(await enterApp(data.user))) authMsg('regMsg', 'အချက်အလက် ရယူမရပါ၊ ပြန်ဝင်ကြည့်ပါ' + errSuffix(), false);
+  } catch (e) {
+    fail('regMsg', 'ချိတ်ဆက်မှု မအောင်မြင်ပါ၊ ထပ်ကြိုးစားပါ', e);
+  } finally { btn.disabled = false; }
+});
+
+// show / hide password
+const EYE_ON  = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#6B6890" d="M12 4.5C7 4.5 2.7 7.6 1 12c1.7 4.4 6 7.5 11 7.5s9.3-3.1 11-7.5c-1.7-4.4-6-7.5-11-7.5zM12 17a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/></svg>';
+const EYE_OFF = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#17143C" d="M12 7c2.8 0 5 2.2 5 5 0 .6-.1 1.3-.4 1.8l2.9 2.9c1.5-1.3 2.7-3 3.5-4.7-1.7-4.4-6-7.5-11-7.5-1.4 0-2.7.2-4 .7l2.2 2.2c.6-.3 1.2-.4 1.8-.4zM2 4.3l2.3 2.3.5.5C3.1 8.5 1.8 10.2 1 12c1.7 4.4 6 7.5 11 7.5 1.5 0 3-.3 4.4-.8l.4.4 2.9 2.9 1.3-1.3L3.3 3 2 4.3zM7.5 9.8l1.5 1.5c-.1.2-.1.5-.1.7 0 1.7 1.3 3 3 3 .2 0 .5 0 .7-.1l1.5 1.5c-.7.3-1.4.5-2.2.5-2.8 0-5-2.2-5-5 0-.8.2-1.5.6-2.1zm4.3-.8 3.1 3.1v-.2c0-1.7-1.3-3-3-3h-.1z"/></svg>';
+document.querySelectorAll('.eye').forEach(btn => {
+  btn.innerHTML = EYE_ON;
+  btn.addEventListener('click', () => {
+    const inp = $(btn.dataset.for);
+    const show = inp.type === 'password';
+    inp.type = show ? 'text' : 'password';
+    btn.innerHTML = show ? EYE_OFF : EYE_ON;
+    btn.setAttribute('aria-pressed', show ? 'true' : 'false');
+    btn.setAttribute('aria-label', show ? 'စကားဝှက်ဖျောက်ရန်' : 'စကားဝှက်ပြရန်');
+  });
+});
+
+// Enter key submits
+[['loginName','loginBtn'],['loginPass','loginBtn'],['regName','regBtn'],['regPass','regBtn'],['regPass2','regBtn']]
+  .forEach(([i, b]) => $(i).addEventListener('keydown', e => {
+    if (e.key === 'Enter') $(b).click();
+  }));
+
+$('logoutBtn').addEventListener('click', async () => {
+  try { await sb.auth.signOut(); } catch (e) {}
+  location.reload();
+});
+
+if (!sb) {
+  console.error('[auth]', !window.supabase ? 'Supabase library failed to load' : 'Check Supabase URL/key (APP_CONFIG)');
+  const m = 'ချိတ်ဆက်မှု မအောင်မြင်ပါ၊ internet စစ်ပြီး page ကို refresh လုပ်ပါ';
+  authMsg('loginMsg', m, false);
+  authMsg('regMsg', m, false);
+  $('loginBtn').disabled = true;
+  $('regBtn').disabled = true;
+} else {
+  // Stay logged in after refresh
+  document.addEventListener('DOMContentLoaded', async function restoreSession() {
+    try {
+      const { data } = await sb.auth.getSession();
+      if (data.session && !(await enterApp(data.session.user))) await sb.auth.signOut();
+    } catch (e) { /* network error: stay on login screen */ }
+  });
+}
+
+(function () {
+  const sync = () => document.querySelectorAll('.chip, .tile').forEach(b => b.setAttribute('aria-pressed', b.classList.contains('active') ? 'true' : 'false'));
+  document.addEventListener('click', () => setTimeout(sync, 0));
+  sync();
+})();
+</script>
+<script>
+// ================= Profile + VIP (แยก script — error ဖြစ်လည်း login မထိ) =================
+const CROWN_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#FFC933" stroke="#8A5A00" stroke-width="1.1" stroke-linejoin="round" d="M3 8l4.5 6.5L12 5l4.5 9.5L21 8l-2 10H5L3 8z"/><rect x="5" y="18" width="14" height="2.6" rx="1.2" fill="#FFB400" stroke="#8A5A00" stroke-width="1"/><circle cx="12" cy="13" r="1.3" fill="#FE2C55"/><circle cx="7.6" cy="14" r="1" fill="#25F4EE"/><circle cx="16.4" cy="14" r="1" fill="#25F4EE"/></svg>';
+const SOLID_COLORS = ['#25F4EE', '#FE2C55', '#FFC933', '#8B5CF6', '#22C55E', '#FF6A00', '#38BDF8', '#FFFFFF'];
+const VIP_BORDERS = [['gold', 'Gold'], ['aurora', 'Aurora'], ['flame', 'Flame'], ['ice', 'Ice'], ['royal', 'Royal']];
+let me = null, myName = '';
+const DEF_BORDER = 'solid:#25F4EE';
+const effBorder = (b, vip) => (b && (!b.startsWith('vip:') || vip)) ? b : DEF_BORDER;
+
+function pfpRender(host, o) {
+  const b = o.border || DEF_BORDER, isVip = b.startsWith('vip:');
+  host.dataset.b = isVip ? b.slice(4) : 'solid';
+  host.style.setProperty('--bc', isVip ? '#25F4EE' : b.slice(6));
+  host.replaceChildren(el('span', 'pfp-ring'));
+  const face = el('span', 'pfp-face');
+  if (o.avatar) { const im = new Image(); im.alt = ''; im.draggable = false; im.src = o.avatar; face.appendChild(im); }
+  else face.textContent = (Array.from(o.name || '')[0] || '?').toUpperCase();
+  host.appendChild(face);
+  if (isVip) { const c = el('span', 'pfp-crown'); c.innerHTML = CROWN_SVG; host.appendChild(c); }
+}
+
+function paintMe() {
+  const vip = !!(me && me.vip_active);
+  pfpRender($('avatar'), { name: myName, avatar: me && me.avatar, border: effBorder(me && me.border, vip) });
+  $('whoVip').hidden = !vip;
+  const ban = $('vipBanner');
+  ban.classList.remove('ready');
+  if (me && me.gift_pending > 0) { $('vbnTitle').textContent = 'VIP လက်ဆောင်ရယူရန်'; $('vbnSub').textContent = 'Credit 1,000 + 300 နှင့် VIP Border — Mail Box မှာ ယူပါ'; ban.classList.add('ready'); }
+  else if (vip && me.daily_ready) { $('vbnTitle').textContent = 'နေ့စဉ် Credit 300 ယူရန်'; $('vbnSub').textContent = 'VIP ကျန် ' + me.days_left + ' ရက်'; ban.classList.add('ready'); }
+  else if (vip) { $('vbnTitle').textContent = 'VIP Member'; $('vbnSub').textContent = 'ကျန် ' + me.days_left + ' ရက် · ဒီနေ့ Credit ယူပြီး'; }
+  else if (me && me.requested) { $('vbnTitle').textContent = 'VIP လျောက်ထားပြီး'; $('vbnSub').textContent = 'Admin ခွင့်ပြုချက် စောင့်နေသည်'; }
+  else { $('vbnTitle').textContent = 'VIP ဝင်ရန်'; $('vbnSub').textContent = 'ဝင်ဝင်ချင်း Credit 1,000 + နေ့စဉ် 300'; }
+  if (!$('vipModal').hidden) renderVipAction();
+}
+async function loadMe() {
+  try {
+    const res = await sb.rpc('my_profile_ext');
+    if (res.error || !res.data) return;
+    me = res.data;
+    paintMe();
+    if (me.gift_pending > 0) loadMail(false);
+  } catch (e) { console.error('loadMe:', e); }
+}
+
+// ----- modal helpers -----
+function showModal(m) { m.hidden = false; document.body.classList.add('modal-open'); }
+function hideModal(m) { m.hidden = true; if ($('pfModal').hidden && $('vipModal').hidden && $('mailModal').hidden) document.body.classList.remove('modal-open'); }
+
+// ----- Profile editor -----
+let draft = null;
+const pfModal = $('pfModal');
+function pfSay(t, ok) { $('pfMsg').textContent = t; $('pfMsg').className = 'msg ' + (ok ? 'ok' : 'err'); }
+function pfRefresh() {
+  const vip = !!(me && me.vip_active);
+  pfpRender($('pfPreview'), { name: myName, avatar: draft.clear ? null : (draft.avatar !== undefined ? draft.avatar : me && me.avatar), border: draft.border });
+  $('pfName').textContent = myName;
+  $('pfTag').textContent = vip ? '👑 VIP Member' : 'Member';
+  $('pfSwatches').querySelectorAll('.swatch').forEach(s => s.setAttribute('aria-checked', String(s.dataset.v === draft.border)));
+  $('pfVipGrid').querySelectorAll('.vbt').forEach(s => s.setAttribute('aria-checked', String(s.dataset.v === draft.border)));
+  $('pfLockNote').textContent = vip ? 'ရွေးလို့ရပါပြီ' : 'VIP ဝင်မှ သုံးလို့ရမည်';
+  $('pfVipBtn').hidden = vip;
+}
+function pfBuild() {
+  const vip = !!(me && me.vip_active);
+  const sw = $('pfSwatches'); sw.replaceChildren();
+  SOLID_COLORS.forEach(c => {
+    const b = el('button', 'swatch'); b.type = 'button'; b.setAttribute('role', 'radio');
+    b.dataset.v = 'solid:' + c; b.style.background = c; b.setAttribute('aria-label', c);
+    b.addEventListener('click', () => { draft.border = b.dataset.v; pfRefresh(); });
+    sw.appendChild(b);
+  });
+  const cu = el('label', 'swatch custom'); cu.setAttribute('aria-label', 'စိတ်ကြိုက်အရောင်');
+  const inp = el('input'); inp.type = 'color'; inp.value = '#25F4EE';
+  inp.addEventListener('input', () => { draft.border = 'solid:' + inp.value.toUpperCase(); pfRefresh(); });
+  cu.appendChild(inp); sw.appendChild(cu);
+  const g = $('pfVipGrid'); g.replaceChildren();
+  VIP_BORDERS.forEach(([k, label]) => {
+    const b = el('button', 'vbt' + (vip ? '' : ' locked')); b.type = 'button'; b.setAttribute('role', 'radio'); b.dataset.v = 'vip:' + k;
+    const p = el('span', 'pfp pfp-sm'); pfpRender(p, { name: myName, avatar: draft.avatar !== undefined ? draft.avatar : me && me.avatar, border: 'vip:' + k });
+    b.append(p, el('span', '', label));
+    b.addEventListener('click', () => {
+      if (!(me && me.vip_active)) { pfSay('VIP သီးသန့် ဘောင်ဖြစ်ပါသည် — VIP ဝင်မှ သုံးလို့ရပါမည်', false); return; }
+      pfSay('', true); draft.border = b.dataset.v; pfRefresh();
+    });
+    g.appendChild(b);
+  });
+}
+function openProfile() {
+  const vip = !!(me && me.vip_active);
+  draft = { border: effBorder(me && me.border, vip), avatar: undefined, clear: false };
+  pfSay('', true);
+  pfBuild(); pfRefresh();
+  showModal(pfModal);
+  $('pfClose').focus();
+}
+function closePf() { if (pfModal.hidden) return; hideModal(pfModal); $('whoBtn').focus(); }
+function fileToAvatar(file) {
+  return new Promise((res, rej) => {
+    const url = URL.createObjectURL(file), img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const S = 192, c = document.createElement('canvas'); c.width = c.height = S;
+      const g = c.getContext('2d'), m = Math.min(img.width, img.height);
+      g.fillStyle = '#fff'; g.fillRect(0, 0, S, S);
+      g.drawImage(img, (img.width - m) / 2, (img.height - m) / 2, m, m, 0, 0, S, S);
+      let q = .85, out = c.toDataURL('image/jpeg', q);
+      while (out.length > 69000 && q > .3) { q -= .1; out = c.toDataURL('image/jpeg', q); }
+      out.length <= 69000 ? res(out) : rej(new Error('BAD_IMAGE'));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); rej(new Error('BAD_IMAGE')); };
+    img.src = url;
+  });
+}
+$('whoBtn').addEventListener('click', openProfile);
+$('pfClose').addEventListener('click', closePf);
+pfModal.addEventListener('click', (e) => { if (e.target === pfModal) closePf(); });
+$('pfPick').addEventListener('click', () => $('pfFile').click());
+$('pfFile').addEventListener('change', async (e) => {
+  const f = e.target.files && e.target.files[0]; e.target.value = '';
+  if (!f) return;
+  if (!/^image\//.test(f.type)) { pfSay(errText({ message: 'BAD_IMAGE' }), false); return; }
+  try { draft.avatar = await fileToAvatar(f); draft.clear = false; pfSay('', true); pfBuild(); pfRefresh(); }
+  catch (err) { pfSay(errText({ message: 'BAD_IMAGE' }), false); }
+});
+$('pfRemove').addEventListener('click', () => { draft.avatar = null; draft.clear = true; pfBuild(); pfRefresh(); });
+$('pfVipBtn').addEventListener('click', openVip);
+$('pfSave').addEventListener('click', async () => {
+  $('pfSave').disabled = true; pfSay('', true);
+  const { error } = await sb.rpc('save_my_profile', {
+    p_border: draft.border,
+    p_avatar: (!draft.clear && draft.avatar) ? draft.avatar : null,
+    p_clear_avatar: !!draft.clear,
+  });
+  $('pfSave').disabled = false;
+  if (error) { pfSay(errText(error), false); return; }
+  await loadMe();
+  pfSay('✓ သိမ်းပြီးပါပြီ', true);
+  setTimeout(closePf, 700);
+});
+
+// ----- VIP modal -----
+const vipModal = $('vipModal');
+function vipSay(t, ok) { $('vipMsg').textContent = t; $('vipMsg').className = 'msg ' + (ok ? 'ok' : 'err'); }
+function renderVipAction() {
+  const box = $('vipAction'); box.replaceChildren();
+  const state = (html) => { const d = el('div', 'vip-state'); d.innerHTML = html; box.appendChild(d); };
+  if (!me) { state('ယူနေသည်...'); return; }
+  if (me.gift_pending > 0) {
+    state('🎁 <b>VIP လက်ဆောင်</b> စောင့်နေပါသည်');
+    const b = el('button', 'btn-gold', 'Mail Box ကို ဖွင့်မည်'); b.type = 'button';
+    b.addEventListener('click', () => { closeVip(); closePf(); $('mailBtn').click(); });
+    box.appendChild(b); return;
+  }
+  if (me.vip_active) {
+    state('👑 <b>VIP Member</b> · ကျန် <b>' + me.days_left + '</b> ရက်');
+    if (me.daily_ready) {
+      const b = el('button', 'btn-gold', 'နေ့စဉ် Credit 300 ယူမည်'); b.type = 'button';
+      b.addEventListener('click', async () => {
+        b.disabled = true; vipSay('', true);
+        const { data, error } = await sb.rpc('vip_claim_daily');
+        if (error) { b.disabled = false; vipSay(errText(error), false); return; }
+        if (data && data.credit != null) setCredit(data.credit, true);
+        vipSay('✓ Credit +300 ရပါပြီ', true);
+        await loadMe();
+      });
+      box.appendChild(b);
+    } else {
+      state('ဒီနေ့အတွက် ယူပြီးပါပြီ · ကျန် ' + me.daily_left + ' ကြိမ်');
+    }
+    return;
+  }
+  if (me.requested) { state('✓ လျောက်ထားပြီးပါပြီ<br>Admin ခွင့်ပြုချက် စောင့်ပါ'); return; }
+  const ta = el('textarea', 'text vip-note'); ta.rows = 2; ta.maxLength = 200; ta.placeholder = 'Admin ဆီ စာတို (မရေးလည်းရ)';
+  const b = el('button', 'btn-gold', 'Admin ဆီ လျောက်ထားမည်'); b.type = 'button';
+  b.addEventListener('click', async () => {
+    b.disabled = true; vipSay('', true);
+    const { error } = await sb.rpc('vip_apply', { p_note: ta.value.trim() || null });
+    if (error) { b.disabled = false; vipSay(errText(error), false); return; }
+    vipSay('✓ Admin ဆီ ပို့ပြီးပါပြီ', true);
+    await loadMe();
+  });
+  box.append(ta, b);
+}
+function openVip() { vipSay('', true); renderVipAction(); showModal(vipModal); $('vipClose').focus(); loadMe(); }
+function closeVip() { if (vipModal.hidden) return; hideModal(vipModal); }
+$('vipBanner').addEventListener('click', openVip);
+$('vipClose').addEventListener('click', closeVip);
+vipModal.addEventListener('click', (e) => { if (e.target === vipModal) closeVip(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { if (!vipModal.hidden) closeVip(); else closePf(); } });
+
+// ----- VIP လက်ဆောင် (Mail Box ထဲက) — Credit 1,000 + 300 + VIP Border -----
+async function claimVipGift(btn) {
+  btn.disabled = true;
+  const { data, error } = await sb.rpc('vip_claim_gift');
+  if (error) { btn.disabled = false; btn.textContent = errText(error); return; }
+  if (data && data.credit != null) setCredit(data.credit, true);
+  const pop = el('div', 'gift-pop', '+1300');
+  document.body.appendChild(pop);
+  setTimeout(() => pop.remove(), 1400);
+  await loadMe();
+  await loadMail(true);
+}
+
+// ----- Admin: VIP tab -----
+async function admVipLoad() {
+  const list = $('admVipList'), msg = $('admVipMsg');
+  const say = (t, ok) => { msg.textContent = t; msg.className = 'msg adm-status ' + (ok ? 'ok' : 'err'); };
+  const { data, error } = await sb.rpc('admin_list_vip');
+  if (error || !Array.isArray(data)) { list.replaceChildren(el('div', 'ord-empty', 'မယူနိုင်ပါ')); return; }
+  const req = data.filter(r => r.kind === 'request').length;
+  $('admVipCount').hidden = req === 0;
+  $('admVipCount').textContent = req > 9 ? '9+' : String(req);
+  list.replaceChildren();
+  if (!data.length) { list.appendChild(el('div', 'ord-empty', 'လျောက်ထားသူ မရှိသေးပါ')); return; }
+  const LABEL = { request: 'လျောက်ထားသည်', gift: 'လက်ဆောင်မယူရသေး', active: 'VIP', expired: 'သက်တမ်းကုန်' };
+  data.forEach(r => {
+    const c = el('div', 'mail-item' + (r.kind === 'request' ? ' unread' : ''));
+    const badge = el('span', 'adm-vip-badge' + (r.kind === 'active' ? ' act' : ''),
+      LABEL[r.kind] + (r.kind === 'active' ? ' · ကျန် ' + r.days_left + ' ရက်' : ''));
+    const head = el('div', 'adm-mi-head');
+    head.append(el('b', '', r.username || 'User'), badge);
+    c.appendChild(head);
+    if (r.note) c.appendChild(el('p', '', r.note));
+    const act = el('div', 'ord-act');
+    const mk = (label, action, ask) => {
+      const b = el('button', '', label); b.type = 'button';
+      b.addEventListener('click', async () => {
+        if (ask && !confirm(ask)) return;
+        b.disabled = true;
+        const res = await sb.rpc('admin_vip_action', { p_user: r.user_id, p_action: action });
+        if (res.error) { b.disabled = false; say('မအောင်မြင်ပါ (' + errText(res.error) + ')', false); return; }
+        say('✓ ပြီးပါပြီ', true); admVipLoad();
+      });
+      act.appendChild(b);
+    };
+    if (r.kind === 'request' || r.kind === 'expired') mk('👑 VIP ဖွင့်ပေးမည်', 'grant', (r.username || 'User') + ' ကို VIP ဖွင့်ပေးမလား? (Mail Box ထဲ လက်ဆောင်ရောက်မည်)');
+    if (r.kind === 'request') mk('ပယ်မည်', 'dismiss', 'လျောက်ထားချက်ကို ပယ်မလား?');
+    if (r.kind === 'gift' || r.kind === 'active') mk('VIP ပြန်ရုပ်မည်', 'revoke', 'VIP ကို ရုပ်သိမ်းမလား?');
+    c.appendChild(act);
+    list.appendChild(c);
+  });
+}
+
+
+
+// ===== Postman popup (စာပို့သမား) =====
+const PM_DEFAULT = 'မင်္ဂလာပါ ပျော်ရွှင်စရာ နေ့လေးတစ်နေ့ဖြစ်ပါစေ';
+const PM_SUGGEST = 'ပျော်ရွှင်စရာအချိန်လေးဖြစ်ပါစေ 1 နာရီအတွင်း Task တစ်ခုလုပ်ဆောင်ပြီးတိုင်း Credit 1 ခုအပိုရယူပါ';
+const pmEl = $('postman'), pmBubble = $('pmBubble'), pmText = $('pmText'), pmDot = $('pmDot'), pmTag = $('pmTag'), pmTimer = $('pmTimer');
+let pmData = null, pmHideT = null;
+const pmGet = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+const pmSet = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+function pmHide() { clearTimeout(pmHideT); pmBubble.classList.remove('show'); }
+function pmUpdateTimer() {
+  if (!pmData || !pmData.updated_at) { pmTimer.hidden = true; pmTimer.textContent = ''; return; }
+  const started = Date.parse(pmData.updated_at);
+  if (!Number.isFinite(started)) { pmTimer.hidden = true; return; }
+  const left = Math.max(0, 3600 - Math.floor((Date.now() - started) / 1000));
+  const mm = String(Math.floor(left / 60)).padStart(2, '0');
+  const ss = String(left % 60).padStart(2, '0');
+  pmTimer.textContent = left > 0 ? '⏳ Bonus ကျန်ချိန် ' + mm + ':' + ss : '⏳ Bonus အချိန် ပြည့်သွားပါပြီ (00:00)';
+  pmTimer.hidden = false;
+}
+function pmShow(text, special) {
+  clearTimeout(pmHideT);
+  pmText.textContent = text;
+  pmTag.hidden = !special;
+  pmTimer.hidden = !special;
+  if (special) pmUpdateTimer();
+  pmBubble.classList.add('show');
+  // Keep the timed bonus popup visible until the user closes it.
+  if (!special) pmHideT = setTimeout(pmHide, 4000);
+}
+async function pmFetch() {
+  if (!sb) return null;
+  try {
+    const { data, error } = await sb.from('app_popup').select('body,active,updated_at').eq('id', 1).maybeSingle();
+    if (error) return null;
+    pmData = data && data.active && data.body ? data : null;
+  } catch (e) { pmData = null; }
+  return pmData;
+}
+function pmIsNew() { return !!pmData && pmGet('pmSeen') !== pmData.updated_at; }
+function pmPaint() { const n = pmIsNew(); pmDot.hidden = !n; pmEl.classList.toggle('new', n); }
+async function pmOpen(auto) {
+  await pmFetch();
+  if (pmData) { pmShow(pmData.body, true); pmSet('pmSeen', pmData.updated_at); }
+  else if (!auto || !pmBubble.classList.contains('show')) pmShow(PM_DEFAULT, false);
+  pmPaint();
+}
+pmEl.addEventListener('click', () => { if (pmBubble.classList.contains('show')) pmHide(); else pmOpen(false); });
+pmBubble.addEventListener('click', pmHide);
+setInterval(pmUpdateTimer, 1000);
+(async () => {
+  await pmFetch();
+  pmOpen(true);
+  setInterval(async () => { await pmFetch(); pmPaint(); if (pmIsNew() && !pmBubble.classList.contains('show')) pmOpen(true); }, 60000);
+})();
+
+// ---- Admin: PopUp tab ----
+const pmInput = $('pmInput'), pmMsg = $('pmMsg'), pmSend = $('pmSend'), pmOff = $('pmOff');
+const pmSay = (t, ok) => { pmMsg.textContent = t; pmMsg.className = 'msg ' + (ok ? 'ok' : 'err'); };
+async function pmAdminFill() {
+  await pmFetch();
+  if (!pmInput.value) pmInput.value = (pmData && pmData.body) || PM_SUGGEST;
+}
+async function pmAdminSave(body, active) {
+  pmSend.disabled = pmOff.disabled = true;
+  const { error } = await sb.rpc('admin_set_popup', { p_body: body, p_active: active });
+  pmSend.disabled = pmOff.disabled = false;
+  if (error) { pmSay('မအောင်မြင်ပါ (' + errText(error).replace('vip_profile.sql', 'popup.sql') + ')', false); return false; }
+  await pmFetch();
+  pmSay(active ? '✓ PopUp ပို့ပြီးပါပြီ' : '✓ PopUp ပိတ်ပြီးပါပြီ', true);
+  return true;
+}
+pmSend.addEventListener('click', async () => {
+  const t = pmInput.value.trim();
+  if (!t) { pmSay('PopUp စာအကြောင်းအရာ ထည့်ပါ', false); return; }
+  if (await pmAdminSave(t, true)) { pmSet('pmSeen', ''); pmOpen(false); }
+});
+pmOff.addEventListener('click', async () => {
+  if (await pmAdminSave('', false)) pmHide();
+});
+</script>
+</body>
+</html>
