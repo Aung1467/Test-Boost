@@ -427,7 +427,7 @@ select.text {
 
 /* ---------- admin: tidy layout ---------- */
 /* sub-tabs: 5 equal columns; badge floats on the corner so it never squeezes the label */
-.adm-tabs { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.adm-tabs { grid-template-columns: repeat(6, minmax(0, 1fr)); }
 .adm-tabs .tab { position: relative; overflow: visible; text-overflow: clip; padding: 8px 2px; font-size: 13px; }
 .adm-dot { position: absolute; top: -5px; right: -1px; min-width: 18px; padding: 0 5px; border-radius: 99px; background: var(--pink); color: #fff; font-size: 11px; font-weight: 700; line-height: 18px; text-align: center; box-shadow: 0 0 0 2px #E6E2FA; pointer-events: none; }
 .adm-tabs .tab.active .adm-dot { background: #fff; color: var(--pink); box-shadow: 0 0 0 2px var(--pink); }
@@ -674,6 +674,22 @@ body {
 #authScreen .tab { min-height: 40px; font-size: 13px; }
 #authScreen .input-box { min-height: 48px; }
 #authScreen .btn-primary { min-height: 50px; margin-top: 8px; }
+
+/* ---------- postman + popup bubble ---------- */
+.postman { position: fixed; z-index: 70; right: max(10px, env(safe-area-inset-right)); top: calc(env(safe-area-inset-top) + 64px); width: 52px; height: 52px; padding: 0; cursor: pointer; border: 2px solid var(--ink); border-radius: 50%; background: var(--cyan); box-shadow: 0 6px 16px -4px rgba(8,6,36,.55); display: grid; place-items: center; }
+.postman svg { width: 38px; height: 38px; }
+.postman:active { transform: scale(.94); }
+.postman.new { animation: pmwiggle 1.6s ease-in-out infinite; }
+.postman .pm-dot { position: absolute; top: -2px; right: -2px; width: 14px; height: 14px; border-radius: 50%; background: var(--pink); border: 2px solid #fff; }
+@keyframes pmwiggle { 0%, 100% { transform: rotate(0); } 15% { transform: rotate(-9deg); } 30% { transform: rotate(8deg); } 45% { transform: rotate(-6deg); } 60% { transform: rotate(0); } }
+.pm-bubble { position: fixed; z-index: 71; right: max(10px, env(safe-area-inset-right)); top: calc(env(safe-area-inset-top) + 124px); width: min(300px, calc(100vw - 20px)); padding: 14px 16px; color: var(--ink); background: #fff; border: 2px solid var(--ink); border-radius: 18px; box-shadow: 0 16px 36px -10px rgba(8,6,36,.6); font-size: 15px; line-height: 1.7; font-weight: 600; overflow-wrap: anywhere; opacity: 0; transform: translateY(-8px) scale(.96); transform-origin: top right; pointer-events: none; transition: opacity .25s var(--ease), transform .25s var(--ease); }
+.pm-bubble.show { opacity: 1; transform: none; pointer-events: auto; }
+.pm-bubble::before { content: ""; position: absolute; top: -9px; right: 18px; width: 14px; height: 14px; background: #fff; border-left: 2px solid var(--ink); border-top: 2px solid var(--ink); transform: rotate(45deg); }
+.pm-bubble small { display: block; margin-bottom: 2px; font-size: 12px; font-weight: 700; color: var(--pink); }
+.pm-ta { min-height: 110px; }
+body.modal-open .postman, body.modal-open .pm-bubble { display: none; }
+.pm-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+.pm-row .btn-primary, .pm-row .btn { margin-top: 0; }
 </style>
 </head>
 <body>
@@ -906,6 +922,7 @@ body {
         <button type="button" class="tab" data-pane="mail" role="tab" aria-selected="false">စာပို့</button>
         <button type="button" class="tab" data-pane="fb" role="tab" aria-selected="false">စာများ<span class="adm-dot" id="admFbCount" hidden></span></button>
         <button type="button" class="tab" data-pane="vip" role="tab" aria-selected="false">VIP<span class="adm-dot" id="admVipCount" hidden></span></button>
+        <button type="button" class="tab" data-pane="popup" role="tab" aria-selected="false">PopUp</button>
       </div>
 
       <!-- User: ရှာ + စီမံ -->
@@ -990,6 +1007,17 @@ body {
       </div>
     </div>
 
+      <!-- PopUp: စာပို့သမားက User အားလုံးဆီ ပြမည့်စာ -->
+      <div class="adm-pane" id="admPane-popup" hidden>
+        <p class="note">"PopUp Sent" ကိုနှိပ်ရင် User အားလုံးရဲ့ စာပို့သမားပုံကနေ ဒီစာ ပေါ်လာမည်။ မပို့ထားရင် "မင်္ဂလာပါ ပျော်ရွှင်စရာ နေ့လေးတစ်နေ့ဖြစ်ပါစေ" ပဲ ပြပြီး ပျောက်သွားမည်။</p>
+        <textarea class="text adm-ta pm-ta" id="pmInput" rows="4" maxlength="300" placeholder="PopUp စာအကြောင်းအရာ"></textarea>
+        <div class="pm-row">
+          <button type="button" class="btn-primary" id="pmSend">PopUp Sent</button>
+          <button type="button" class="btn" id="pmOff">ပိတ်မည်</button>
+        </div>
+        <div class="msg" id="pmMsg" role="status"></div>
+      </div>
+
     <!-- Spend -->
     <div id="spendView" hidden>
       <div class="tiles" id="useTiles">
@@ -1058,6 +1086,22 @@ body {
     </div>
   </div>
 </div>
+
+<button type="button" class="postman" id="postman" aria-label="Admin ဆီက စာ ကြည့်ရန်">
+  <svg viewBox="0 0 48 48" aria-hidden="true">
+    <path d="M12 44c0-8 5-13 12-13s12 5 12 13z" fill="#2B6BFF" stroke="#17143C" stroke-width="2.2" stroke-linejoin="round"/>
+    <path d="M14 33l20 11" stroke="#FFC933" stroke-width="3.2" stroke-linecap="round"/>
+    <circle cx="24" cy="20" r="8.5" fill="#FFD7B5" stroke="#17143C" stroke-width="2.2"/>
+    <path d="M14.5 17.5c1-6.5 5-9 9.5-9s8.5 2.5 9.5 9z" fill="#2B6BFF" stroke="#17143C" stroke-width="2.2" stroke-linejoin="round"/>
+    <path d="M13 18.2h22" stroke="#17143C" stroke-width="2.6" stroke-linecap="round"/>
+    <circle cx="20.8" cy="21" r="1.2" fill="#17143C"/><circle cx="27.2" cy="21" r="1.2" fill="#17143C"/>
+    <path d="M20.6 24.6c1.8 1.6 4.9 1.6 6.8 0" fill="none" stroke="#17143C" stroke-width="1.8" stroke-linecap="round"/>
+    <rect x="28" y="30" width="16" height="11" rx="2" fill="#fff" stroke="#17143C" stroke-width="2"/>
+    <path d="M28.6 31l7.4 5.6 7.4-5.6" fill="none" stroke="#FE2C55" stroke-width="2" stroke-linejoin="round"/>
+  </svg>
+  <span class="pm-dot" id="pmDot" hidden></span>
+</button>
+<div class="pm-bubble" id="pmBubble" role="status" aria-live="polite"><small id="pmTag">📮 စာပို့သမား</small><span id="pmText"></span></div>
 
 <script>
 /* DIAG vip-6: error ဖြစ်ရင် ဖန်သားပြင်အောက်ခြေမှာ အနီရောင်နဲ့ ပြမည် (screenshot ရိုက်ပို့ပါ) */
@@ -1868,10 +1912,11 @@ clMore.addEventListener('click', () => creditListLoad(false));
 $('admSearch').addEventListener('click', admLoad);
 admQ.addEventListener('keydown', e => { if (e.key === 'Enter') admLoad(); });
 // ---- Admin sub-tabs ----
-const admPanes = { user: $('admPane-user'), credit: $('admPane-credit'), mail: $('admPane-mail'), fb: $('admPane-fb'), vip: $('admPane-vip') };
+const admPanes = { user: $('admPane-user'), credit: $('admPane-credit'), mail: $('admPane-mail'), fb: $('admPane-fb'), vip: $('admPane-vip'), popup: $('admPane-popup') };
 bindTabs($('admTabs'), (d) => {
   for (const k in admPanes) admPanes[k].hidden = k !== d.pane;
   if (d.pane === 'vip') admVipLoad();
+  if (d.pane === 'popup') pmAdminFill();
 });
 function admGoUser() {                              // Credit စာရင်းကနေ နာမည်နှိပ်ရင် User tab ကို ပြောင်းပြီး ရှာ
   $('admTabs').querySelector('[data-pane="user"]').click();
@@ -2701,6 +2746,71 @@ async function admVipLoad() {
 }
 
 
+
+// ===== Postman popup (စာပို့သမား) =====
+const PM_DEFAULT = 'မင်္ဂလာပါ ပျော်ရွှင်စရာ နေ့လေးတစ်နေ့ဖြစ်ပါစေ';
+const PM_SUGGEST = 'ပျော်ရွှင်စရာအချိန်လေးဖြစ်ပါစေ 1 နာရီအတွင်း Task တစ်ခုလုပ်ဆောင်ပြီးတိုင်း Credit 1 ခုအပိုရယူပါ';
+const pmEl = $('postman'), pmBubble = $('pmBubble'), pmText = $('pmText'), pmDot = $('pmDot'), pmTag = $('pmTag');
+let pmData = null, pmHideT = null;
+const pmGet = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+const pmSet = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+function pmHide() { clearTimeout(pmHideT); pmBubble.classList.remove('show'); }
+function pmShow(text, special) {
+  clearTimeout(pmHideT);
+  pmText.textContent = text;
+  pmTag.hidden = !special;
+  pmBubble.classList.add('show');
+  pmHideT = setTimeout(pmHide, special ? 9000 : 4000);
+}
+async function pmFetch() {
+  if (!sb) return null;
+  try {
+    const { data, error } = await sb.from('app_popup').select('body,active,updated_at').eq('id', 1).maybeSingle();
+    if (error) return null;
+    pmData = data && data.active && data.body ? data : null;
+  } catch (e) { pmData = null; }
+  return pmData;
+}
+function pmIsNew() { return !!pmData && pmGet('pmSeen') !== pmData.updated_at; }
+function pmPaint() { const n = pmIsNew(); pmDot.hidden = !n; pmEl.classList.toggle('new', n); }
+async function pmOpen(auto) {
+  await pmFetch();
+  if (pmData) { pmShow(pmData.body, true); pmSet('pmSeen', pmData.updated_at); }
+  else if (!auto || !pmBubble.classList.contains('show')) pmShow(PM_DEFAULT, false);
+  pmPaint();
+}
+pmEl.addEventListener('click', () => { if (pmBubble.classList.contains('show')) pmHide(); else pmOpen(false); });
+pmBubble.addEventListener('click', pmHide);
+(async () => {
+  await pmFetch();
+  pmOpen(true);
+  setInterval(async () => { await pmFetch(); pmPaint(); if (pmIsNew() && !pmBubble.classList.contains('show')) pmOpen(true); }, 60000);
+})();
+
+// ---- Admin: PopUp tab ----
+const pmInput = $('pmInput'), pmMsg = $('pmMsg'), pmSend = $('pmSend'), pmOff = $('pmOff');
+const pmSay = (t, ok) => { pmMsg.textContent = t; pmMsg.className = 'msg ' + (ok ? 'ok' : 'err'); };
+async function pmAdminFill() {
+  await pmFetch();
+  if (!pmInput.value) pmInput.value = (pmData && pmData.body) || PM_SUGGEST;
+}
+async function pmAdminSave(body, active) {
+  pmSend.disabled = pmOff.disabled = true;
+  const { error } = await sb.rpc('admin_set_popup', { p_body: body, p_active: active });
+  pmSend.disabled = pmOff.disabled = false;
+  if (error) { pmSay('မအောင်မြင်ပါ (' + errText(error).replace('vip_profile.sql', 'popup.sql') + ')', false); return false; }
+  await pmFetch();
+  pmSay(active ? '✓ PopUp ပို့ပြီးပါပြီ' : '✓ PopUp ပိတ်ပြီးပါပြီ', true);
+  return true;
+}
+pmSend.addEventListener('click', async () => {
+  const t = pmInput.value.trim();
+  if (!t) { pmSay('PopUp စာအကြောင်းအရာ ထည့်ပါ', false); return; }
+  if (await pmAdminSave(t, true)) { pmSet('pmSeen', ''); pmOpen(false); }
+});
+pmOff.addEventListener('click', async () => {
+  if (await pmAdminSave('', false)) pmHide();
+});
 </script>
 </body>
 </html>
