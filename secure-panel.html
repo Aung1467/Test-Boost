@@ -739,7 +739,9 @@ body { letter-spacing:.005em; }
 .postman { width:56px;height:56px; border:1px solid rgba(255,255,255,.8); background:linear-gradient(145deg,#72FFFA,#25DCD7); box-shadow:0 12px 30px rgba(4,8,40,.42),0 0 0 5px rgba(37,244,238,.12),inset 0 1px 0 rgba(255,255,255,.8); cursor:grab; touch-action:none; user-select:none; -webkit-user-select:none; transition:box-shadow .2s,filter .2s; }
 .postman svg { width:37px;height:37px; filter:drop-shadow(0 2px 1px rgba(0,0,0,.12)); }
 .postman:hover { filter:brightness(1.04);box-shadow:0 15px 34px rgba(4,8,40,.48),0 0 0 7px rgba(37,244,238,.14); }
-.postman.dragging { cursor:grabbing; transform:scale(1.04); }
+.postman.dragging { cursor:grabbing; transform:scale(1.04); animation:none!important; transition:none!important; }
+.postman { position:fixed; z-index:1000; touch-action:none; -webkit-user-select:none; user-select:none; }
+.postman svg,.postman .pm-dot { pointer-events:none; }
 .pm-bubble { width:min(320px,calc(100vw - 24px)); padding:18px 18px 17px; color:#F8F7FF; background:linear-gradient(145deg,rgba(43,36,103,.98),rgba(18,15,51,.98)); border:1px solid rgba(255,209,90,.9); border-radius:20px; outline:1px solid rgba(255,255,255,.16); outline-offset:3px; box-shadow:0 22px 56px rgba(4,3,24,.52),inset 0 1px 0 rgba(255,255,255,.12); font-size:14px; line-height:1.85; cursor:grab; touch-action:none; user-select:none; -webkit-user-select:none; }
 .pm-bubble::before { background:#2B2467;border-color:var(--gold); }
 .pm-bubble small { color:var(--gold); font-size:11px; letter-spacing:.08em; text-transform:uppercase; }
@@ -2923,18 +2925,24 @@ function pmDrag(elm,key) {
   let st=null;
   elm.addEventListener('pointerdown',e=>{
     if(e.button!==undefined && e.button!==0)return;
-    if(e.target.closest('button,a,input,textarea,select'))return;
+    // The floating postman itself is a button: do not mistake its root for a nested control.
+    const control=e.target.closest('a,input,textarea,select,[data-no-drag]');
+    if(control && control!==elm)return;
     const r=elm.getBoundingClientRect();
     st={id:e.pointerId,x:e.clientX,y:e.clientY,left:r.left,top:r.top,moved:false};
     pmDragged=false; elm.classList.add('dragging');
+    if(e.cancelable)e.preventDefault();
     try { elm.setPointerCapture(e.pointerId); } catch(_){}
   });
   elm.addEventListener('pointermove',e=>{
     if(!st||st.id!==e.pointerId)return;
     const dx=e.clientX-st.x,dy=e.clientY-st.y;
-    if(!st.moved && Math.hypot(dx,dy)>6)st.moved=true;
-    if(st.moved){pmDragged=true;pmSetPos(elm,st.left+dx,st.top+dy,key);}
-  });
+    if(!st.moved && Math.hypot(dx,dy)>5)st.moved=true;
+    if(st.moved){
+      if(e.cancelable)e.preventDefault();
+      pmDragged=true;pmSetPos(elm,st.left+dx,st.top+dy,key);
+    }
+  },{passive:false});
   const finish=e=>{
     if(!st || (e && st.id!==e.pointerId))return;
     const moved=st.moved;
