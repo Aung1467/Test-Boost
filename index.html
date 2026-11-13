@@ -480,6 +480,40 @@ select.text {
 .cl-go:active { background: var(--soft); }
 .cl-row:nth-child(-n+3) .cl-rank { color: var(--pink); }
 
+
+/* ---------- admin: mail composer (recipient + gift box) ---------- */
+.mail-to { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 5px; background: #E6E2FA; border-radius: 16px; }
+.mail-to button { min-height: 42px; padding: 8px 6px; font: inherit; font-size: 14px; font-weight: 700; color: var(--ink); background: transparent; border: 0; border-radius: 12px; cursor: pointer; }
+.mail-to button.on { background: var(--ink); color: #fff; box-shadow: 0 3px 10px rgba(23,20,60,.28); }
+.mail-who { position: relative; margin-top: 10px; }
+.mail-sug { margin-top: 6px; max-height: 220px; overflow-y: auto; overscroll-behavior: contain; background: var(--card); border: 1.5px solid var(--line); border-radius: var(--r-md); box-shadow: var(--sh-card); }
+.mail-sug button { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 44px; padding: 8px 14px; font: inherit; font-size: 14px; text-align: left; color: var(--ink); background: transparent; border: 0; border-bottom: 1px solid var(--line); cursor: pointer; }
+.mail-sug button:last-child { border-bottom: 0; }
+.mail-sug button:active, .mail-sug button:hover { background: var(--soft); }
+.mail-sug .ms-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+.mail-sug .ms-cr { flex: none; font: 800 13px var(--display); color: var(--muted); font-variant-numeric: tabular-nums; }
+.mail-sug .ms-empty { padding: 12px 14px; font-size: 13px; color: var(--muted); }
+.mail-picked { display: flex; align-items: center; gap: 10px; margin-top: 8px; padding: 10px 12px; background: var(--soft); border: 1.5px solid var(--ink); border-radius: var(--r-md); }
+.mail-picked b { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; }
+.mail-picked small { flex: none; color: var(--muted); font-variant-numeric: tabular-nums; }
+.mail-picked button { flex: none; width: 32px; height: 32px; font-size: 16px; line-height: 1; color: var(--ink); background: #fff; border: 1.5px solid var(--line); border-radius: 99px; cursor: pointer; }
+.mail-gift { margin-top: 12px; background: var(--card); border: 1.5px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--sh-card); overflow: hidden; }
+.mail-gift.has { background: #FFF6D6; border-color: var(--gold); }
+.mg-box { display: flex; align-items: center; gap: 12px; width: 100%; padding: 10px 14px; font: inherit; text-align: left; color: var(--ink); background: transparent; border: 0; cursor: pointer; }
+.mg-box svg { flex: none; width: 46px; height: 46px; overflow: visible; }
+.mg-box span { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.mg-box b { font-size: 15px; }
+.mg-box small { font-size: 12.5px; line-height: 1.5; color: var(--muted); }
+.mg-lid { transform-box: fill-box; transform-origin: 10% 100%; transition: transform .4s ease; }
+.mail-gift.open .mg-lid, .mail-gift.has .mg-lid { transform: translateY(-7px) rotate(-18deg); }
+.mail-gift.has .mg-box svg { animation: giftwiggle 1.4s ease-in-out infinite; }
+.mg-panel { padding: 0 14px 14px; }
+.mg-panel .text { background: #fff; }
+.mg-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.mg-chips button { flex: 1; min-width: 64px; min-height: 40px; padding: 6px 8px; font: 800 14px var(--display); color: var(--ink); background: #fff; border: 1.5px solid var(--ink); border-radius: var(--r-sm); cursor: pointer; }
+.mg-chips button:active { background: var(--gold); }
+.mg-clear { display: block; margin: 10px auto 0; padding: 6px 10px; font: inherit; font-size: 13px; color: var(--muted); background: none; border: 0; text-decoration: underline; cursor: pointer; }
+
 /* ---------- motion ---------- */
 .task.pop, .use-panel.pop { animation: pop .3s var(--ease); }
 .coin.drop { animation: drop .7s cubic-bezier(.2, 1.3, .4, 1); }
@@ -898,12 +932,49 @@ body {
 
       <!-- စာပို့ -->
       <div class="adm-pane" id="admPane-mail" hidden>
-        <div class="field-label">User အားလုံးသို့ စာပို့ရန်</div>
-        <input class="text" type="text" id="admMailTitle" maxlength="100" placeholder="ခေါင်းစဉ်">
+        <div class="field-label">ဘယ်သူ့ဆီ ပို့မလဲ</div>
+        <div class="mail-to" id="mailTo" role="tablist">
+          <button type="button" class="on" data-to="all" role="tab" aria-selected="true">👥 User အားလုံး</button>
+          <button type="button" data-to="one" role="tab" aria-selected="false">👤 User တစ်ယောက်</button>
+        </div>
+
+        <div class="mail-who" id="mailWho" hidden>
+          <input class="text" type="search" id="mailUser" placeholder="User နာမည် ရိုက်ပြီး ရှာပါ..." autocapitalize="none" autocomplete="off" aria-label="User နာမည်">
+          <div class="mail-sug" id="mailSug" hidden></div>
+          <div class="mail-picked" id="mailPicked" hidden></div>
+        </div>
+
+        <input class="text" type="text" id="admMailTitle" maxlength="100" placeholder="ခေါင်းစဉ်" style="margin-top:12px">
         <textarea class="text adm-ta" id="admMailBody" rows="4" maxlength="1000" placeholder="စာအကြောင်းအရာ"></textarea>
+
+        <div class="mail-gift" id="mailGift" hidden>
+          <button type="button" class="mg-box" id="mgBtn" aria-expanded="false">
+            <svg viewBox="0 0 64 64" aria-hidden="true">
+              <rect x="10" y="28" width="44" height="28" rx="4" fill="#FE2C55" stroke="#17143C" stroke-width="3"/>
+              <rect x="29" y="28" width="6" height="28" fill="#FFC933" stroke="#17143C" stroke-width="2"/>
+              <g class="mg-lid">
+                <rect x="6" y="18" width="52" height="12" rx="4" fill="#FF6B86" stroke="#17143C" stroke-width="3"/>
+                <rect x="29" y="18" width="6" height="12" fill="#FFC933" stroke="#17143C" stroke-width="2"/>
+                <path d="M32 18c-6-12-18-8-13-2 2 2 8 2 13 2zM32 18c6-12 18-8 13-2-2 2-8 2-13 2z" fill="#FFC933" stroke="#17143C" stroke-width="2.5" stroke-linejoin="round"/>
+              </g>
+            </svg>
+            <span><b>Credit လက်ဆောင် ထည့်မည်</b><small id="mgSub">နှိပ်ပြီး ပမာဏ ထည့်ပါ (မထည့်လည်း ရ)</small></span>
+          </button>
+          <div class="mg-panel" id="mgPanel" hidden>
+            <input class="text" type="number" inputmode="numeric" min="1" step="1" id="mgAmt" placeholder="လက်ဆောင် Credit ပမာဏ" aria-label="လက်ဆောင် Credit ပမာဏ">
+            <div class="mg-chips" id="mgChips">
+              <button type="button" data-n="50">+50</button>
+              <button type="button" data-n="100">+100</button>
+              <button type="button" data-n="500">+500</button>
+              <button type="button" data-n="1000">+1,000</button>
+            </div>
+            <button type="button" class="mg-clear" id="mgClear">လက်ဆောင် မပေးတော့ပါ</button>
+          </div>
+        </div>
+
         <button type="button" class="btn-primary" id="admMailAll">User အားလုံးသို့ ပို့မည်</button>
         <div class="msg" id="admMailMsg" role="status"></div>
-        <p class="note">တစ်ယောက်တည်းကို ပို့ချင်ရင် User tab မှာ ရှာပြီး ၎င်းရဲ့ "စာပို့" ကိုနှိပ်ပါ (စာရိုက်ကွက် ပေါ်လာမည်)</p>
+        <p class="note" id="mailNote">User အားလုံးဆီ စာပို့မည်။ တစ်ယောက်တည်းကို ပို့ချင်ရင် "User တစ်ယောက်" ကိုရွေးပြီး နာမည်ထည့်ပါ၊ ထိုအခါ 🎁 Credit လက်ဆောင်ပါ ထည့်ပေးနိုင်ပါမည်။</p>
       </div>
 
       <!-- User တွေဆီက စာများ -->
@@ -1828,11 +1899,10 @@ function admCard(u) {
   const add = el('button', '', 'ထည့်မည် (+)');
   const set = el('button', '', 'သတ်မှတ် (=)');
   const pw  = el('button', '', 'Password');
-  const ml  = el('button', '', 'စာပို့');
   const vp  = el('button', '', '👑 VIP ဖွင့်ပေးမည်');
-  [add, set, pw, ml, vp].forEach(b => b.type = 'button');
+  [add, set, pw, vp].forEach(b => b.type = 'button');
   add.classList.add('pri'); set.classList.add('pri'); vp.classList.add('vip', 'wide');
-  act.append(add, set, pw, ml, vp);
+  act.append(add, set, pw, vp);
 
   const msg = el('div', 'msg');
   const say = (t, ok) => { msg.textContent = t; msg.className = 'msg ' + (ok ? 'ok' : 'err'); };
@@ -1872,21 +1942,7 @@ function admCard(u) {
     error ? say('မအောင်မြင်ပါ (' + (error.message || '') + ')', false) : say('✓ စကားဝှက် ပြောင်းပြီးပါပြီ', true);
   });
 
-  const mailBox = el('div', 'adm-compose'); mailBox.hidden = true;
-  const mt = el('input', 'text'); mt.type = 'text'; mt.maxLength = 100; mt.placeholder = 'ခေါင်းစဉ်';
-  const mb = el('textarea', 'text adm-ta'); mb.rows = 3; mb.maxLength = 1000; mb.placeholder = 'စာအကြောင်းအရာ';
-  const go = el('button', 'btn-primary', (u.username || 'User') + ' ဆီ ပို့မည်'); go.type = 'button';
-  mailBox.append(mt, mb, go);
-  ml.addEventListener('click', () => {
-    mailBox.hidden = !mailBox.hidden;
-    ml.classList.toggle('on', !mailBox.hidden);
-    if (!mailBox.hidden) mt.focus();
-  });
-  go.addEventListener('click', async () => {
-    if (await admSendMail(u.id, say, go, { t: mt, b: mb })) { mailBox.hidden = true; ml.classList.remove('on'); }
-  });
-
-  body.append(inp, act, mailBox, msg);
+  body.append(inp, act, msg);
   card.append(top, body);
   top.addEventListener('click', () => {
     const open = body.hidden;
@@ -1981,9 +2037,117 @@ async function admSendMail(userId, say, btn, src) {
   tEl.value = ''; bEl.value = '';
   return true;
 }
-$('admMailAll').addEventListener('click', () => {
-  const m = $('admMailMsg');
-  admSendMail(null, (t, ok) => { m.textContent = t; m.className = 'msg ' + (ok ? 'ok' : 'err'); }, $('admMailAll'));
+// ---- စာပို့ tab: User အားလုံး / User တစ်ယောက် + 🎁 Credit လက်ဆောင် ----
+const mailToEl = $('mailTo'), mailWho = $('mailWho'), mailUser = $('mailUser'), mailSug = $('mailSug'), mailPicked = $('mailPicked');
+const mailGift = $('mailGift'), mgBtn = $('mgBtn'), mgPanel = $('mgPanel'), mgAmt = $('mgAmt'), mgSub = $('mgSub');
+const mailSend = $('admMailAll'), mailMsg = $('admMailMsg');
+let mailMode = 'all', mailTarget = null, mailSugTok = 0, mailSugTimer = null;
+const mailSay = (t, ok) => { mailMsg.textContent = t; mailMsg.className = 'msg ' + (ok ? 'ok' : 'err'); };
+const giftAmt = () => { const n = parseInt(mgAmt.value, 10); return n > 0 ? n : 0; };
+
+function mailRefresh() {
+  const one = mailMode === 'one';
+  mailToEl.querySelectorAll('button').forEach(b => { const on = b.dataset.to === mailMode; b.classList.toggle('on', on); b.setAttribute('aria-selected', String(on)); });
+  mailWho.hidden = !one;
+  mailGift.hidden = !one;
+  const g = one ? giftAmt() : 0;
+  mailGift.classList.toggle('has', g > 0);
+  mgSub.textContent = g > 0 ? '🎁 ' + fmtNum(g) + ' Credit လက်ဆောင် ပါမည်' : 'နှိပ်ပြီး ပမာဏ ထည့်ပါ (မထည့်လည်း ရ)';
+  mailSend.textContent = !one ? 'User အားလုံးသို့ ပို့မည်'
+    : (mailTarget ? mailTarget.username + ' ဆီ ပို့မည်' : 'User ကို အရင်ရွေးပါ') + (g > 0 ? ' + 🎁 ' + fmtNum(g) : '');
+  $('mailNote').hidden = one && !!mailTarget;
+}
+function mailPick(u) {
+  mailTarget = u;
+  mailSug.hidden = true; mailSug.replaceChildren();
+  mailUser.hidden = true; mailUser.value = '';
+  mailPicked.hidden = false;
+  const x = el('button', '', '✕'); x.type = 'button'; x.setAttribute('aria-label', 'ပြောင်းရန်');
+  x.addEventListener('click', () => { mailTarget = null; mailPicked.hidden = true; mailUser.hidden = false; mailUser.focus(); mailRefresh(); });
+  mailPicked.replaceChildren(el('b', '', u.username), el('small', '', fmtNum(u.credit) + ' Credit'), x);
+  mailRefresh();
+}
+async function mailSuggest() {
+  const q = mailUser.value.trim();
+  const my = ++mailSugTok;
+  if (!q) { mailSug.hidden = true; mailSug.replaceChildren(); return; }
+  const { data, error } = await sb.rpc('admin_list_users', { p_search: q });
+  if (my !== mailSugTok) return;
+  mailSug.replaceChildren();
+  mailSug.hidden = false;
+  if (error || !Array.isArray(data)) { mailSug.appendChild(el('div', 'ms-empty', 'ရှာမရပါ')); return; }
+  if (!data.length) { mailSug.appendChild(el('div', 'ms-empty', 'User မတွေ့ပါ')); return; }
+  data.slice(0, 8).forEach(u => {
+    const b = el('button'); b.type = 'button';
+    b.append(el('span', 'ms-name', u.username || '-'), el('span', 'ms-cr', fmtNum(u.credit) + ' Credit'));
+    b.addEventListener('click', () => mailPick(u));
+    mailSug.appendChild(b);
+  });
+}
+mailToEl.addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b) return;
+  mailMode = b.dataset.to; mailSay('', true); mailRefresh();
+  if (mailMode === 'one' && !mailTarget) mailUser.focus();
+});
+mailUser.addEventListener('input', () => { clearTimeout(mailSugTimer); mailSugTimer = setTimeout(mailSuggest, 250); });
+mailUser.addEventListener('keydown', (e) => {
+  if (e.key !== 'Enter') return;
+  e.preventDefault();
+  const first = mailSug.querySelector('button');
+  if (first) first.click();
+});
+mgBtn.addEventListener('click', () => {
+  const open = mgPanel.hidden;
+  mgPanel.hidden = !open;
+  mailGift.classList.toggle('open', open);
+  mgBtn.setAttribute('aria-expanded', String(open));
+  if (open) mgAmt.focus();
+});
+mgAmt.addEventListener('input', mailRefresh);
+$('mgChips').addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b) return;
+  mgAmt.value = String(giftAmt() + Number(b.dataset.n));
+  mailRefresh();
+});
+$('mgClear').addEventListener('click', () => { mgAmt.value = ''; mailRefresh(); });
+mailRefresh();
+
+mailSend.addEventListener('click', async () => {
+  if (mailMode === 'all') {
+    admSendMail(null, mailSay, mailSend);
+    return;
+  }
+  if (!mailTarget) { mailSay('User နာမည် ရှာပြီး ရွေးပါ', false); mailUser.focus(); return; }
+  const u = mailTarget, g = giftAmt();
+  const tEl = $('admMailTitle'), bEl = $('admMailBody');
+  const t = tEl.value.trim(); let b = bEl.value.trim();
+  if (!t || !b) { mailSay('ခေါင်းစဉ်နှင့် စာအကြောင်းအရာ ထည့်ပါ', false); return; }
+  if (g > 0 && !confirm(u.username + ' ကို 🎁 Credit ' + fmtNum(g) + ' လက်ဆောင်နဲ့ စာပို့မလား?')) return;
+  mailSend.disabled = true;
+  try {
+    let newCredit = null;
+    if (g > 0) {                                     // လက်ဆောင် Credit ကို အရင်ထည့် — မအောင်ရင် စာမပို့
+      const r = await sb.rpc('admin_adjust_credit', { p_user: u.id, p_delta: g });
+      if (r.error) { mailSay('Credit မထည့်နိုင်ပါ (' + errText(r.error) + ')', false); return; }
+      newCredit = r.data;
+      u.credit = newCredit;
+      if (u.id === myId) setCredit(newCredit, true);
+      b = b + '\n\n🎁 လက်ဆောင် Credit ' + fmtNum(g) + ' ကို သင့်ဆီ ထည့်ပေးထားပါပြီ';
+    }
+    const m = await sb.rpc('admin_send_message', { p_user: u.id, p_title: (g > 0 ? '🎁 ' : '') + t, p_body: b });
+    if (m.error) {
+      mailSay((g > 0 ? 'Credit ' + fmtNum(g) + ' ထည့်ပြီးပါပြီ၊ ဒါပေမဲ့ ' : '') + 'စာ မပို့နိုင်ပါ (' + errText(m.error) + ')', false);
+      if (g > 0) { mgAmt.value = ''; mailPick(u); creditListLoad(true); }
+      return;
+    }
+    mailSay('✓ ' + u.username + ' ဆီ စာပို့ပြီးပါပြီ' + (g > 0 ? ' · 🎁 Credit ' + fmtNum(g) + ' လက်ဆောင်ပေးပြီး (လက်ကျန် ' + fmtNum(newCredit) + ')' : ''), true);
+    tEl.value = ''; bEl.value = ''; mgAmt.value = '';
+    mgPanel.hidden = true; mailGift.classList.remove('open'); mgBtn.setAttribute('aria-expanded', 'false');
+    mailPick(u);
+    if (g > 0) { creditListLoad(true); admSearchUsers(); }
+  } finally {
+    mailSend.disabled = false;
+  }
 });
 
 
