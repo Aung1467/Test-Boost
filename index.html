@@ -946,7 +946,6 @@ body { letter-spacing:.005em; }
     <div class="tabs" id="appTabs" role="tablist">
       <button type="button" class="tab active" data-view="earn" role="tab" aria-selected="true">Credit ယူရန်</button>
       <button type="button" class="tab" data-view="spend" role="tab" aria-selected="false">Credit သုံးရန်</button>
-      <button type="button" class="tab" data-view="admin" id="adminTab" role="tab" aria-selected="false" hidden>Admin</button>
     </div>
 
     <!-- Earn -->
@@ -999,110 +998,6 @@ body { letter-spacing:.005em; }
         </div>
       </div>
     </div>
-
-    <!-- Admin -->
-    <div id="adminView" hidden>
-      <div class="tabs adm-tabs" id="admTabs" role="tablist">
-        <button type="button" class="tab active" data-pane="user" role="tab" aria-selected="true">User</button>
-        <button type="button" class="tab" data-pane="credit" role="tab" aria-selected="false">Credit</button>
-        <button type="button" class="tab" data-pane="mail" role="tab" aria-selected="false">စာပို့</button>
-        <button type="button" class="tab" data-pane="fb" role="tab" aria-selected="false">စာများ<span class="adm-dot" id="admFbCount" hidden></span></button>
-        <button type="button" class="tab" data-pane="vip" role="tab" aria-selected="false">VIP<span class="adm-dot" id="admVipCount" hidden></span></button>
-        <button type="button" class="tab" data-pane="popup" role="tab" aria-selected="false">PopUp</button>
-      </div>
-
-      <!-- User: ရှာ + စီမံ -->
-      <div class="adm-pane" id="admPane-user">
-        <div class="adm-search">
-          <input class="text" type="search" id="admQ" placeholder="User နာမည် ရှာရန်..." autocapitalize="none" autocomplete="off">
-          <button type="button" class="btn" id="admSearch">ရှာ</button>
-        </div>
-        <div class="msg adm-status" id="admMsg" role="status"></div>
-        <div id="admList"></div>
-        <button type="button" class="btn adm-more" id="admMore" hidden></button>
-      </div>
-
-      <!-- Credit စာရင်း -->
-      <div class="adm-pane" id="admPane-credit" hidden>
-        <div class="adm-stats">
-          <div class="adm-stat"><small>User စုစုပေါင်း</small><b id="clUsers">–</b></div>
-          <div class="adm-stat"><small>Credit စုစုပေါင်း</small><b id="clTotal">–</b></div>
-        </div>
-        <p class="note" id="clSum">Credit များသူ စီထားသည် · နာမည်ကို နှိပ်ရင် User tab မှာ ဖွင့်ပေးမည်</p>
-        <div id="clList"></div>
-        <button type="button" class="btn adm-more" id="clMore" hidden>နောက်ထပ်ကြည့်မည်</button>
-      </div>
-
-      <!-- စာပို့ -->
-      <div class="adm-pane" id="admPane-mail" hidden>
-        <div class="field-label">ဘယ်သူ့ဆီ ပို့မလဲ</div>
-        <div class="mail-to" id="mailTo" role="tablist">
-          <button type="button" class="on" data-to="all" role="tab" aria-selected="true">👥 User အားလုံး</button>
-          <button type="button" data-to="one" role="tab" aria-selected="false">👤 User တစ်ယောက်</button>
-        </div>
-
-        <div class="mail-who" id="mailWho" hidden>
-          <input class="text" type="search" id="mailUser" placeholder="User နာမည် ရိုက်ပြီး ရှာပါ..." autocapitalize="none" autocomplete="off" aria-label="User နာမည်">
-          <div class="mail-sug" id="mailSug" hidden></div>
-          <div class="mail-picked" id="mailPicked" hidden></div>
-        </div>
-
-        <input class="text" type="text" id="admMailTitle" maxlength="100" placeholder="ခေါင်းစဉ်" style="margin-top:12px">
-        <textarea class="text adm-ta" id="admMailBody" rows="4" maxlength="1000" placeholder="စာအကြောင်းအရာ"></textarea>
-
-        <div class="mail-gift" id="mailGift" hidden>
-          <button type="button" class="mg-box" id="mgBtn" aria-expanded="false">
-            <svg viewBox="0 0 64 64" aria-hidden="true">
-              <rect x="10" y="28" width="44" height="28" rx="4" fill="#FE2C55" stroke="#17143C" stroke-width="3"/>
-              <rect x="29" y="28" width="6" height="28" fill="#FFC933" stroke="#17143C" stroke-width="2"/>
-              <g class="mg-lid">
-                <rect x="6" y="18" width="52" height="12" rx="4" fill="#FF6B86" stroke="#17143C" stroke-width="3"/>
-                <rect x="29" y="18" width="6" height="12" fill="#FFC933" stroke="#17143C" stroke-width="2"/>
-                <path d="M32 18c-6-12-18-8-13-2 2 2 8 2 13 2zM32 18c6-12 18-8 13-2-2 2-8 2-13 2z" fill="#FFC933" stroke="#17143C" stroke-width="2.5" stroke-linejoin="round"/>
-              </g>
-            </svg>
-            <span><b>Credit လက်ဆောင် ထည့်မည်</b><small id="mgSub">နှိပ်ပြီး ပမာဏ ထည့်ပါ (မထည့်လည်း ရ)</small></span>
-          </button>
-          <div class="mg-panel" id="mgPanel" hidden>
-            <input class="text" type="number" inputmode="numeric" min="1" step="1" id="mgAmt" placeholder="လက်ဆောင် Credit ပမာဏ" aria-label="လက်ဆောင် Credit ပမာဏ">
-            <div class="mg-chips" id="mgChips">
-              <button type="button" data-n="50">+50</button>
-              <button type="button" data-n="100">+100</button>
-              <button type="button" data-n="500">+500</button>
-              <button type="button" data-n="1000">+1,000</button>
-            </div>
-            <button type="button" class="mg-clear" id="mgClear">လက်ဆောင် မပေးတော့ပါ</button>
-          </div>
-        </div>
-
-        <button type="button" class="btn-primary" id="admMailAll">User အားလုံးသို့ ပို့မည်</button>
-        <div class="msg" id="admMailMsg" role="status"></div>
-        <p class="note" id="mailNote">User အားလုံးဆီ စာပို့မည်။ တစ်ယောက်တည်းကို ပို့ချင်ရင် "User တစ်ယောက်" ကိုရွေးပြီး နာမည်ထည့်ပါ၊ ထိုအခါ 🎁 Credit လက်ဆောင်ပါ ထည့်ပေးနိုင်ပါမည်။</p>
-      </div>
-
-      <!-- User တွေဆီက စာများ -->
-      <div class="adm-pane" id="admPane-fb" hidden>
-        <div id="admFb"></div>
-      </div>
-
-      <!-- VIP: လျောက်ထားသူ + VIP Member များ -->
-      <div class="adm-pane" id="admPane-vip" hidden>
-        <p class="note">"VIP ဖွင့်ပေးမည်" ကိုနှိပ်ရင် User ရဲ့ Mail Box ထဲကို "VIP လက်ဆောင်ရယူရန်" (Credit 1,000 + 300 နှင့် VIP Border) ရောက်သွားမည်</p>
-        <div class="msg adm-status" id="admVipMsg" role="status"></div>
-        <div id="admVipList"></div>
-      </div>
-    </div>
-
-      <!-- PopUp: စာပို့သမားက User အားလုံးဆီ ပြမည့်စာ -->
-      <div class="adm-pane" id="admPane-popup" hidden>
-        <p class="note">"PopUp Sent" ကိုနှိပ်ရင် User အားလုံးရဲ့ စာပို့သမားပုံကနေ ဒီစာ ပေါ်လာမည်။ မပို့ထားရင် "မင်္ဂလာပါ ပျော်ရွှင်စရာ နေ့လေးတစ်နေ့ဖြစ်ပါစေ" ပဲ ပြပြီး ပျောက်သွားမည်။</p>
-        <textarea class="text adm-ta pm-ta" id="pmInput" rows="4" maxlength="300" placeholder="PopUp စာအကြောင်းအရာ"></textarea>
-        <div class="pm-row">
-          <button type="button" class="btn-primary" id="pmSend">PopUp Sent</button>
-          <button type="button" class="btn" id="pmOff">ပိတ်မည်</button>
-        </div>
-        <div class="msg" id="pmMsg" role="status"></div>
-      </div>
 
     <!-- Spend -->
     <div id="spendView" hidden>
@@ -1324,8 +1219,6 @@ let earnKind = '';                 // 'watch' | 'like'
 bindTabs($('appTabs'), (d) => {
   $('earnView').hidden  = d.view !== 'earn';
   $('spendView').hidden = d.view !== 'spend';
-  $('adminView').hidden = d.view !== 'admin';
-  if (d.view === 'admin') admLoad();
   if (d.view === 'spend') loadOrders();
   if (d.view !== 'earn') { lkStop(); }
   else if (lk && !lkFinished && !likeTaskEl.hidden && !lkWrap.hidden) {
@@ -1930,166 +1823,7 @@ function buildEditForm(o) {
   return f;
 }
 
-// ===== Admin =====
-let myId = null, isAdm = false;
-async function checkAdmin() {
-  try {
-    const { data } = await sb.rpc('is_admin');
-    isAdm = !!data;
-    $('fbBox').hidden = isAdm;
-    $('adminTab').hidden = !data;
-    if (data) { admFbLoad(); admVipLoad(); }
-    $('appTabs').style.gridTemplateColumns = data ? 'repeat(3, 1fr)' : '';
-  } catch (e) {}
-}
-const admList = $('admList'), admMsg = $('admMsg'), admQ = $('admQ');
-function admSay(t, ok) { admMsg.textContent = t; admMsg.className = 'msg adm-status ' + (ok ? 'ok' : 'err'); }
-
-let admTok = 0, admRows = [], admShown = 0;
-const ADM_PAGE = 20;
-const admMore = $('admMore');
-function admRender() {
-  const next = admRows.slice(admShown, admShown + ADM_PAGE);
-  next.forEach(u => admList.appendChild(admCard(u)));
-  admShown += next.length;
-  const left = admRows.length - admShown;
-  admMore.hidden = left <= 0;
-  admMore.textContent = 'နောက်ထပ်ကြည့်မည် (ကျန် ' + left + ' ဦး)';
-}
-admMore.addEventListener('click', admRender);
-async function admSearchUsers() {
-  const my = ++admTok;
-  const { data, error } = await sb.rpc('admin_list_users', { p_search: admQ.value.trim() || null });
-  if (my !== admTok) return;                       // နောက်ဆုံးရိုက်တာကိုသာ ပြ
-  if (error) { admSay('ယူမရပါ (' + (error.message || '') + ')', false); return; }
-  admList.replaceChildren();
-  admRows = data; admShown = 0; admMore.hidden = true;
-  if (!data.length) { admSay('', true); admList.appendChild(el('div', 'ord-empty', 'User မတွေ့ပါ')); return; }
-  admSay('User ' + data.length + ' ဦး · နာမည်ကို နှိပ်ပြီး ဖွင့်ပါ', true);
-  admRender();
-  if (data.length === 1) admList.firstChild.admToggle(true);   // တစ်ယောက်တည်းဆို အလိုအလျောက် ဖွင့်
-}
-async function admLoad() {
-  admSay('', true);
-  admFbLoad();
-  admVipLoad();
-  creditListLoad(true);
-  await admSearchUsers();
-}
-const clList = $('clList'), clSum = $('clSum'), clMore = $('clMore');
-const CL_PAGE = 50;
-let clOffset = 0;
-const fmtNum = (n) => Number(n || 0).toLocaleString('en-US');
-async function creditListLoad(reset) {
-  if (reset) { clOffset = 0; clList.replaceChildren(); }
-  clMore.disabled = true;
-  const { data, error } = await sb.rpc('admin_credit_list', { p_limit: CL_PAGE, p_offset: clOffset });
-  if (error || !Array.isArray(data)) {
-    clSum.textContent = 'စာရင်း ယူမရပါ';
-    clMore.hidden = true;
-    return;
-  }
-  if (data.length) { $('clUsers').textContent = fmtNum(data[0].total_users); $('clTotal').textContent = fmtNum(data[0].total_credit); }
-  data.forEach((u, i) => {
-    const row = el('div', 'cl-row cl-go');
-    row.addEventListener('click', () => { admQ.value = u.username || ''; admGoUser(); });
-    row.append(el('span', 'cl-rank', String(clOffset + i + 1)), el('span', 'cl-name', u.username || '-'), el('b', 'cl-credit', fmtNum(u.credit)));
-    clList.appendChild(row);
-  });
-  clOffset += data.length;
-  clMore.hidden = data.length < CL_PAGE;
-  clMore.disabled = false;
-  if (!clOffset) { clList.appendChild(el('div', 'ord-empty', 'User မရှိသေးပါ')); }
-}
-clMore.addEventListener('click', () => creditListLoad(false));
-$('admSearch').addEventListener('click', admLoad);
-admQ.addEventListener('keydown', e => { if (e.key === 'Enter') admLoad(); });
-// ---- Admin sub-tabs ----
-const admPanes = { user: $('admPane-user'), credit: $('admPane-credit'), mail: $('admPane-mail'), fb: $('admPane-fb'), vip: $('admPane-vip'), popup: $('admPane-popup') };
-bindTabs($('admTabs'), (d) => {
-  for (const k in admPanes) admPanes[k].hidden = k !== d.pane;
-  if (d.pane === 'vip') admVipLoad();
-  if (d.pane === 'popup') pmAdminFill();
-});
-function admGoUser() {                              // Credit စာရင်းကနေ နာမည်နှိပ်ရင် User tab ကို ပြောင်းပြီး ရှာ
-  $('admTabs').querySelector('[data-pane="user"]').click();
-  admSearchUsers();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-let admTimer = null;
-admQ.addEventListener('input', () => { clearTimeout(admTimer); admTimer = setTimeout(admSearchUsers, 300); });   // ရိုက်ရင်း ရှာ
-
-function admCard(u) {
-  const card = el('div', 'ord adm-card');
-  const top = el('button', 'ord-top adm-head');
-  top.type = 'button'; top.setAttribute('aria-expanded', 'false');
-  const badge = el('span', 'badge st-open', u.credit + ' Credit');
-  top.append(el('span', 'ord-name', u.username), badge, el('span', 'adm-chev', '▾'));
-  const body = el('div', 'adm-body'); body.hidden = true;
-  const setOpen = (o) => { body.hidden = !o; card.classList.toggle('adm-open', o); top.setAttribute('aria-expanded', String(o)); };
-  card.admToggle = setOpen;
-
-  const inp = el('input', 'text');
-  inp.type = 'number'; inp.inputMode = 'numeric'; inp.placeholder = 'Credit ပမာဏ';
-  inp.classList.add('adm-amt'); inp.setAttribute('aria-label', 'Credit ပမာဏ');
-
-  const act = el('div', 'ord-act adm-act');
-  const add = el('button', '', 'ထည့်မည် (+)');
-  const set = el('button', '', 'သတ်မှတ် (=)');
-  const pw  = el('button', '', 'Password');
-  const vp  = el('button', '', '👑 VIP ဖွင့်ပေးမည်');
-  [add, set, pw, vp].forEach(b => b.type = 'button');
-  add.classList.add('pri'); set.classList.add('pri'); vp.classList.add('vip', 'wide');
-  act.append(add, set, pw, vp);
-
-  const msg = el('div', 'msg');
-  const say = (t, ok) => { msg.textContent = t; msg.className = 'msg ' + (ok ? 'ok' : 'err'); };
-  const done = (v) => {
-    badge.textContent = v + ' Credit'; u.credit = v; inp.value = '';
-    say('✓ ပြီးပါပြီ', true);
-    if (u.id === myId) setCredit(v, true);
-    creditListLoad(true);
-  };
-  const num = () => { const n = parseInt(inp.value, 10); if (isNaN(n)) { say('ပမာဏ ထည့်ပါ', false); return null; } return n; };
-
-  vp.addEventListener('click', async () => {
-    if (!confirm((u.username || 'User') + ' ကို VIP ဖွင့်ပေးမလား? (Mail Box ထဲ လက်ဆောင်ရောက်မည်)')) return;
-    vp.disabled = true;
-    const { error } = await sb.rpc('admin_vip_action', { p_user: u.id, p_action: 'grant' });
-    vp.disabled = false;
-    if (error) { say('မအောင်မြင်ပါ (' + errText(error) + ')', false); return; }
-    say('✓ VIP လက်ဆောင် ပို့ပြီးပါပြီ', true);
-    admVipLoad();
-  });
-  add.addEventListener('click', async () => {
-    const n = num(); if (n === null) return;
-    const { data, error } = await sb.rpc('admin_adjust_credit', { p_user: u.id, p_delta: n });
-    error ? say('မအောင်မြင်ပါ (' + (error.message || '') + ')', false) : done(data);
-  });
-  set.addEventListener('click', async () => {
-    const n = num(); if (n === null) return;
-    if (n < 0) { say('0 နှင့်အထက် ထည့်ပါ', false); return; }
-    const { data, error } = await sb.rpc('admin_set_credit', { p_user: u.id, p_credit: n });
-    error ? say('မအောင်မြင်ပါ (' + (error.message || '') + ')', false) : done(data);
-  });
-  pw.addEventListener('click', async () => {
-    const v = prompt(u.username + ' ၏ စကားဝှက်အသစ် (အနည်းဆုံး ၆ လုံး)');
-    if (!v) return;
-    if (v.length < 6) { say('အနည်းဆုံး ၆ လုံး ထည့်ပါ', false); return; }
-    const { error } = await sb.rpc('admin_set_password', { p_user: u.id, p_password: v });
-    error ? say('မအောင်မြင်ပါ (' + (error.message || '') + ')', false) : say('✓ စကားဝှက် ပြောင်းပြီးပါပြီ', true);
-  });
-
-  body.append(inp, act, msg);
-  card.append(top, body);
-  top.addEventListener('click', () => {
-    const open = body.hidden;
-    if (open) admList.querySelectorAll('.adm-card.adm-open').forEach(c => c.admToggle(false));   // တစ်ခုပဲ ဖွင့်
-    setOpen(open);
-  });
-  return card;
-}
-
+// Admin dashboard code is isolated in admin.html.
 // ================= Mail Box =================
 const mailBtn = $('mailBtn'), mailBadge = $('mailBadge'), mailModal = $('mailModal'), mailList = $('mailList');
 function fmtDate(str) {
@@ -2159,135 +1893,8 @@ document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMail(
 let mailTimer = null;
 function startMailPolling() {
   loadMail(false);
-  if (!mailTimer) mailTimer = setInterval(() => { if (!appScreen.hidden && mailModal.hidden) { loadMail(false); loadMe(); if (isAdm) { admFbLoad(); admVipLoad(); } } }, 60000);
+  if (!mailTimer) mailTimer = setInterval(() => { if (!appScreen.hidden && mailModal.hidden) { loadMail(false); loadMe(); } }, 60000);
 }
-
-async function admSendMail(userId, say, btn, src) {
-  const tEl = src ? src.t : $('admMailTitle'), bEl = src ? src.b : $('admMailBody');
-  const t = tEl.value.trim(), b = bEl.value.trim();
-  if (!t || !b) { say('ခေါင်းစဉ်နှင့် စာအကြောင်းအရာ ထည့်ပါ', false); return; }
-  if (!userId && !confirm('User အားလုံးဆီ ပို့မလား?')) return;
-  if (btn) btn.disabled = true;
-  const { data, error } = await sb.rpc('admin_send_message', { p_user: userId, p_title: t, p_body: b });
-  if (btn) btn.disabled = false;
-  if (error) { say('မအောင်မြင်ပါ (' + errText(error) + ')', false); return; }
-  say('✓ စာပို့ပြီးပါပြီ (' + data + ' ဦး)', true);
-  tEl.value = ''; bEl.value = '';
-  return true;
-}
-// ---- စာပို့ tab: User အားလုံး / User တစ်ယောက် + 🎁 Credit လက်ဆောင် ----
-const mailToEl = $('mailTo'), mailWho = $('mailWho'), mailUser = $('mailUser'), mailSug = $('mailSug'), mailPicked = $('mailPicked');
-const mailGift = $('mailGift'), mgBtn = $('mgBtn'), mgPanel = $('mgPanel'), mgAmt = $('mgAmt'), mgSub = $('mgSub');
-const mailSend = $('admMailAll'), mailMsg = $('admMailMsg');
-let mailMode = 'all', mailTarget = null, mailSugTok = 0, mailSugTimer = null;
-const mailSay = (t, ok) => { mailMsg.textContent = t; mailMsg.className = 'msg ' + (ok ? 'ok' : 'err'); };
-const giftAmt = () => { const n = parseInt(mgAmt.value, 10); return n > 0 ? n : 0; };
-
-function mailRefresh() {
-  const one = mailMode === 'one';
-  mailToEl.querySelectorAll('button').forEach(b => { const on = b.dataset.to === mailMode; b.classList.toggle('on', on); b.setAttribute('aria-selected', String(on)); });
-  mailWho.hidden = !one;
-  mailGift.hidden = !one;
-  const g = one ? giftAmt() : 0;
-  mailGift.classList.toggle('has', g > 0);
-  mgSub.textContent = g > 0 ? '🎁 ' + fmtNum(g) + ' Credit လက်ဆောင် ပါမည်' : 'နှိပ်ပြီး ပမာဏ ထည့်ပါ (မထည့်လည်း ရ)';
-  mailSend.textContent = !one ? 'User အားလုံးသို့ ပို့မည်'
-    : (mailTarget ? mailTarget.username + ' ဆီ ပို့မည်' : 'User ကို အရင်ရွေးပါ') + (g > 0 ? ' + 🎁 ' + fmtNum(g) : '');
-  $('mailNote').hidden = one && !!mailTarget;
-}
-function mailPick(u) {
-  mailTarget = u;
-  mailSug.hidden = true; mailSug.replaceChildren();
-  mailUser.hidden = true; mailUser.value = '';
-  mailPicked.hidden = false;
-  const x = el('button', '', '✕'); x.type = 'button'; x.setAttribute('aria-label', 'ပြောင်းရန်');
-  x.addEventListener('click', () => { mailTarget = null; mailPicked.hidden = true; mailUser.hidden = false; mailUser.focus(); mailRefresh(); });
-  mailPicked.replaceChildren(el('b', '', u.username), el('small', '', fmtNum(u.credit) + ' Credit'), x);
-  mailRefresh();
-}
-async function mailSuggest() {
-  const q = mailUser.value.trim();
-  const my = ++mailSugTok;
-  if (!q) { mailSug.hidden = true; mailSug.replaceChildren(); return; }
-  const { data, error } = await sb.rpc('admin_list_users', { p_search: q });
-  if (my !== mailSugTok) return;
-  mailSug.replaceChildren();
-  mailSug.hidden = false;
-  if (error || !Array.isArray(data)) { mailSug.appendChild(el('div', 'ms-empty', 'ရှာမရပါ')); return; }
-  if (!data.length) { mailSug.appendChild(el('div', 'ms-empty', 'User မတွေ့ပါ')); return; }
-  data.slice(0, 8).forEach(u => {
-    const b = el('button'); b.type = 'button';
-    b.append(el('span', 'ms-name', u.username || '-'), el('span', 'ms-cr', fmtNum(u.credit) + ' Credit'));
-    b.addEventListener('click', () => mailPick(u));
-    mailSug.appendChild(b);
-  });
-}
-mailToEl.addEventListener('click', (e) => {
-  const b = e.target.closest('button'); if (!b) return;
-  mailMode = b.dataset.to; mailSay('', true); mailRefresh();
-  if (mailMode === 'one' && !mailTarget) mailUser.focus();
-});
-mailUser.addEventListener('input', () => { clearTimeout(mailSugTimer); mailSugTimer = setTimeout(mailSuggest, 250); });
-mailUser.addEventListener('keydown', (e) => {
-  if (e.key !== 'Enter') return;
-  e.preventDefault();
-  const first = mailSug.querySelector('button');
-  if (first) first.click();
-});
-mgBtn.addEventListener('click', () => {
-  const open = mgPanel.hidden;
-  mgPanel.hidden = !open;
-  mailGift.classList.toggle('open', open);
-  mgBtn.setAttribute('aria-expanded', String(open));
-  if (open) mgAmt.focus();
-});
-mgAmt.addEventListener('input', mailRefresh);
-$('mgChips').addEventListener('click', (e) => {
-  const b = e.target.closest('button'); if (!b) return;
-  mgAmt.value = String(giftAmt() + Number(b.dataset.n));
-  mailRefresh();
-});
-$('mgClear').addEventListener('click', () => { mgAmt.value = ''; mailRefresh(); });
-mailRefresh();
-
-mailSend.addEventListener('click', async () => {
-  if (mailMode === 'all') {
-    admSendMail(null, mailSay, mailSend);
-    return;
-  }
-  if (!mailTarget) { mailSay('User နာမည် ရှာပြီး ရွေးပါ', false); mailUser.focus(); return; }
-  const u = mailTarget, g = giftAmt();
-  const tEl = $('admMailTitle'), bEl = $('admMailBody');
-  const t = tEl.value.trim(); let b = bEl.value.trim();
-  if (!t || !b) { mailSay('ခေါင်းစဉ်နှင့် စာအကြောင်းအရာ ထည့်ပါ', false); return; }
-  if (g > 0 && !confirm(u.username + ' ကို 🎁 Credit ' + fmtNum(g) + ' လက်ဆောင်နဲ့ စာပို့မလား?')) return;
-  mailSend.disabled = true;
-  try {
-    let newCredit = null;
-    if (g > 0) {                                     // လက်ဆောင် Credit ကို အရင်ထည့် — မအောင်ရင် စာမပို့
-      const r = await sb.rpc('admin_adjust_credit', { p_user: u.id, p_delta: g });
-      if (r.error) { mailSay('Credit မထည့်နိုင်ပါ (' + errText(r.error) + ')', false); return; }
-      newCredit = r.data;
-      u.credit = newCredit;
-      if (u.id === myId) setCredit(newCredit, true);
-      b = b + '\n\n🎁 လက်ဆောင် Credit ' + fmtNum(g) + ' ကို သင့်ဆီ ထည့်ပေးထားပါပြီ';
-    }
-    const m = await sb.rpc('admin_send_message', { p_user: u.id, p_title: (g > 0 ? '🎁 ' : '') + t, p_body: b });
-    if (m.error) {
-      mailSay((g > 0 ? 'Credit ' + fmtNum(g) + ' ထည့်ပြီးပါပြီ၊ ဒါပေမဲ့ ' : '') + 'စာ မပို့နိုင်ပါ (' + errText(m.error) + ')', false);
-      if (g > 0) { mgAmt.value = ''; mailPick(u); creditListLoad(true); }
-      return;
-    }
-    mailSay('✓ ' + u.username + ' ဆီ စာပို့ပြီးပါပြီ' + (g > 0 ? ' · 🎁 Credit ' + fmtNum(g) + ' လက်ဆောင်ပေးပြီး (လက်ကျန် ' + fmtNum(newCredit) + ')' : ''), true);
-    tEl.value = ''; bEl.value = ''; mgAmt.value = '';
-    mgPanel.hidden = true; mailGift.classList.remove('open'); mgBtn.setAttribute('aria-expanded', 'false');
-    mailPick(u);
-    if (g > 0) { creditListLoad(true); admSearchUsers(); }
-  } finally {
-    mailSend.disabled = false;
-  }
-});
-
 
 // ---------- User → Admin messages ----------
 $('fbSend').addEventListener('click', async () => {
@@ -2301,53 +1908,6 @@ $('fbSend').addEventListener('click', async () => {
   ta.value = '';
   say('✓ Admin ဆီ ပို့ပြီးပါပြီ', true);
 });
-
-// ---------- Admin: user messages ----------
-async function admFbLoad() {
-  let res;
-  try { res = await sb.rpc('admin_list_feedback'); } catch (e) { return; }
-  const data = res.data;
-  if (res.error || !Array.isArray(data)) return;
-  const unread = data.filter(f => !f.is_read).length;
-  $('adminTab').textContent = unread ? 'Admin (' + unread + ')' : 'Admin';
-  $('admFbCount').textContent = unread > 9 ? '9+' : String(unread); $('admFbCount').hidden = !unread;
-  const box = $('admFb');
-  box.replaceChildren();
-  if (!data.length) { box.appendChild(el('div', 'ord-empty', 'စာ မရှိသေးပါ')); return; }
-  data.forEach(f => box.appendChild(admFbCard(f)));
-}
-function admFbCard(f) {
-  const c = el('div', 'mail-item' + (f.is_read ? '' : ' unread'));
-  const head = el('div', 'adm-mi-head');
-  head.append(el('b', '', f.username || 'User'), el('small', '', fmtDate(f.created_at)));
-  c.append(head, el('p', '', f.body));
-  const act = el('div', 'ord-act');
-  const rp = el('button', '', 'ပြန်စာ'), rd = el('button', '', 'ဖတ်ပြီး'), dl = el('button', 'del', 'ဖျက်');
-  [rp, rd, dl].forEach(b => b.type = 'button');
-  rd.hidden = !!f.is_read;
-  act.append(rp, rd, dl);
-  const msg = el('div', 'msg');
-  const say = (t, ok) => { msg.textContent = t; msg.className = 'msg ' + (ok ? 'ok' : 'err'); };
-  rp.addEventListener('click', async () => {
-    const v = prompt((f.username || 'User') + ' ကို ပြန်စာ');
-    if (!v || !v.trim()) return;
-    const r = await sb.rpc('admin_send_message', { p_user: f.user_id, p_title: 'Admin ပြန်စာ', p_body: v });
-    if (r.error) { say('မအောင်မြင်ပါ (' + errText(r.error) + ')', false); return; }
-    await sb.rpc('admin_mark_feedback', { p_id: f.id });
-    admFbLoad();
-  });
-  rd.addEventListener('click', async () => {
-    const r = await sb.rpc('admin_mark_feedback', { p_id: f.id });
-    r.error ? say('မအောင်မြင်ပါ', false) : admFbLoad();
-  });
-  dl.addEventListener('click', async () => {
-    if (!confirm('ဒီစာကို ဖျက်မလား?')) return;
-    const r = await sb.rpc('admin_delete_feedback', { p_id: f.id });
-    r.error ? say('မအောင်မြင်ပါ', false) : admFbLoad();
-  });
-  c.append(act, msg);
-  return c;
-}
 
 // ===== Gift box =====
 const giftCard = $('giftCard'), giftBtn = $('giftBtn');
@@ -2449,7 +2009,7 @@ async function enterApp(user) {
   $('who').textContent = data.username;
   try { myName = data.username; me = null; paintMe(); loadMe().catch(() => {}); } catch (e) { console.error('profile paint:', e); }
   setCredit(data.credit);
-  myId = user.id; checkAdmin();
+  // Admin dashboard is served separately from admin.html.
   startMailPolling(); refreshBonus();
   authScreen.hidden = true;
   appScreen.hidden = false;
@@ -2815,48 +2375,6 @@ async function claimVipGift(btn) {
   await loadMail(true);
 }
 
-// ----- Admin: VIP tab -----
-async function admVipLoad() {
-  const list = $('admVipList'), msg = $('admVipMsg');
-  const say = (t, ok) => { msg.textContent = t; msg.className = 'msg adm-status ' + (ok ? 'ok' : 'err'); };
-  const { data, error } = await sb.rpc('admin_list_vip');
-  if (error || !Array.isArray(data)) { list.replaceChildren(el('div', 'ord-empty', 'မယူနိုင်ပါ')); return; }
-  const req = data.filter(r => r.kind === 'request').length;
-  $('admVipCount').hidden = req === 0;
-  $('admVipCount').textContent = req > 9 ? '9+' : String(req);
-  list.replaceChildren();
-  if (!data.length) { list.appendChild(el('div', 'ord-empty', 'လျောက်ထားသူ မရှိသေးပါ')); return; }
-  const LABEL = { request: 'လျောက်ထားသည်', gift: 'လက်ဆောင်မယူရသေး', active: 'VIP', expired: 'သက်တမ်းကုန်' };
-  data.forEach(r => {
-    const c = el('div', 'mail-item' + (r.kind === 'request' ? ' unread' : ''));
-    const badge = el('span', 'adm-vip-badge' + (r.kind === 'active' ? ' act' : ''),
-      LABEL[r.kind] + (r.kind === 'active' ? ' · ကျန် ' + r.days_left + ' ရက်' : ''));
-    const head = el('div', 'adm-mi-head');
-    head.append(el('b', '', r.username || 'User'), badge);
-    c.appendChild(head);
-    if (r.note) c.appendChild(el('p', '', r.note));
-    const act = el('div', 'ord-act');
-    const mk = (label, action, ask) => {
-      const b = el('button', '', label); b.type = 'button';
-      b.addEventListener('click', async () => {
-        if (ask && !confirm(ask)) return;
-        b.disabled = true;
-        const res = await sb.rpc('admin_vip_action', { p_user: r.user_id, p_action: action });
-        if (res.error) { b.disabled = false; say('မအောင်မြင်ပါ (' + errText(res.error) + ')', false); return; }
-        say('✓ ပြီးပါပြီ', true); admVipLoad();
-      });
-      act.appendChild(b);
-    };
-    if (r.kind === 'request' || r.kind === 'expired') mk('👑 VIP ဖွင့်ပေးမည်', 'grant', (r.username || 'User') + ' ကို VIP ဖွင့်ပေးမလား? (Mail Box ထဲ လက်ဆောင်ရောက်မည်)');
-    if (r.kind === 'request') mk('ပယ်မည်', 'dismiss', 'လျောက်ထားချက်ကို ပယ်မလား?');
-    if (r.kind === 'gift' || r.kind === 'active') mk('VIP ပြန်ရုပ်မည်', 'revoke', 'VIP ကို ရုပ်သိမ်းမလား?');
-    c.appendChild(act);
-    list.appendChild(c);
-  });
-}
-
-
-
 // ===== Postman popup (စာပို့သမား) =====
 const PM_DEFAULT = 'မင်္ဂလာပါ ပျော်ရွှင်စရာ နေ့လေးတစ်နေ့ဖြစ်ပါစေ';
 const PM_SUGGEST = 'ပျော်ရွှင်စရာအချိန်လေးဖြစ်ပါစေ 1 နာရီအတွင်း Task တစ်ခုလုပ်ဆောင်ပြီးတိုင်း Credit 1 ခုအပိုရယူပါ';
@@ -2942,30 +2460,6 @@ pmRestorePos(pmEl,'pmIconPos'); pmRestorePos(pmBubble,'pmBubblePos');
   setInterval(async () => { await pmFetch(); pmPaint(); if (pmIsNew() && !pmBubble.classList.contains('show')) pmOpen(true); }, 60000);
 })();
 
-// ---- Admin: PopUp tab ----
-const pmInput = $('pmInput'), pmMsg = $('pmMsg'), pmSend = $('pmSend'), pmOff = $('pmOff');
-const pmSay = (t, ok) => { pmMsg.textContent = t; pmMsg.className = 'msg ' + (ok ? 'ok' : 'err'); };
-async function pmAdminFill() {
-  await pmFetch();
-  if (!pmInput.value) pmInput.value = (pmData && pmData.body) || PM_SUGGEST;
-}
-async function pmAdminSave(body, active) {
-  pmSend.disabled = pmOff.disabled = true;
-  const { error } = await sb.rpc('admin_set_popup', { p_body: body, p_active: active });
-  pmSend.disabled = pmOff.disabled = false;
-  if (error) { pmSay('မအောင်မြင်ပါ (' + errText(error).replace('vip_profile.sql', 'popup.sql') + ')', false); return false; }
-  await pmFetch();
-  pmSay(active ? '✓ PopUp ပို့ပြီးပါပြီ' : '✓ PopUp ပိတ်ပြီးပါပြီ', true);
-  return true;
-}
-pmSend.addEventListener('click', async () => {
-  const t = pmInput.value.trim();
-  if (!t) { pmSay('PopUp စာအကြောင်းအရာ ထည့်ပါ', false); return; }
-  if (await pmAdminSave(t, true)) { pmSet('pmSeen', ''); pmOpen(false); }
-});
-pmOff.addEventListener('click', async () => {
-  if (await pmAdminSave('', false)) pmHide();
-});
 </script>
 </body>
 </html>
