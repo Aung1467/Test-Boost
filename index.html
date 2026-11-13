@@ -459,6 +459,10 @@ select.text {
 .adm-act .vip, .adm-act .vip:hover { background: linear-gradient(135deg, #FFF1B8, #FFC933); border-color: var(--gold); font-weight: 700; }
 .ord-act button:disabled { opacity: .5; cursor: not-allowed; }
 
+.adm-compose { margin-top: 10px; padding: 12px; background: var(--soft); border-radius: var(--r-md); }
+.adm-compose .text { background: #fff; }
+.adm-compose .btn-primary { min-height: 46px; margin-top: 10px; font-size: 15px; }
+.adm-act .on, .adm-act .on:hover { background: var(--soft); border-color: var(--ink); }
 /* mail / feedback / vip lists share the mail-item card */
 .adm-mi-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .adm-mi-head b { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -899,7 +903,7 @@ body {
         <textarea class="text adm-ta" id="admMailBody" rows="4" maxlength="1000" placeholder="စာအကြောင်းအရာ"></textarea>
         <button type="button" class="btn-primary" id="admMailAll">User အားလုံးသို့ ပို့မည်</button>
         <div class="msg" id="admMailMsg" role="status"></div>
-        <p class="note">တစ်ယောက်တည်းကို ပို့ချင်ရင် User tab မှာ ရှာပြီး ၎င်းရဲ့ "စာပို့" ကိုနှိပ်ပါ (ဒီမှာ ရေးထားတဲ့ စာကို သုံးမည်)</p>
+        <p class="note">တစ်ယောက်တည်းကို ပို့ချင်ရင် User tab မှာ ရှာပြီး ၎င်းရဲ့ "စာပို့" ကိုနှိပ်ပါ (စာရိုက်ကွက် ပေါ်လာမည်)</p>
       </div>
 
       <!-- User တွေဆီက စာများ -->
@@ -1868,9 +1872,21 @@ function admCard(u) {
     error ? say('မအောင်မြင်ပါ (' + (error.message || '') + ')', false) : say('✓ စကားဝှက် ပြောင်းပြီးပါပြီ', true);
   });
 
-  ml.addEventListener('click', () => admSendMail(u.id, say, ml));
+  const mailBox = el('div', 'adm-compose'); mailBox.hidden = true;
+  const mt = el('input', 'text'); mt.type = 'text'; mt.maxLength = 100; mt.placeholder = 'ခေါင်းစဉ်';
+  const mb = el('textarea', 'text adm-ta'); mb.rows = 3; mb.maxLength = 1000; mb.placeholder = 'စာအကြောင်းအရာ';
+  const go = el('button', 'btn-primary', (u.username || 'User') + ' ဆီ ပို့မည်'); go.type = 'button';
+  mailBox.append(mt, mb, go);
+  ml.addEventListener('click', () => {
+    mailBox.hidden = !mailBox.hidden;
+    ml.classList.toggle('on', !mailBox.hidden);
+    if (!mailBox.hidden) mt.focus();
+  });
+  go.addEventListener('click', async () => {
+    if (await admSendMail(u.id, say, go, { t: mt, b: mb })) { mailBox.hidden = true; ml.classList.remove('on'); }
+  });
 
-  body.append(inp, act, msg);
+  body.append(inp, act, mailBox, msg);
   card.append(top, body);
   top.addEventListener('click', () => {
     const open = body.hidden;
@@ -1952,8 +1968,9 @@ function startMailPolling() {
   if (!mailTimer) mailTimer = setInterval(() => { if (!appScreen.hidden && mailModal.hidden) { loadMail(false); loadMe(); if (isAdm) { admFbLoad(); admVipLoad(); } } }, 60000);
 }
 
-async function admSendMail(userId, say, btn) {
-  const t = $('admMailTitle').value.trim(), b = $('admMailBody').value.trim();
+async function admSendMail(userId, say, btn, src) {
+  const tEl = src ? src.t : $('admMailTitle'), bEl = src ? src.b : $('admMailBody');
+  const t = tEl.value.trim(), b = bEl.value.trim();
   if (!t || !b) { say('ခေါင်းစဉ်နှင့် စာအကြောင်းအရာ ထည့်ပါ', false); return; }
   if (!userId && !confirm('User အားလုံးဆီ ပို့မလား?')) return;
   if (btn) btn.disabled = true;
@@ -1961,7 +1978,8 @@ async function admSendMail(userId, say, btn) {
   if (btn) btn.disabled = false;
   if (error) { say('မအောင်မြင်ပါ (' + errText(error) + ')', false); return; }
   say('✓ စာပို့ပြီးပါပြီ (' + data + ' ဦး)', true);
-  if (!userId) { $('admMailTitle').value = ''; $('admMailBody').value = ''; }
+  tEl.value = ''; bEl.value = '';
+  return true;
 }
 $('admMailAll').addEventListener('click', () => {
   const m = $('admMailMsg');
