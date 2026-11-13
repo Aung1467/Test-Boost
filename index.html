@@ -767,6 +767,20 @@ body { letter-spacing:.005em; }
   .pm-bubble.show { animation:none; }
 }
 
+
+/* Attached floating postman: icon + message are one draggable unit */
+.pm-float{position:fixed;left:auto;right:10px;top:110px;width:60px;height:60px;z-index:1200;touch-action:none;user-select:none;-webkit-user-select:none;transition:transform .42s cubic-bezier(.2,.8,.2,1);}
+.pm-float .postman{position:absolute!important;left:0!important;right:auto!important;top:auto!important;bottom:0!important;width:60px;height:60px;z-index:2;touch-action:none;cursor:grab;}
+.pm-float .pm-bubble{position:absolute!important;left:auto;right:0;top:auto;bottom:70px;width:min(300px,calc(100vw - 24px));max-width:calc(100vw - 24px);z-index:1;opacity:0;pointer-events:none;transform:translateY(8px) scale(.97);transform-origin:bottom right;transition:opacity .22s ease,transform .22s ease;cursor:grab;}
+.pm-float .pm-bubble.show{opacity:1;pointer-events:auto;transform:none;}
+.pm-float.docked-right{transform:translateX(calc(100% - 18px));}
+.pm-float.docked-right .pm-bubble{right:18px;transform-origin:bottom right;}
+.pm-float.docked-left{transform:translateX(calc(-100% + 18px));}
+.pm-float.docked-left .pm-bubble{left:42px;right:auto;transform-origin:bottom left;}
+.pm-float.dragging{transition:none!important;cursor:grabbing;}
+.pm-float.dragging .postman{cursor:grabbing;}
+body.modal-open .pm-float{display:none!important;}
+
 </style>
 </head>
 <body>
@@ -1070,6 +1084,7 @@ body { letter-spacing:.005em; }
   </div>
 </div>
 
+<div class="pm-float" id="pmFloat" aria-label="စာပို့သမား">
 <button type="button" class="postman" id="postman" aria-label="Admin ဆီက စာ ကြည့်ရန်">
   <svg viewBox="0 0 48 48" aria-hidden="true">
     <path d="M12 44c0-8 5-13 12-13s12 5 12 13z" fill="#2B6BFF" stroke="#17143C" stroke-width="2.2" stroke-linejoin="round"/>
@@ -1085,6 +1100,7 @@ body { letter-spacing:.005em; }
   <span class="pm-dot" id="pmDot" hidden></span>
 </button>
 <div class="pm-bubble" id="pmBubble" role="status" aria-live="polite"><small id="pmTag">📮 စာပို့သမား</small><span id="pmText"></span></div>
+</div>
 
 <script>
 /* DIAG vip-6: error ဖြစ်ရင် ဖန်သားပြင်အောက်ခြေမှာ အနီရောင်နဲ့ ပြမည် (screenshot ရိုက်ပို့ပါ) */
@@ -2377,96 +2393,35 @@ async function claimVipGift(btn) {
   await loadMail(true);
 }
 
-// ===== Postman popup (စာပို့သမား) =====
+// ===== Attached floating postman + message bubble =====
 const PM_DEFAULT = 'မင်္ဂလာပါ ပျော်ရွှင်စရာ နေ့လေးတစ်နေ့ဖြစ်ပါစေ';
 const PM_SUGGEST = 'ပျော်ရွှင်စရာအချိန်လေးဖြစ်ပါစေ 1 နာရီအတွင်း Task တစ်ခုလုပ်ဆောင်ပြီးတိုင်း Credit 1 ခုအပိုရယူပါ';
-const pmEl = $('postman'), pmBubble = $('pmBubble'), pmText = $('pmText'), pmDot = $('pmDot'), pmTag = $('pmTag');
-let pmData = null, pmHideT = null;
-const pmGet = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
-const pmSet = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
-function pmHide() { clearTimeout(pmHideT); pmBubble.classList.remove('show'); }
-function pmShow(text, special) {
-  clearTimeout(pmHideT);
-  pmText.textContent = text;
-  pmTag.hidden = !special;
-  pmBubble.classList.add('show');
-  pmHideT = setTimeout(pmHide, special ? 9000 : 4000);
-}
-async function pmFetch() {
-  if (!sb) return null;
-  try {
-    const { data, error } = await sb.from('app_popup').select('body,active,updated_at').eq('id', 1).maybeSingle();
-    if (error) return null;
-    pmData = data && data.active && data.body ? data : null;
-  } catch (e) { pmData = null; }
-  return pmData;
-}
-function pmIsNew() { return !!pmData && pmGet('pmSeen') !== pmData.updated_at; }
-function pmPaint() { const n = pmIsNew(); pmDot.hidden = !n; pmEl.classList.toggle('new', n); }
-async function pmOpen(auto) {
-  await pmFetch();
-  if (pmData) { pmShow(pmData.body, true); pmSet('pmSeen', pmData.updated_at); }
-  else if (!auto || !pmBubble.classList.contains('show')) pmShow(PM_DEFAULT, false);
-  pmPaint();
-}
-let pmDragged = false, pmDragSuppressClick = false;
-function pmViewport() {
-  const vv = window.visualViewport;
-  return { w: vv ? vv.width : window.innerWidth, h: vv ? vv.height : window.innerHeight,
-    ox: vv ? vv.offsetLeft : 0, oy: vv ? vv.offsetTop : 0 };
-}
-function pmClamp(elm, x, y) {
-  const v=pmViewport(), r=elm.getBoundingClientRect(), pad=10;
-  return {x:Math.max(v.ox+pad,Math.min(v.ox+v.w-r.width-pad,x)),y:Math.max(v.oy+pad,Math.min(v.oy+v.h-r.height-pad,y))};
-}
-function pmSetPos(elm,x,y,key) {
-  const p=pmClamp(elm,x,y); elm.style.left=p.x+'px'; elm.style.top=p.y+'px'; elm.style.right='auto';
-  pmSet(key,JSON.stringify({x:p.x,y:p.y}));
-}
-function pmRestorePos(elm,key) {
-  try { const p=JSON.parse(pmGet(key)||'null'); if(p&&Number.isFinite(p.x)&&Number.isFinite(p.y)) requestAnimationFrame(()=>pmSetPos(elm,p.x,p.y,key)); } catch(e){}
-}
-function pmDrag(elm,key) {
-  let st=null;
-  elm.addEventListener('pointerdown',e=>{
-    if(e.button!==undefined && e.button!==0)return;
-    // The floating postman itself is a button: do not mistake its root for a nested control.
-    const control=e.target.closest('a,input,textarea,select,[data-no-drag]');
-    if(control && control!==elm)return;
-    const r=elm.getBoundingClientRect();
-    st={id:e.pointerId,x:e.clientX,y:e.clientY,left:r.left,top:r.top,moved:false};
-    pmDragged=false; elm.classList.add('dragging');
-    if(e.cancelable)e.preventDefault();
-    try { elm.setPointerCapture(e.pointerId); } catch(_){}
-  });
-  elm.addEventListener('pointermove',e=>{
-    if(!st||st.id!==e.pointerId)return;
-    const dx=e.clientX-st.x,dy=e.clientY-st.y;
-    if(!st.moved && Math.hypot(dx,dy)>5)st.moved=true;
-    if(st.moved){
-      if(e.cancelable)e.preventDefault();
-      pmDragged=true;pmSetPos(elm,st.left+dx,st.top+dy,key);
-    }
-  },{passive:false});
-  const finish=e=>{
-    if(!st || (e && st.id!==e.pointerId))return;
-    const moved=st.moved;
-    if(moved){const r=elm.getBoundingClientRect();pmSetPos(elm,r.left,r.top,key);pmDragSuppressClick=true;setTimeout(()=>{pmDragSuppressClick=false;pmDragged=false;},280);}
-    st=null;elm.classList.remove('dragging');
-  };
-  elm.addEventListener('pointerup',finish); elm.addEventListener('pointercancel',finish); elm.addEventListener('lostpointercapture',finish);
-}
-pmDrag(pmEl,'pmIconPos'); pmDrag(pmBubble,'pmBubblePos');
-function pmReclamp(){[[pmEl,'pmIconPos'],[pmBubble,'pmBubblePos']].forEach(([e,k])=>{if(e.style.left)pmSetPos(e,e.getBoundingClientRect().left,e.getBoundingClientRect().top,k);});}
-window.addEventListener('resize',pmReclamp); if(window.visualViewport)window.visualViewport.addEventListener('resize',pmReclamp);
+const pmWrap = $('pmFloat'), pmEl = $('postman'), pmBubble = $('pmBubble'), pmText = $('pmText'), pmDot = $('pmDot'), pmTag = $('pmTag');
+let pmData = null, pmHideT = null, pmDockT = null, pmDragSuppressClick = false;
+const pmGet = k => { try { return localStorage.getItem(k); } catch(e) { return null; } };
+const pmSet = (k,v) => { try { localStorage.setItem(k,v); } catch(e) {} };
+function pmViewport(){ const vv=window.visualViewport; return {w:vv?vv.width:innerWidth,h:vv?vv.height:innerHeight,ox:vv?vv.offsetLeft:0,oy:vv?vv.offsetTop:0}; }
+function pmPosition(x,y,save=true){ const v=pmViewport(), r=pmWrap.getBoundingClientRect(), w=60,h=60; x=Math.max(v.ox,Math.min(v.ox+v.w-w,x)); y=Math.max(v.oy+8,Math.min(v.oy+v.h-h-8,y)); pmWrap.style.left=x+'px';pmWrap.style.top=y+'px';pmWrap.style.right='auto'; if(save)pmSet('pmFloatPos',JSON.stringify({x,y})); }
+function pmCancelDock(){ clearTimeout(pmDockT); pmWrap.classList.remove('docked-left','docked-right'); }
+function pmDock(){ const v=pmViewport(),r=pmWrap.getBoundingClientRect(),cx=r.left+r.width/2; pmWrap.classList.remove('docked-left','docked-right'); pmWrap.classList.add(cx<v.ox+v.w/2?'docked-left':'docked-right'); }
+function pmScheduleDock(){ clearTimeout(pmDockT); pmDockT=setTimeout(pmDock,3000); }
+function pmHide(){ clearTimeout(pmHideT); pmBubble.classList.remove('show'); pmScheduleDock(); }
+function pmShow(text,special){ clearTimeout(pmHideT);pmCancelDock();pmText.textContent=text;pmTag.hidden=!special;pmBubble.classList.add('show');pmHideT=setTimeout(pmHide,special?9000:4000); }
+async function pmFetch(){if(!sb)return null;try{const {data,error}=await sb.from('app_popup').select('body,active,updated_at').eq('id',1).maybeSingle();if(error)return null;pmData=data&&data.active&&data.body?data:null;}catch(e){pmData=null;}return pmData;}
+function pmIsNew(){return !!pmData&&pmGet('pmSeen')!==pmData.updated_at;}
+function pmPaint(){const n=pmIsNew();pmDot.hidden=!n;pmEl.classList.toggle('new',n);}
+async function pmOpen(auto){await pmFetch();if(pmData){pmShow(pmData.body,true);pmSet('pmSeen',pmData.updated_at);}else if(!auto||!pmBubble.classList.contains('show'))pmShow(PM_DEFAULT,false);pmPaint();}
+// Drag the wrapper, so the character and its message always travel together.
+let pmDragState=null;
+pmWrap.addEventListener('pointerdown',e=>{if(e.button!==undefined&&e.button!==0)return;if(e.target.closest('a,input,textarea,select,[data-no-drag]'))return;const r=pmWrap.getBoundingClientRect();pmCancelDock();pmDragState={id:e.pointerId,x:e.clientX,y:e.clientY,left:r.left,top:r.top,moved:false};pmWrap.classList.add('dragging');if(e.cancelable)e.preventDefault();try{pmWrap.setPointerCapture(e.pointerId);}catch(_){}},{passive:false});
+pmWrap.addEventListener('pointermove',e=>{if(!pmDragState||pmDragState.id!==e.pointerId)return;const dx=e.clientX-pmDragState.x,dy=e.clientY-pmDragState.y;if(!pmDragState.moved&&Math.hypot(dx,dy)>5)pmDragState.moved=true;if(pmDragState.moved){if(e.cancelable)e.preventDefault();pmPosition(pmDragState.left+dx,pmDragState.top+dy);}}, {passive:false});
+function pmDragEnd(e){if(!pmDragState||(e&&pmDragState.id!==e.pointerId))return;const moved=pmDragState.moved;pmDragState=null;pmWrap.classList.remove('dragging');if(moved){pmDragSuppressClick=true;setTimeout(()=>pmDragSuppressClick=false,350);pmScheduleDock();}}
+pmWrap.addEventListener('pointerup',pmDragEnd);pmWrap.addEventListener('pointercancel',pmDragEnd);pmWrap.addEventListener('lostpointercapture',pmDragEnd);
 pmEl.addEventListener('click',()=>{if(pmDragSuppressClick)return;if(pmBubble.classList.contains('show'))pmHide();else pmOpen(false);});
 pmBubble.addEventListener('click',()=>{if(pmDragSuppressClick)return;pmHide();});
-pmRestorePos(pmEl,'pmIconPos'); pmRestorePos(pmBubble,'pmBubblePos');
-(async () => {
-  await pmFetch();
-  pmOpen(true);
-  setInterval(async () => { await pmFetch(); pmPaint(); if (pmIsNew() && !pmBubble.classList.contains('show')) pmOpen(true); }, 60000);
-})();
+try{const p=JSON.parse(pmGet('pmFloatPos')||'null');if(p&&Number.isFinite(p.x)&&Number.isFinite(p.y))pmPosition(p.x,p.y,false);else{const v=pmViewport();pmPosition(v.ox+v.w-70,v.oy+110,false);}}catch(e){const v=pmViewport();pmPosition(v.ox+v.w-70,v.oy+110,false);}
+function pmReclamp(){const r=pmWrap.getBoundingClientRect();pmCancelDock();pmPosition(r.left,r.top);pmScheduleDock();}window.addEventListener('resize',pmReclamp);if(window.visualViewport)window.visualViewport.addEventListener('resize',pmReclamp);
+(async()=>{await pmFetch();pmOpen(true);setInterval(async()=>{await pmFetch();pmPaint();if(pmIsNew()&&!pmBubble.classList.contains('show'))pmOpen(true);},60000);})();
 
 </script>
 </body>
