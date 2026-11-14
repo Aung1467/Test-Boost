@@ -1041,6 +1041,337 @@ select.text option,select option{background:#15171d;color:#fff}
 .vip-banner:active{transform:scale(.985)}
 </style>
 
+<style>
+
+/* ================================================================
+   LFL DESIGN SYSTEM 2026 — refinement layer
+   Presentation-only overrides. Existing IDs, forms, events,
+   Supabase calls, database logic and workflows remain untouched.
+   ================================================================ */
+:root{
+  --ground:#090b12;
+  --sheet:#10131d;
+  --card:#141927;
+  --elev:#1b2232;
+  --ink:#f7f8fc;
+  --muted:#a5aec0;
+  --line:rgba(173,190,220,.15);
+  --soft:#20283a;
+  --gold:#e8c66a;
+  --pink:#f2d98d;
+  --cyan:#65d8df;
+  --ok:#55d6a0;
+  --err:#ff7587;
+  --r-sm:10px;
+  --r-md:14px;
+  --r-lg:18px;
+  --r-xl:24px;
+  --sh-card:0 12px 32px rgba(0,0,0,.22);
+  --sh-float:0 28px 80px rgba(0,0,0,.58);
+  --ring:0 0 0 3px rgba(101,216,223,.2);
+}
+html{background:var(--ground)!important;scroll-behavior:smooth}
+body{
+  background:
+    radial-gradient(ellipse at 12% -12%,rgba(83,110,190,.16),transparent 38%),
+    radial-gradient(ellipse at 90% 8%,rgba(232,198,106,.075),transparent 30%),
+    var(--ground)!important;
+  color:var(--ink)!important;
+  line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+::selection{background:rgba(101,216,223,.28);color:#fff}
+:focus-visible{outline:2px solid var(--cyan)!important;outline-offset:3px}
+button,input,textarea{font-family:inherit}
+button{ -webkit-tap-highlight-color:transparent }
+button:disabled{opacity:.55;cursor:not-allowed;transform:none!important}
+[hidden]{display:none!important}
+
+/* Main frame and top navigation */
+.screen{width:min(100% - 44px,1180px);max-width:1180px;margin-inline:auto}
+#appScreen{padding-bottom:48px}
+.sheet{padding:26px 0 56px}
+#appScreen>.sheet{padding-top:28px}
+.top{
+  min-height:76px;
+  padding:13px 18px;
+  margin:0 -18px;
+  border:1px solid rgba(173,190,220,.12);
+  border-top:0;
+  border-radius:0 0 18px 18px;
+  background:rgba(11,14,23,.86);
+  box-shadow:0 12px 34px rgba(0,0,0,.16);
+  backdrop-filter:blur(22px);
+  -webkit-backdrop-filter:blur(22px);
+}
+.top:before{color:var(--gold);font-size:12px;letter-spacing:.16em}
+.top-r{gap:9px;align-items:center}
+.who{min-width:0}
+.who:hover{opacity:.92}
+.pfp{flex:0 0 auto;border-color:rgba(232,198,106,.72);box-shadow:0 0 0 4px rgba(232,198,106,.08),0 0 24px rgba(232,198,106,.12)}
+.vip-pill{background:linear-gradient(135deg,#f8e6a8,#c69a3d);color:#211a0c;box-shadow:0 5px 16px rgba(232,198,106,.14)}
+.ghost{
+  min-height:42px;height:42px;
+  border:1px solid rgba(173,190,220,.18);
+  border-radius:12px;
+  background:linear-gradient(180deg,#1a2030,#141a27);
+  color:#f3f5fa;
+}
+.ghost:hover{border-color:rgba(101,216,223,.45);background:#202a3b}
+.ghost.mail{width:44px}
+.mail-badge{background:var(--gold);color:#18140b;box-shadow:0 0 0 3px rgba(232,198,106,.13)}
+
+/* Sign in / registration */
+#authScreen{width:min(100% - 32px,500px);padding:46px 0}
+.auth-top{position:relative;padding:22px 18px 28px}
+.auth-top .logo{
+  width:66px;height:66px;border-radius:21px;
+  background:linear-gradient(145deg,#29334a,#151b2a);
+  border:1px solid rgba(232,198,106,.55);
+  box-shadow:0 14px 38px rgba(0,0,0,.3),0 0 34px rgba(232,198,106,.09);
+}
+.auth-top h1{letter-spacing:-.045em}
+.auth-top .tag{font-size:13px;line-height:1.9;color:#aab4c8}
+#authScreen .sheet{
+  padding:26px;
+  border:1px solid rgba(173,190,220,.17);
+  border-radius:22px;
+  background:linear-gradient(155deg,rgba(25,32,49,.97),rgba(15,19,30,.98));
+  box-shadow:0 28px 76px rgba(0,0,0,.42);
+}
+.tabs{
+  padding:5px;gap:5px;margin-bottom:24px;
+  background:#0c111c;border:1px solid rgba(173,190,220,.13);
+  border-radius:14px;
+}
+.tab{border-radius:10px;color:#aab4c8}
+.tab.active,.tab[aria-selected="true"]{
+  background:linear-gradient(135deg,#f1d98f,#c59b48);
+  color:#20190c;
+  box-shadow:0 7px 20px rgba(232,198,106,.15);
+}
+.field{margin-bottom:19px;color:#e8edf7}
+.field>span,.field-label{color:#c7d0e1;font-size:12px;letter-spacing:.025em}
+.input-box,.text,textarea.text{
+  min-height:48px;padding:12px 14px;
+  border:1px solid rgba(173,190,220,.2);
+  border-radius:12px;background:#0c111b;color:#f7f8fc;
+}
+.input-box:focus-within,.text:focus,textarea.text:focus{
+  border-color:rgba(101,216,223,.72);box-shadow:var(--ring)
+}
+.input-box input{color:#fff}
+.input-box input::placeholder,.text::placeholder,textarea::placeholder{color:#748097}
+.btn-primary,.btn,.btn-gold,.crop-icon-btn{min-height:44px;border-radius:12px;font-weight:750}
+.btn-primary{
+  border:1px solid rgba(255,230,166,.5);
+  background:linear-gradient(135deg,#f3dc9c,#c99d48);
+  color:#21190b;
+  box-shadow:0 9px 24px rgba(201,157,72,.17);
+}
+.btn-primary:hover,.btn-gold:hover{filter:brightness(1.07);box-shadow:0 12px 28px rgba(201,157,72,.23)}
+.btn{background:#202a3b;border:1px solid rgba(173,190,220,.2);color:#edf2fb}
+.btn:hover{background:#29364b;border-color:rgba(101,216,223,.4)}
+.btn.alt{background:transparent;color:#b7c1d2}
+.btn-gold{background:linear-gradient(135deg,#f3dc9c,#c99d48);color:#21190b;border:1px solid #f1d78d}
+.msg{line-height:1.7}
+.note,.hint{color:#9da9bd;line-height:1.8}
+
+/* Wallet, VIP and main actions */
+.wallet{
+  position:relative;overflow:hidden;
+  padding:25px 28px;
+  border:1px solid rgba(232,198,106,.3);
+  border-radius:22px;
+  background:
+    radial-gradient(circle at 88% 8%,rgba(232,198,106,.14),transparent 34%),
+    linear-gradient(120deg,#20283a,#151d2d 58%,#252116);
+  box-shadow:0 18px 44px rgba(0,0,0,.25);
+}
+.wallet:after{
+  content:"";position:absolute;right:-58px;bottom:-100px;width:240px;height:240px;
+  border:1px solid rgba(232,198,106,.12);border-radius:50%;
+  box-shadow:0 0 0 22px rgba(232,198,106,.025),0 0 0 48px rgba(232,198,106,.02);
+  pointer-events:none;
+}
+.coin{background:linear-gradient(145deg,#f8e7ad,#c79a40);color:#21190b;box-shadow:0 8px 24px rgba(232,198,106,.18)}
+.wallet-text,.bal-label{color:#b4bfd1}
+.wallet strong,.bal{color:#fff}
+#credit{font-size:clamp(34px,5vw,50px);letter-spacing:-.045em}
+.vip-banner{
+  border:1px solid rgba(232,198,106,.32);border-radius:16px;
+  background:linear-gradient(105deg,rgba(72,57,27,.72),rgba(27,33,47,.94) 72%);
+  box-shadow:0 12px 30px rgba(0,0,0,.17);
+}
+.vbn-text,.vip-banner b{color:#f5dfa1}
+#appTabs{
+  gap:7px;padding:6px;margin:22px 0 26px;
+  background:#111827;border:1px solid rgba(173,190,220,.15);
+  border-radius:16px;
+}
+#appTabs .tab{min-height:46px}
+#appTabs .tab.active{background:linear-gradient(135deg,#f3dc9c,#c99d48);color:#21190b}
+.tiles{gap:17px;margin:18px 0}
+.tile{
+  min-height:152px;padding:23px;
+  border:1px solid rgba(173,190,220,.16);border-radius:18px;
+  background:linear-gradient(145deg,#1a2233,#131a28);
+  box-shadow:0 12px 30px rgba(0,0,0,.2);
+}
+.tile svg{fill:var(--cyan)}
+.tile small{color:#9eabc0;line-height:1.65}
+.tile:hover{transform:translateY(-3px);border-color:rgba(101,216,223,.38);box-shadow:0 18px 38px rgba(0,0,0,.28)}
+.task,.use-panel,.orders,.gift,.vip-panel,.preview,.player-wrap{
+  background:linear-gradient(150deg,#192235,#131a28);
+  border:1px solid rgba(173,190,220,.15);border-radius:18px;
+  box-shadow:0 12px 30px rgba(0,0,0,.2);
+}
+.task,.use-panel,.orders{padding:22px;margin:17px 0}
+.gift{padding:18px 20px}
+.gift-info b,.orders-head,.type{color:#f5f7fc}
+.gift-bar,.lk-bar{background:#2b3548}
+.gift-bar>div,.lk-fill{background:linear-gradient(90deg,#c89a43,#f4df9e)}
+.chip{
+  min-height:40px;padding:8px 14px;border-radius:11px;
+  background:#202a3b;border:1px solid rgba(173,190,220,.18);color:#dbe3f0;
+}
+.chip.active{background:rgba(101,216,223,.12);border-color:rgba(101,216,223,.6);color:#8de8ed}
+.cost-note,.cost{color:#f2d98d}
+.orders-head{padding-bottom:13px;border-bottom:1px solid var(--line)}
+.orders .ord-card,.orders .order-card{background:#1b2639;border:1px solid rgba(173,190,220,.14);border-radius:14px}
+
+/* Admin workspace — same existing tabs and actions, clearer hierarchy */
+#adminView{margin-top:12px}
+.adm-tabs{
+  display:flex;flex-wrap:wrap;gap:7px;padding:7px;
+  background:#111827;border:1px solid rgba(173,190,220,.15);
+  border-radius:16px;margin:17px 0 22px;
+}
+.adm-tabs button,.adm-tabs .tab{
+  min-height:42px;padding:9px 15px;border-radius:11px;
+  color:#aebbd0;font-weight:750;
+}
+.adm-tabs button.active,.adm-tabs .active{
+  background:linear-gradient(135deg,#f3dc9c,#c99d48);color:#21190b;
+}
+.adm-stats{gap:14px;margin:17px 0}
+.adm-stat{
+  min-height:104px;padding:20px;
+  background:linear-gradient(145deg,#202a3d,#151d2c);
+  border:1px solid rgba(173,190,220,.15);border-radius:16px;
+  box-shadow:0 10px 26px rgba(0,0,0,.18);
+}
+.adm-stat small{color:#a9b6ca}
+.adm-stat b{color:#f2d98d}
+.adm-search,.adm-ta,.mail-to,.mail-who{
+  background:#0c121e!important;border:1px solid rgba(173,190,220,.2)!important;
+  border-radius:13px!important;color:#f7f8fc!important;
+}
+.adm-search{padding:8px!important;gap:10px}
+.adm-pane{
+  padding:21px;margin:15px 0;
+  background:linear-gradient(150deg,#182235,#121a28);
+  border:1px solid rgba(173,190,220,.15);border-radius:18px;
+  box-shadow:0 12px 30px rgba(0,0,0,.2);
+}
+.adm-pane h2,.adm-pane h3{color:#f7f8fc}
+.adm-more{min-height:43px;border:1px solid rgba(173,190,220,.2);border-radius:11px;background:#202a3b;color:#fff}
+.mail-sug,.mail-picked{background:#202a3b;border:1px solid rgba(173,190,220,.18);border-radius:12px;color:#fff}
+.mail-to{padding:5px!important;gap:6px}
+.mail-to button{border-radius:10px}
+.mail-to button.on{background:linear-gradient(135deg,#f3dc9c,#c99d48);color:#21190b}
+.mg-box{border:1px solid rgba(232,198,106,.3);border-radius:14px;background:#222a3a;color:#f7f8fc}
+.mg-panel{border:1px solid rgba(173,190,220,.15);border-radius:14px;background:#131b2a;padding:14px}
+
+/* Dialogs and profile surfaces */
+.modal{padding:18px;background:rgba(3,6,12,.78);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.modal-box{
+  width:min(100%,590px);max-height:min(88dvh,850px);
+  padding:25px;background:linear-gradient(155deg,#1b2538,#111927);
+  border:1px solid rgba(173,190,220,.2);border-radius:21px;
+  color:#f7f8fc;box-shadow:0 30px 90px rgba(0,0,0,.6);
+}
+.modal-head{
+  background:#1b2538;border-bottom:1px solid rgba(173,190,220,.16);
+  color:#fff;padding-bottom:15px;margin-bottom:18px;
+}
+.modal-head button,.crop-close{min-width:38px;min-height:38px;border:1px solid rgba(173,190,220,.18);border-radius:11px;background:#263248;color:#fff}
+.vip-panel{padding:18px;background:linear-gradient(145deg,#29251b,#1a2130);border-color:rgba(232,198,106,.3)}
+.vip-panel-head,.vip-title{color:#f3dc9c}
+.vip-box .vip-hero{
+  padding:27px 18px;border-radius:17px;
+  background:radial-gradient(ellipse at top,rgba(232,198,106,.16),transparent 72%);
+  border:1px solid rgba(232,198,106,.22);
+}
+.vip-sub,.perk small{color:#aab6c9}
+
+/* Language control */
+.lfl-lang-switch{
+  display:inline-flex;align-items:center;justify-content:center;gap:5px;
+  min-height:36px;padding:0 12px;border-radius:999px;
+  border:1px solid rgba(101,216,223,.32);
+  background:rgba(101,216,223,.08);color:#baf4f4;
+  font-size:11px;font-weight:850;letter-spacing:.07em;
+  cursor:pointer;white-space:nowrap;
+}
+.lfl-lang-switch:hover{background:rgba(101,216,223,.15);border-color:rgba(101,216,223,.6)}
+.auth-top .lfl-lang-switch{position:absolute;top:0;right:0}
+.top .lfl-lang-switch{margin-left:2px}
+html[lang="en"] .lfl-lang-switch{color:#f3dc9c;border-color:rgba(232,198,106,.35);background:rgba(232,198,106,.08)}
+
+/* Scrollbars and responsive behavior */
+*{scrollbar-color:#46536a #101724;scrollbar-width:thin}
+@media(min-width:1000px){
+  .screen{width:min(100% - 64px,1180px)}
+  #authScreen{width:min(100% - 32px,500px)}
+  .tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:767px){
+  .screen{width:min(100% - 28px,680px)}
+  .sheet{padding:18px 0 38px}
+  .top{margin:0 -8px;padding:11px 10px;min-height:66px;border-radius:0 0 15px 15px;gap:8px}
+  .top:before{font-size:10px;letter-spacing:.1em}
+  .top-r{gap:7px}
+  .ghost{min-width:39px;min-height:40px;height:40px;padding:0 11px}
+  .ghost.mail{width:40px}
+  .who{gap:8px;font-size:13px}
+  .pfp{width:38px;height:38px}
+  .vip-pill{font-size:10px;padding:3px 8px}
+  .wallet{padding:20px;border-radius:18px}
+  #appTabs{gap:4px;padding:5px;margin:17px 0 20px}
+  #appTabs .tab{min-height:42px;padding:7px 5px;font-size:12px}
+  .tiles{gap:11px}
+  .tile{min-height:136px;padding:17px;border-radius:15px;gap:9px}
+  .tile b{font-size:14px}
+  .task,.use-panel,.orders{padding:17px;border-radius:15px}
+  .adm-pane{padding:16px;border-radius:15px}
+  .adm-tabs{overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none}
+  .adm-tabs>*{flex:0 0 auto}
+  .adm-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .modal{padding:10px}
+  .modal-box{padding:18px;border-radius:17px}
+  .modal-head{top:-18px}
+}
+@media(max-width:420px){
+  .screen{width:calc(100% - 22px)}
+  #authScreen{width:calc(100% - 24px);padding:34px 0}
+  #authScreen .sheet{padding:19px}
+  .auth-top{padding:20px 10px 24px}
+  .top:before{font-size:9px;letter-spacing:.07em}
+  .top-r{gap:5px}
+  .ghost{padding:0 9px}
+  .lfl-lang-switch{min-height:33px;padding:0 9px;font-size:10px}
+  .tiles{gap:9px}
+  .tile{min-height:126px;padding:14px}
+  .tile b{font-size:13px}
+  .adm-stat{padding:15px;min-height:90px}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+
+</style>
 </head>
 <body>
 <noscript><p style="padding:24px;text-align:center;color:#fff;font-family:system-ui,sans-serif">ဒီ website ကို သုံးဖို့ JavaScript ဖွင့်ထားရန် လိုအပ်ပါသည်။</p></noscript>
@@ -3303,5 +3634,117 @@ pmOff.addEventListener('click', async () => {
   if (await pmAdminSave('', false)) pmHide();
 });
 </script>
+
+<script>
+/* LFL language switch: Burmese is the default; English is optional.
+   Only known interface labels/placeholders are translated. User content,
+   usernames, messages and database values are never rewritten. */
+(function(){
+  if (window.__lflLanguageReady) return;
+  window.__lflLanguageReady = true;
+  const myToEn = {
+    "ဒီ website ကို သုံးဖို့ JavaScript ဖွင့်ထားရန် လိုအပ်ပါသည်။":"JavaScript is required to use this website.",
+    "Like တစ်ခုအတွက် Like တစ်ခု":"One Like for One Like",
+    "ကြည့်ရှုမှုတစ်ခုအတွက် ကြည့်ရှုမှု":"One View for One View",
+    "အကောင့်ဝင်မည်":"Sign in","အကောင့်သစ်ဖွင့်မည်":"Create account",
+    "နာမည်":"Username","စကားဝှက်":"Password","အသုံးပြုမည့်နာမည်":"Choose a username",
+    "စကားဝှက်ကို ပြန်ရိုက်ပါ":"Confirm password","အကောင့်ဖွင့်မည်":"Register",
+    "ထွက်ရန်":"Log out","ပိတ်":"Close","ပိတ်မည်":"Close",
+    "Admin ကို စာပို့ရန် (Error / အကြံပေးချက်)":"Message admin (issue / feedback)",
+    "Admin ဆီ ပို့မည်":"Send to admin","ရရှိထားသော စာများ":"Received messages",
+    "ပုံတင်မည်":"Upload photo","ပုံဖယ်မည်":"Remove photo",
+    "ဘောင်အရောင် (စိတ်ကြိုက်ရွေးပါ)":"Border color (choose one)",
+    "VIP သီးသန့် ဘောင်":"VIP-only border","VIP ဝင်ရန်":"Join VIP",
+    "သိမ်းမည်":"Save","Credit ပိုရ၊ ဘောင်ကြီး ဆန်းဆန်းနဲ့ ထင်ရှားပါစေ":"Earn more credits and stand out with a premium border",
+    "ဝင်ဝင်ချင်း Credit 1,000":"1,000 starter credits",
+    "VIP လက်ဆောင်ကို ယူလိုက်တာနဲ့ ချက်ချင်း ရပါမည်":"Receive instantly when you claim the VIP gift",
+    "နေ့စဉ် Credit 300":"300 daily credits",
+    "တစ်လတိတိ (၃၀ ရက်) — တစ်ရက် တစ်ကြိမ်":"For 30 days — claim once per day",
+    "VIP သီးသန့် Premium Border":"Exclusive VIP premium border",
+    "သင့်ရဲ့ Credit":"Your credits","ဝင်ဝင်ချင်း Credit 1,000 + နေ့စဉ် 300":"1,000 starter credits + 300 daily",
+    "Credit ယူရန်":"Earn credits","Credit သုံးရန်":"Spend credits",
+    "လက်ဆောင်ပုံး":"Gift box","TikTok ကြည့်ရန်":"Watch TikTok","TikTok Like ပေးရန်":"Like TikTok",
+    "အပေါ်က တစ်ခုကို ရွေးပါ":"Choose one above","ရမည့် Credit":"Credits earned",
+    "Credit ရယူမည်":"Claim credits","ကိုယ့် Video အတွက်":"For your video",
+    "TikTok ကြည့်ရှုမှု":"TikTok views","သင့်ရဲ့ TikTok Video Link":"Your TikTok video link",
+    "ကြည့်ရှုမည့် ကြာချိန်":"Watch duration","6 စက္ကန့်":"6 seconds",
+    "30 စက္ကန့်":"30 seconds","1 မိနစ်":"1 minute",
+    "အသုံးပြုမယ့် Credit ပမာဏ":"Credits to spend",
+    "သုံးမည့် Credit များလေ ပိုမြန်လေ ဖြစ်သည်":"More credits can help your order complete faster",
+    "လိုချင်တဲ့ Like အရေအတွက်":"Number of likes",
+    "Video မှန်/မမှန် စစ်ကြည့်ပါ (Play နှိပ်ရင် ကြာချိန်ကိုပါ မှတ်ထားမည်)":"Verify the video. Press Play to record the watch duration.",
+    "ကုန်ကျမည့် Credit":"Credits required","မှာယူမည်":"Place order",
+    "မှတ်တမ်း":"History","📮 စာပို့သမား":"📮 Mailbox",
+    "စာပို့":"Messages","စာများ":"Messages","User":"Users","Credit":"Credits",
+    "ရှာ":"Search","User စုစုပေါင်း":"Total users","Credit စုစုပေါင်း":"Total credits",
+    "နောက်ထပ်ကြည့်မည်":"Load more","ဘယ်သူ့ဆီ ပို့မလဲ":"Send to",
+    "👥 User အားလုံး":"👥 All users","👤 User တစ်ယောက်":"👤 One user",
+    "Credit လက်ဆောင် ထည့်မည်":"Add credit gift",
+    "နှိပ်ပြီး ပမာဏ ထည့်ပါ (မထည့်လည်း ရ)":"Tap to enter an amount (optional)",
+    "လက်ဆောင် မပေးတော့ပါ":"Remove gift","User အားလုံးသို့ ပို့မည်":"Send to all users",
+    "PopUp Sent":"Send popup","User နာမည်":"Username",
+    "သင့်ရဲ့ TikTok Video Link":"Your TikTok video link"
+  };
+  const enToMy = Object.fromEntries(Object.entries(myToEn).map(([my,en])=>[en,my]));
+  const attrNames = ["placeholder","aria-label","title"];
+  function translateNode(node, lang){
+    const map = lang === "en" ? myToEn : enToMy;
+    if (node.nodeType === Node.TEXT_NODE) {
+      const raw = node.nodeValue || "", trimmed = raw.trim();
+      if (map[trimmed]) node.nodeValue = raw.replace(trimmed, map[trimmed]);
+      return;
+    }
+    if (node.nodeType !== Node.ELEMENT_NODE) return;
+    if (/^(SCRIPT|STYLE|TEXTAREA|NOSCRIPT)$/i.test(node.tagName)) return;
+    attrNames.forEach(a=>{
+      const v=node.getAttribute(a);
+      if(v && map[v]) node.setAttribute(a,map[v]);
+    });
+    node.childNodes.forEach(child=>translateNode(child,lang));
+  }
+  function applyLanguage(lang){
+    lang = lang === "en" ? "en" : "my";
+    document.documentElement.lang = lang;
+    document.documentElement.setAttribute("data-language",lang);
+    translateNode(document.body,lang);
+    document.querySelectorAll("[data-lfl-lang-toggle]").forEach(btn=>{
+      btn.textContent = lang === "my" ? "EN  |  မြန်မာ" : "မြန်မာ  |  EN";
+      btn.setAttribute("aria-label",lang === "my" ? "Switch to English" : "မြန်မာဘာသာသို့ ပြောင်းရန်");
+      btn.setAttribute("aria-pressed",String(lang === "en"));
+    });
+    try{localStorage.setItem("lfl_language",lang)}catch(e){}
+  }
+  function addToggle(parent, where){
+    if(!parent || parent.querySelector("[data-lfl-lang-toggle]")) return;
+    const b=document.createElement("button");
+    b.type="button";b.className="lfl-lang-switch";b.dataset.lflLangToggle="";
+    b.textContent="EN  |  မြန်မာ";
+    b.addEventListener("click",()=>{
+      const current=document.documentElement.getAttribute("data-language") || "my";
+      applyLanguage(current==="my"?"en":"my");
+    });
+    if(where==="auth") parent.appendChild(b); else parent.appendChild(b);
+  }
+  function init(){
+    addToggle(document.querySelector(".auth-top"),"auth");
+    addToggle(document.querySelector("#appScreen .top"),"top");
+    let saved="my";try{saved=localStorage.getItem("lfl_language")||"my"}catch(e){}
+    applyLanguage(saved);
+    const observer=new MutationObserver(records=>{
+      const lang=document.documentElement.getAttribute("data-language")||"my";
+      records.forEach(rec=>{
+        rec.addedNodes.forEach(n=>{
+          if(n.nodeType===Node.TEXT_NODE) translateNode(n,lang);
+          else if(n.nodeType===Node.ELEMENT_NODE) translateNode(n,lang);
+        });
+      });
+    });
+    observer.observe(document.body,{childList:true,subtree:true});
+  }
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",init,{once:true});
+  else init();
+})();
+</script>
+
 </body>
 </html>
