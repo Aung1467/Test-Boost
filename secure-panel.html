@@ -1013,6 +1013,10 @@ select.text option,select option{background:#15171d;color:#fff}
 
 /* Crop: Slider နဲ့ ခလုတ်တွေ Stage ပြည့်အကျယ်နဲ့ ညီအောင် */
 .crop-zoom,.crop-actions{width:min(100%,360px)}
+
+/* Wallet card နဲ့ VIP banner: ဘေးအနားစပ် မညီတာ + ကြားထဲ နေရာကြီး ကွာနေတာ ပြင် */
+.wallet{margin:8px 0 16px}
+.vip-banner{margin:0 0 16px}
 </style>
 
 </head>
@@ -3216,12 +3220,23 @@ let pmData = null, pmHideT = null, pmDockT = null, pmDragSuppressClick = false;
 const pmGet = k => { try { return localStorage.getItem(k); } catch(e) { return null; } };
 const pmSet = (k,v) => { try { localStorage.setItem(k,v); } catch(e) {} };
 function pmViewport(){ const vv=window.visualViewport; return {w:vv?vv.width:innerWidth,h:vv?vv.height:innerHeight,ox:vv?vv.offsetLeft:0,oy:vv?vv.offsetTop:0}; }
-function pmPosition(x,y,save=true){ const v=pmViewport(), r=pmWrap.getBoundingClientRect(), w=60,h=60; x=Math.max(v.ox,Math.min(v.ox+v.w-w,x)); y=Math.max(v.oy+8,Math.min(v.oy+v.h-h-8,y)); pmWrap.style.left=x+'px';pmWrap.style.top=y+'px';pmWrap.style.right='auto'; if(save)pmSet('pmFloatPos',JSON.stringify({x,y})); }
+function pmPosition(x,y,save=true){ const v=pmViewport(), r=pmWrap.getBoundingClientRect(), w=60,h=60; x=Math.max(v.ox,Math.min(v.ox+v.w-w,x)); y=Math.max(v.oy+8,Math.min(v.oy+v.h-h-8,y)); pmWrap.style.left=x+'px';pmWrap.style.top=y+'px';pmWrap.style.right='auto'; if(save)pmSet('pmFloatPos',JSON.stringify({x,y})); if(pmBubble.classList.contains('show'))pmAlign(); }
 function pmCancelDock(){ clearTimeout(pmDockT); pmWrap.classList.remove('docked-left','docked-right'); }
 function pmDock(){ const v=pmViewport(),r=pmWrap.getBoundingClientRect(),cx=r.left+r.width/2; pmWrap.classList.remove('docked-left','docked-right'); pmWrap.classList.add(cx<v.ox+v.w/2?'docked-left':'docked-right'); }
 function pmScheduleDock(){ clearTimeout(pmDockT); pmDockT=setTimeout(pmDock,3000); }
 function pmHide(){ clearTimeout(pmHideT); pmBubble.classList.remove('show'); pmScheduleDock(); }
-function pmShow(text,special){ clearTimeout(pmHideT);pmCancelDock();pmText.textContent=text;pmTag.hidden=!special;pmBubble.classList.add('show');pmHideT=setTimeout(pmHide,special?9000:4000); }
+function pmAlign(){
+  /* Bubble ကို ဖန်သားပြင်အပြင် မထွက်အောင် ညှပ်ထားမယ် (Postman ကို ဘယ်နေရာ ဆွဲထားထား) */
+  const v=pmViewport(), x=parseFloat(pmWrap.style.left), y=parseFloat(pmWrap.style.top);
+  const px=Number.isFinite(x)?x:pmWrap.getBoundingClientRect().left;
+  const py=Number.isFinite(y)?y:pmWrap.getBoundingClientRect().top;
+  const bw=Math.min(300,v.w-24);
+  let L=px+60-bw; L=Math.max(v.ox+12,Math.min(v.ox+v.w-bw-12,L));
+  pmBubble.style.right='auto'; pmBubble.style.left=(L-px)+'px';
+  if(py-v.oy<150){pmBubble.style.bottom='auto';pmBubble.style.top='64px';pmBubble.style.transformOrigin='top right';}
+  else{pmBubble.style.bottom='';pmBubble.style.top='';pmBubble.style.transformOrigin='';}
+}
+function pmShow(text,special){ clearTimeout(pmHideT);pmCancelDock();pmText.textContent=text;pmAlign();pmTag.hidden=!special;pmBubble.classList.add('show');pmHideT=setTimeout(pmHide,special?9000:4000); }
 async function pmFetch(){if(!sb)return null;try{const {data,error}=await sb.from('app_popup').select('body,active,updated_at').eq('id',1).maybeSingle();if(error)return null;pmData=data&&data.active&&data.body?data:null;}catch(e){pmData=null;}return pmData;}
 function pmIsNew(){return !!pmData&&pmGet('pmSeen')!==pmData.updated_at;}
 function pmPaint(){const n=pmIsNew();pmDot.hidden=!n;pmEl.classList.toggle('new',n);}
