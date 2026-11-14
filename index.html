@@ -983,6 +983,39 @@ button:active{transform:translateY(1px)}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 
 </style>
+
+<style id="lfl-fixes">
+/* ===== LFL fixes: redesign အပြီး စာမမြင်ရတာတွေ + Avatar ===== */
+
+/* Avatar: --s အရွယ်ကို ပြန်သုံး၊ User ရွေးတဲ့ ဘောင်အရောင် မထင်ရှားတာ ပြင်၊ စာလုံးအစ ပြန်မြင်ရအောင် */
+.pfp{width:var(--s);height:var(--s);border:0;background:transparent;box-shadow:none;color:#17143C}
+.top .pfp,.who .pfp{--s:42px}
+.pfp-xl{--s:92px}
+.pfp-face{color:#17143C}
+
+/* လက်ဆောင် Ready အခြေအနေ: Light cream + အဖြူစာ ဖြစ်နေတာကို Dark gold ပြောင်း */
+.gift.ready,.mail-gift.has{background:linear-gradient(135deg,#2e2713,#1c1a17);border-color:var(--gold);color:#fff}
+.gift.ready .gift-info small,.mail-gift.has small{color:#d9d3bd}
+
+/* Admin: မက်ဆေ့ချ်/လက်ဆောင် Form အကွက်တွေ (အဖြူပေါ် အဖြူစာ ဖြစ်နေတာ) */
+.adm-compose .text,.mg-panel .text,.adm-compose textarea,.mg-panel textarea{background:#0d0f14;color:#fff;border:1px solid #353943}
+select.text{
+  background:#0d0f14 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23F5D77A' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E") no-repeat right 8px center / 22px;
+  color:#fff;border:1px solid #353943;
+}
+select.text option,select option{background:#15171d;color:#fff}
+.mg-chips button{background:#20232b;color:#fff;border:1px solid #3a3d47}
+.mg-chips button:active{background:var(--gold);color:#17130a}
+.mail-picked button{background:#24262e;color:#fff;border:1px solid var(--line)}
+
+/* Status Badge: --ok အရောင်ပျော့သွားလို့ Light mint ပေါ် မဖတ်ရတာ ပြင် */
+.st-open{background:rgba(76,203,145,.16);color:var(--ok)}
+.st-warn{background:rgba(255,201,51,.16);color:#F5D77A}
+
+/* Crop: Slider နဲ့ ခလုတ်တွေ Stage ပြည့်အကျယ်နဲ့ ညီအောင် */
+.crop-zoom,.crop-actions{width:min(100%,360px)}
+</style>
+
 </head>
 <body>
 <noscript><p style="padding:24px;text-align:center;color:#fff;font-family:system-ui,sans-serif">ဒီ website ကို သုံးဖို့ JavaScript ဖွင့်ထားရန် လိုအပ်ပါသည်။</p></noscript>
