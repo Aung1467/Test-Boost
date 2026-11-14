@@ -1018,6 +1018,28 @@ select.text option,select option{background:#15171d;color:#fff}
 /* Wallet card နဲ့ VIP banner: ဘေးအနားစပ် မညီတာ + ကြားထဲ နေရာကြီး ကွာနေတာ ပြင် */
 .wallet{margin:8px 0 16px}
 .vip-banner{margin:0 0 16px}
+
+/* ===== ကြည့်ကောင်းအောင် ထပ်ပြင်ချက် ===== */
+/* Bubble မြားလေး (▾) ကို Postman ကို အမြဲ ညွှန်စေ */
+.pm-float .pm-bubble::before{left:var(--tx,calc(100% - 32px));right:auto}
+.pm-float .pm-bubble.below::before{top:-8px;bottom:auto;transform:rotate(225deg)}
+.pm-float .pm-bubble{border-radius:16px;line-height:1.6}
+
+/* ဖုန်းမျက်နှာပြင် ကျဉ်းရင် Top bar ကျပ်တာ ပြေစေ: Brand စာ ဖျောက်၊ နာမည် အပြည့်ပြ */
+@media(max-width:520px){
+  .top:before{display:none}
+  .top{min-height:60px;padding:8px 0}
+  .who{flex:1 1 auto;min-width:0}
+  .who #who{flex:0 1 auto;min-width:0;max-width:100%}
+  .vip-pill{padding:3px 8px;font-size:10px;flex:none}
+  .top-r{flex:none}
+}
+
+/* Tile / Card အနည်းငယ် ပိုသပ်ရပ် */
+.tile{transition:transform .18s var(--ease),border-color .18s var(--ease),box-shadow .18s var(--ease)}
+.wallet .bal{letter-spacing:-.02em;text-shadow:0 2px 18px rgba(212,175,55,.18)}
+.vip-banner{transition:transform .15s var(--ease),box-shadow .15s var(--ease)}
+.vip-banner:active{transform:scale(.985)}
 </style>
 
 </head>
@@ -1362,7 +1384,7 @@ select.text option,select option{background:#15171d;color:#fff}
   window.addEventListener('unhandledrejection', function (e) { show('PROMISE: ' + ((e.reason && e.reason.message) || e.reason)); });
   document.addEventListener('DOMContentLoaded', function () {
     var s = document.createElement('div');
-    s.textContent = 'build version 1.0.0';
+    s.textContent = 'build version 1.0.0'; s.hidden = true;
     s.style.cssText = 'position:fixed;left:6px;bottom:4px;z-index:99998;font:10px monospace;color:#999;opacity:.6;pointer-events:none;';
     document.body.appendChild(s);
   });
@@ -2739,8 +2761,11 @@ function pmAlign(){
   const bw=Math.min(300,v.w-24);
   let L=px+60-bw; L=Math.max(v.ox+12,Math.min(v.ox+v.w-bw-12,L));
   pmBubble.style.right='auto'; pmBubble.style.left=(L-px)+'px';
-  if(py-v.oy<150){pmBubble.style.bottom='auto';pmBubble.style.top='64px';pmBubble.style.transformOrigin='top right';}
-  else{pmBubble.style.bottom='';pmBubble.style.top='';pmBubble.style.transformOrigin='';}
+  const tx=Math.max(14,Math.min(bw-28,(px+30)-L-7)); pmBubble.style.setProperty('--tx',tx+'px');
+  const below=py-v.oy<150;
+  pmBubble.classList.toggle('below',below);
+  if(below){pmBubble.style.bottom='auto';pmBubble.style.top='64px';pmBubble.style.transformOrigin='top '+(tx>bw/2?'right':'left');}
+  else{pmBubble.style.bottom='';pmBubble.style.top='';pmBubble.style.transformOrigin='bottom '+(tx>bw/2?'right':'left');}
 }
 function pmShow(text,special){ clearTimeout(pmHideT);pmCancelDock();pmText.textContent=text;pmAlign();pmTag.hidden=!special;pmBubble.classList.add('show');pmHideT=setTimeout(pmHide,special?9000:4000); }
 async function pmFetch(){if(!sb)return null;try{const {data,error}=await sb.from('app_popup').select('body,active,updated_at').eq('id',1).maybeSingle();if(error)return null;pmData=data&&data.active&&data.body?data:null;}catch(e){pmData=null;}return pmData;}
